@@ -5,7 +5,7 @@
 \title{Count of concept relations using URI/ID via SPARQL.}
 \usage{
 agCount_ID_Num(
-  ID_Name,
+  Entity_ID,
   EndPoint,
   FROM = "",
   Property,
@@ -15,7 +15,7 @@ agCount_ID_Num(
 )
 }
 \arguments{
-\item{ID_Name}{a character vector corresponing to the entity ID.}
+\item{Entity_ID}{a character vector corresponing to the entity ID.}
 
 \item{EndPoint}{a string of SPARQL endpoint. ex. http://....}
 
@@ -51,7 +51,7 @@ print(wikidataClassProperty)
 
 #run
 agCount_ID_Num(
-  ID_Name=ID,
+  Entity_ID=ID,
   EndPoint=KzLabEndPoint$EndPoint,
   FROM=KzLabEndPoint$FROM,
   Property=wikidataClassProperty)

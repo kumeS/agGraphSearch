@@ -4,13 +4,13 @@
 \alias{agCount_Label_Num_Wikidata_P279_P31}
 \title{Count of labels and class relations for wikidata local endpoint at OECU via SPARQL.}
 \usage{
-agCount_Label_Num_Wikidata_P279_P31(EntityName, Message = FALSE)
+agCount_Label_Num_Wikidata_P279_P31(Entity_Name, Message = FALSE)
 }
 \arguments{
-\item{EntityName}{a character vector. The string was
+\item{Entity_Name}{a character vector. The string was
 automatically judged to be Japanese (@ja) or English (@en)}
 
-\item{Message}{logical; perform an output of EntityName or not.}
+\item{Message}{logical; perform an output of Entity_Name or not.}
 }
 \value{
 data.frame
@@ -31,7 +31,7 @@ print(wikidataClassProperty)
 
 #run
 agCount_Label_Num_Wikidata_P279_P31(
-  EntityName=Label,
+  Entity_Name=Label,
   Message=TRUE
   )
 

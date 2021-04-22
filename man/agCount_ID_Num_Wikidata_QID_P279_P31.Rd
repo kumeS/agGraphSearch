@@ -4,10 +4,10 @@
 \alias{agCount_ID_Num_Wikidata_QID_P279_P31}
 \title{Count of concept relations in wikidata using URI/ID via SPARQL.}
 \usage{
-agCount_ID_Num_Wikidata_QID_P279_P31(ID_Name, Message = FALSE)
+agCount_ID_Num_Wikidata_QID_P279_P31(Entity_ID, Message = FALSE)
 }
 \arguments{
-\item{ID_Name}{a character vector corresponing to the entity ID.}
+\item{Entity_ID}{a character vector corresponing to the entity ID.}
 
 \item{Message}{logical; perform an output of EntityName or not.}
 }
@@ -26,7 +26,7 @@ and instanceOf (wdt:P31) in wikidata RDF data using an entity URI via SPARQL.
 ID <- "wd:Q81163"
 
 agCount_ID_Num_Wikidata_QID_P279_P31(
-  ID_Name=ID,
+  Entity_ID=ID,
   Message=TRUE)
 
 #Parallel processing of 4 cores using furrr package

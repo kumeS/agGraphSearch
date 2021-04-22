@@ -5,7 +5,7 @@
 \title{Count of labels and concept relations using labels via SPARQL.}
 \usage{
 agCount_Label_Num(
-  EntityName,
+  Entity_Name,
   EndPoint,
   FROM = "",
   Property,
@@ -16,7 +16,7 @@ agCount_Label_Num(
 )
 }
 \arguments{
-\item{EntityName}{a character vector. The string was
+\item{Entity_Name}{a character vector. The string was
 automatically judged to be Japanese (@ja) or English (@en)}
 
 \item{EndPoint}{a string of SPARQL endpoint. ex. http://....}
@@ -27,7 +27,7 @@ automatically judged to be Japanese (@ja) or English (@en)}
 The first element of list contain the first property ID.
 The second element of list contain the second property ID.}
 
-\item{Message}{logical; perform an output of EntityName or not.}
+\item{Message}{logical; perform an output of Entity_Name or not.}
 
 \item{FilterRegex}{do not use this option.}
 
@@ -55,7 +55,7 @@ print(wikidataClassProperty)
 
 #run
 agCount_Label_Num(
-  EntityName=Label,
+  Entity_Name=Label,
   EndPoint=KzLabEndPoint$EndPoint,
   FROM=KzLabEndPoint$FROM,
   Property=wikidataClassProperty)

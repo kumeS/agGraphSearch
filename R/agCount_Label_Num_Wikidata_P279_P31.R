@@ -1,7 +1,7 @@
 ##' @title Count of labels and class relations for wikidata local endpoint at OECU via SPARQL.
-##' @param EntityName a character vector. The string was
+##' @param Entity_Name a character vector. The string was
 ##' automatically judged to be Japanese (@ja) or English (@en)
-##' @param Message logical; perform an output of EntityName or not.
+##' @param Message logical; perform an output of Entity_Name or not.
 ##' @description
 ##' For parameters of EndPoint and graph id, the variable of KzLabEndPoint is used.
 ##' For parameters of properties, the variable of wikidataClassProperty is used.
@@ -20,7 +20,7 @@
 ##'
 ##' #run
 ##' agCount_Label_Num_Wikidata_P279_P31(
-##'   EntityName=Label,
+##'   Entity_Name=Label,
 ##'   Message=TRUE
 ##'   )
 ##'
@@ -37,12 +37,12 @@
 ##'
 ##' }
 
-agCount_Label_Num_Wikidata_P279_P31 <- function(EntityName,
+agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name,
                                                 Message=FALSE){
 
 #Parameter set
 #Labels
-LABEL <- EntityName
+LABEL <- Entity_Name
 
 #EndPoint
 EndPoint <- KzLabEndPoint$EndPoint
@@ -60,7 +60,7 @@ Dir="R01_Results"
 if(!grepl("^http", EndPoint)){return(message("No EndPoint URL"))}
 if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}
 
-SPA <- agCount_Label_Num(EntityName=LABEL,
+SPA <- agCount_Label_Num(Entity_Name=LABEL,
                          EndPoint=EndPoint,
                          FROM = FROM,
                          Property=Property,

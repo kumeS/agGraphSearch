@@ -1,6 +1,6 @@
 ##' @title Count of concept relations using URI/ID via SPARQL.
 ##'
-##' @param ID_Name a character vector corresponing to the entity ID.
+##' @param Entity_ID a character vector corresponing to the entity ID.
 ##' @param EndPoint a string of SPARQL endpoint. ex. http://....
 ##' @param FROM a string of graph URI in the endpoint. The default is blank ("").
 ##' @param Property a list of two character vectors.
@@ -29,21 +29,21 @@
 ##'
 ##' #run
 ##' agCount_ID_Num(
-##'   ID_Name=ID,
+##'   Entity_ID=ID,
 ##'   EndPoint=KzLabEndPoint$EndPoint,
 ##'   FROM=KzLabEndPoint$FROM,
 ##'   Property=wikidataClassProperty)
 ##'
 ##' }
 
-agCount_ID_Num <- function(ID_Name,
+agCount_ID_Num <- function(Entity_ID,
                            EndPoint,
                            FROM ="",
                            Property,
                            Message=TRUE,
                            DirSave=FALSE,
                            Dir="R01_Results"){
-ID <- ID_Name
+ID <- Entity_ID
 
 Prefix <- agGraphSearch::PREFIX
 
@@ -65,7 +65,7 @@ FROM, ' ',
 'WHERE {
 ?childClass ', Property[[1]], ' ', ID, '.
 }', sep="")
-A <- try(SPA04A <- SPARQL(url=EndPoint, query=paste(Prefix, Query04A))$results, silent = T)
+A <- try(SPA04A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query04A))$results, silent = T)
 if(class(A) == "try-error"){SPA04A <- 0}else{}
 
 Query05A <-paste('
@@ -74,7 +74,7 @@ FROM, ' ',
 'WHERE {
 ?instance ', Property[[2]], ' ', ID, '.
 }', sep="")
-A <- try(SPA05A <- SPARQL(url=EndPoint, query=paste(Prefix, Query05A))$results, silent = T)
+A <- try(SPA05A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query05A))$results, silent = T)
 if(class(A) == "try-error"){SPA05A <- 0}else{}
 
 Query06A <-paste('
@@ -83,7 +83,7 @@ FROM, ' ',
 'WHERE {',
 ID, ' ', Property[[2]], ' ?instance.
 }', sep="")
-A <- try(SPA06A <- SPARQL(url=EndPoint, query=paste(Prefix, Query06A))$results, silent = T)
+A <- try(SPA06A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query06A))$results, silent = T)
 if(class(A) == "try-error"){SPA06A <- 0}else{}
 
 #Property[[1]]

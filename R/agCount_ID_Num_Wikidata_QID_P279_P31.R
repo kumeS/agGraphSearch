@@ -1,6 +1,6 @@
 ##' @title Count of concept relations in wikidata using URI/ID via SPARQL.
 ##'
-##' @param ID_Name a character vector corresponing to the entity ID.
+##' @param Entity_ID a character vector corresponing to the entity ID.
 ##' @param Message logical; perform an output of EntityName or not.
 ##'
 ##' @description this function count of concept relations of subClassOf (wdt:P279)
@@ -17,7 +17,7 @@
 ##' ID <- "wd:Q81163"
 ##'
 ##' agCount_ID_Num_Wikidata_QID_P279_P31(
-##'   ID_Name=ID,
+##'   Entity_ID=ID,
 ##'   Message=TRUE)
 ##'
 ##' #Parallel processing of 4 cores using furrr package
@@ -32,12 +32,12 @@
 ##'
 ##' }
 
-agCount_ID_Num_Wikidata_QID_P279_P31 <- function(ID_Name,
+agCount_ID_Num_Wikidata_QID_P279_P31 <- function(Entity_ID,
                                                  Message=FALSE){
 
 #Parameter set
 #Labels
-ID <- ID_Name
+ID <- Entity_ID
 
 #EndPoint
 EndPoint <- KzLabEndPoint$EndPoint
@@ -54,7 +54,7 @@ Dir="R01_Results"
 if(!grepl("^http", EndPoint)){return(message("No EndPoint URL"))}
 if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}
 
-SPA <- agCount_ID_Num(ID_Name=ID,
+SPA <- agCount_ID_Num(Entity_ID=ID,
                       EndPoint=EndPoint,
                       FROM=FROM,
                       Property=Property,
