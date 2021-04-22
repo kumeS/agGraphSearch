@@ -4,7 +4,7 @@
 \alias{agCount_Label_Num_Wikidata_P279_P31}
 \title{Count of labels and class relations for wikidata local endpoint at OECU via SPARQL.}
 \usage{
-agCount_Label_Num_Wikidata_P279_P31(EntityName, Message = TRUE)
+agCount_Label_Num_Wikidata_P279_P31(EntityName, Message = FALSE)
 }
 \arguments{
 \item{EntityName}{a character vector. The string was
@@ -32,8 +32,20 @@ print(wikidataClassProperty)
 #run
 agCount_Label_Num_Wikidata_P279_P31(
   EntityName=Label,
-  Message=FALSE
+  Message=TRUE
   )
+
+##' #Parallel processing of 4 cores using furrr package
+
+library(furrr)
+plan(multisession(workers = 4))
+#plan()
+
+#Run multisession
+lab <- c("polymer", "biopolymer", "pterophyta", "calcium")
+
+future_map(as.character(unlist(lab)), agCount_Label_Num_Wikidata_P279_P31, .progress = TRUE)
+
 }
 }
 \author{

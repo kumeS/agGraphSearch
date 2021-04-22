@@ -7,7 +7,7 @@
 ##' For parameters of properties, the variable of wikidataClassProperty is used.
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import franc SPARQL readr agGraphSearch
+##' @import franc SPARQL readr
 ##' @export agCount_Label_Num_Wikidata_P279_P31
 ##' @examples \dontrun{
 ##' #parameters
@@ -21,15 +21,24 @@
 ##' #run
 ##' agCount_Label_Num_Wikidata_P279_P31(
 ##'   EntityName=Label,
-##'   Message=FALSE
+##'   Message=TRUE
 ##'   )
+##'
+##' ##' #Parallel processing of 4 cores using furrr package
+##'
+##' library(furrr)
+##' plan(multisession(workers = 4))
+##' #plan()
+##'
+##' #Run multisession
+##' lab <- c("polymer", "biopolymer", "pterophyta", "calcium")
+##'
+##' future_map(as.character(unlist(lab)), agCount_Label_Num_Wikidata_P279_P31, .progress = TRUE)
+##'
 ##' }
 
-######################################################
-#agCount_Label_Num
-######################################################
 agCount_Label_Num_Wikidata_P279_P31 <- function(EntityName,
-                                                Message=TRUE){
+                                                Message=FALSE){
 
 #Parameter set
 #Labels
@@ -60,6 +69,7 @@ SPA <- agCount_Label_Num(EntityName=LABEL,
                          DirSave=FALSE,
                          Dir="")
 
+#change the colnames
 colnames(SPA) <- c("LABEL",
                    "Hit_Label",
                    "Hit_ALL",
@@ -71,16 +81,16 @@ colnames(SPA) <- c("LABEL",
                    "Hit_subClassOf_ChildClass",
                    "Hit_InstanceOf_ParentClass",
                    "Hit_InstanceOf_ChildClass",
-                   "Count_As_Label",
-                   "Count_As_AltLabel",
+                   "Count_Of_Label",
+                   "Count_Of_AltLabel",
                    "Count_Of_subClassOf_ParentClass_Label",
                    "Count_Of_subClassOf_ParentClass_altLabel",
                    "Count_Of_subClassOf_ChildClass_Label",
                    "Count_Of_subClassOf_ChildClass_altLabel",
-                   "Count_InstanceOf_ParentClass_Label",
-                   "Count_InstanceOf_ParentClass_altLabel",
-                   "Count_InstanceOf_ChildClass_Label",
-                   "Count_InstanceOf_ChildClass_altLabel")
+                   "Count_Of_InstanceOf_ParentClass_Label",
+                   "Count_Of_InstanceOf_ParentClass_altLabel",
+                   "Count_Of_InstanceOf_ChildClass_Label",
+                   "Count_Of_InstanceOf_ChildClass_altLabel")
 
 if(DirSave){
 try(LABEL00 <- gsub("/", "_", as.character(LABEL)), silent = T)

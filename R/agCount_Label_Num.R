@@ -1,4 +1,5 @@
-##' @title Count of labels and concept relations via SPARQL.
+##' @title Count of labels and concept relations using labels via SPARQL.
+##'
 ##' @param EntityName a character vector. The string was
 ##' automatically judged to be Japanese (@ja) or English (@en)
 ##' @param EndPoint a string of SPARQL endpoint. ex. http://....
@@ -10,9 +11,11 @@
 ##' @param FilterRegex do not use this option.
 ##' @param DirSave logical; save the results in the Dir path or not
 ##' @param Dir a folder path for output files.
+##'
 ##' @description this function is a general function for
-##' searching the RDF data via SPARQL.
+##' searching the RDF data using a label information via SPARQL.
 ##' the specific functions for each endpoint were also prepared.
+##'
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @import franc SPARQL
@@ -161,49 +164,28 @@ SPA_Hit_ParentClass_InstanceOf <- SPA03A.SPA03B + SPA06A.SPA06B
 SPA_Hit_childClass_HasInstance <- SPA04A.SPA04B + SPA05A.SPA05B
 SPA_Hit_ALL <- SPA03A.SPA03B.SPA04A.SPA04B+SPA05A.SPA05B.SPA06A.SPA06B
 
-colnames(SPA) <- c("LABEL",
-                   "Hit_Label",
-                   "Hit_ALL",
-                   "Hit_upClass_All",
-                   "Hit_downClass_All",
-                   "Hit_subClassOf",
-                   "Hit_InstanceOf",
-                   "Hit_subClassOf_ParentClass",
-                   "Hit_subClassOf_ChildClass",
-                   "Hit_InstanceOf_ParentClass",
-                   "Hit_InstanceOf_ChildClass",
-                   "Count_As_Label",
-                   "Count_As_AltLabel",
-                   "Count_Of_subClassOf_ParentClass_Label",
-                   "Count_Of_subClassOf_ParentClass_altLabel",
-                   "Count_Of_subClassOf_ChildClass_Label",
-                   "Count_Of_subClassOf_ChildClass_altLabel",
-                   "Count_InstanceOf_ParentClass_Label",
-                   "Count_InstanceOf_ParentClass_altLabel",
-                   "Count_InstanceOf_ChildClass_Label",
-                   "Count_InstanceOf_ChildClass_altLabel")
-
+#make data.frame
 SPA <- data.frame(LABEL=LABEL,
                   Hit_Label=SPA01.SPA02,
                   Hit_All=SPA_Hit_ALL,
-                  Hit_upClass_All=
-                  Hit_subClassOf_InstanceOf=SPA03A.SPA03B.SPA04A.SPA04B+SPA05A.SPA05B.SPA06A.SPA06B,
-                  Hit_subClassOf=SPA03A.SPA03B.SPA04A.SPA04B,
-                  Hit_InstanceOf=SPA05A.SPA05B.SPA06A.SPA06B,
-                  Hit_ParentClass=SPA03A.SPA03B,
-                  Hit_ChildClass=SPA04A.SPA04B,
-                  Hit_InstanceOf=SPA06A.SPA06B,
-                  Hit_Has_Instance=SPA05A.SPA05B,
+                  Hit_up_All=SPA_Hit_ParentClass_InstanceOf,
+                  Hit_down_All=SPA_Hit_childClass_HasInstance,
+                  Hit_p1_all=SPA03A.SPA03B.SPA04A.SPA04B,
+                  Hit_p2_all=SPA05A.SPA05B.SPA06A.SPA06B,
+                  Hit_p1_up=SPA03A.SPA03B,
+                  Hit_p1_down=SPA04A.SPA04B,
+                  Hit_p2_up=SPA06A.SPA06B,
+                  Hit_p2_down=SPA05A.SPA05B,
                   Count_As_Label=as.numeric(SPA01),
                   Count_As_AltLabel=as.numeric(SPA02),
-                  Count_Of_ParentClass_Label=as.numeric(SPA03A),
-                  Count_Of_ParentClass_altLabel=as.numeric(SPA03B),
-                  Count_Of_ChildClass_Label=as.numeric(SPA04A),
-                  Count_Of_ChildClass_altLabel=as.numeric(SPA04B),
-                  Count_InstanceOf_Label=as.numeric(SPA06A),
-                  Count_InstanceOf_altLabel=as.numeric(SPA06B),
-                  Count_Has_Instance_Label=as.numeric(SPA05A),
-                  Count_Has_Instance_altLabel=as.numeric(SPA05B),
+                  Count_p1up_Label=as.numeric(SPA03A),
+                  Count_p1up_altLabel=as.numeric(SPA03B),
+                  Count_p1down_Label=as.numeric(SPA04A),
+                  Count_p1down_altLabel=as.numeric(SPA04B),
+                  Count_p2up_Label=as.numeric(SPA06A),
+                  Count_p2up_altLabel=as.numeric(SPA06B),
+                  Count_p2down_Label=as.numeric(SPA05A),
+                  Count_p2down_altLabel=as.numeric(SPA05B),
                   stringsAsFactors=F)
 
 if(DirSave){
