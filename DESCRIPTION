@@ -7,11 +7,11 @@ Author: Satoshi Kume
 Maintainer: Satoshi Kume <satoshi.kume.1984@gmail.com>
 Description: This package provides a graph search for RDF data via SPARQL 
 Depends: R (>= 4.0.0)
-Imports: SPARQL, RCurl
-Suggests: rmarkdown, franc, SPARQL, magrittr, htmlwidgets, 
+Imports: SPARQL, RCurl, rmarkdown, franc, magrittr, htmlwidgets, 
   networkD3, visNetwork, DT, formattable, data.tree, htmltools,
-  purrr, furrr, readr, tidyverse, progress, stringr, VennDiagram, plotly,
+  purrr, readr, tidyverse, progress, stringr, VennDiagram, plotly,
   testthat
+Suggests: furrr
 License: Artistic-2.0
 URL: https://github.com/kumeS/agGraphSearch
 LazyData: true

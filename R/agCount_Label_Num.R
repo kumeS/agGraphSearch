@@ -18,7 +18,7 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import franc SPARQL
+##' @import SPARQL
 ##' @export agCount_Label_Num
 ##' @examples \dontrun{
 ##' #parameters
@@ -52,17 +52,7 @@ if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}
 LABEL <- EntityName
 if(franc(LABEL, min_length = 1) == "jpn" | franc(LABEL, min_length = 1) == "cmn"){rdfs.l <- "ja" } else { rdfs.l <- "en" }
 
-Prefix <- '
-PREFIX wd: <http://www.wikidata.org/entity/>
-PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX dct: <http://purl.org/dc/terms/>
-PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-'
+Prefix <- agGraphSearch::PREFIX
 
 if(FilterRegex){
 LAB00 <- paste('?subject rdfs:label ?text FILTER regex (?text, \"', LABEL, '\", \"i\"). ', sep="")

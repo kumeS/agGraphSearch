@@ -2,8 +2,7 @@
 % Please edit documentation in R/agCount_ID_Num_Wikidata_QID_P279_P31.R
 \name{agCount_ID_Num_Wikidata_QID_P279_P31}
 \alias{agCount_ID_Num_Wikidata_QID_P279_P31}
-\title{Count of concept relations of subClassOf (wdt:P279)
-and instanceOf (wdt:P31) in wikidata using URI/ID via SPARQL.}
+\title{Count of concept relations in wikidata using URI/ID via SPARQL.}
 \usage{
 agCount_ID_Num_Wikidata_QID_P279_P31(ID_Name, Message = FALSE)
 }
@@ -16,8 +15,8 @@ agCount_ID_Num_Wikidata_QID_P279_P31(ID_Name, Message = FALSE)
 data.frame
 }
 \description{
-this function is for
-searching the RDF data using an entity URI via SPARQL.
+this function count of concept relations of subClassOf (wdt:P279)
+and instanceOf (wdt:P31) in wikidata RDF data using an entity URI via SPARQL.
 }
 \examples{
 \dontrun{

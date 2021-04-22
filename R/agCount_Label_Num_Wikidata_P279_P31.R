@@ -7,7 +7,7 @@
 ##' For parameters of properties, the variable of wikidataClassProperty is used.
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import franc SPARQL readr
+##' @import readr
 ##' @export agCount_Label_Num_Wikidata_P279_P31
 ##' @examples \dontrun{
 ##' #parameters

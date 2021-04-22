@@ -8,7 +8,7 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import franc SPARQL
+##' @import readr
 ##' @export agCount_ID_Num_Wikidata_QID_P279_P31
 ##' @examples \dontrun{
 ##' #parameters

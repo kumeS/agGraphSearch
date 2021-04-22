@@ -16,7 +16,7 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import franc SPARQL
+##' @import SPARQL
 ##' @export agCount_ID_Num
 ##' @examples \dontrun{
 ##' #parameters
@@ -45,17 +45,7 @@ agCount_ID_Num <- function(ID_Name,
                            Dir="R01_Results"){
 ID <- ID_Name
 
-Prefix <- '
-PREFIX wd: <http://www.wikidata.org/entity/>
-PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX dct: <http://purl.org/dc/terms/>
-PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-'
+Prefix <- agGraphSearch::PREFIX
 
 if(Message){message(paste("Query: ", ID, sep=""))}
 
@@ -66,8 +56,7 @@ FROM, ' ',
 ID, ' ', Property[[1]], ' ?parentClass.
 }', sep="")
 
-library(SPARQL)
-A <- try(SPA03A <- SPARQL(url=EndPoint, query=paste(Prefix, Query03A))$results, silent = T)
+A <- try(SPA03A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query03A))$results, silent = T)
 if(class(A) == "try-error"){SPA03A <- 0}
 
 Query04A <-paste('
