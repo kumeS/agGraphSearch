@@ -1,21 +1,50 @@
+##' @title Count of labels and concept relations via SPARQL.
+##' @param EntityName a character vector. The string was
+##' automatically judged to be Japanese (@ja) or English (@en)
+##' @param EndPoint a string of SPARQL endpoint. ex. http://....
+##' @param FROM a string of graph URI in the endpoint. The default is blank ("").
+##' @param Property a list of two character vectors.
+##' The first element of list contain the first property ID.
+##' The second element of list contain the second property ID.
+##' @param Message logical; perform an output of EntityName or not.
+##' @param FilterRegex do not use this option.
+##' @param DirSave logical; save the results in the Dir path or not
+##' @param Dir a folder path for output files.
+##' @description this function is a general function for
+##' searching the RDF data via SPARQL.
+##' the specific functions for each endpoint were also prepared.
+##' @return data.frame
+##' @author Satoshi Kume
+##' @import franc SPARQL
+##' @export agCount_Label_Num
+##' @examples \dontrun{
+##' #parameters
+##'
+##' #polymer (wikidata prefix URI: wd:Q81163)
+##' Label <- "polymer"
+##'
+##' print(KzLabEndPoint)
+##' print(wikidataClassProperty)
+##'
+##' #run
+##' agCount_Label_Num(
+##'   EntityName=Label,
+##'   EndPoint=KzLabEndPoint$EndPoint,
+##'   FROM=KzLabEndPoint$FROM,
+##'   Property=wikidataClassProperty)
+##' }
 
+agCount_Label_Num <- function(EntityName,
+                              EndPoint,
+                              FROM = "",
+                              Property,
+                              Message=FALSE,
+                              FilterRegex=FALSE,
+                              DirSave=FALSE,
+                              Dir="R01_Results"){
 
-######################################################
-#agCount_Label_Num_DirSave
-######################################################
-agCount_Label_Num_DirSave <- function(EntityName, EndPoint, Dir="Results_test"){
-agCount_Label_Num(EntityName=EntityName, Message=F, FilterRegex=F,
-                  DirSave=T, Dir=Dir, EndPoint=EndPoint)
-}
-
-######################################################
-#agCount_Label_Num
-######################################################
-agCount_Label_Num <- function(EntityName, EndPoint, FROM = "",
-                              Message=F, FilterRegex=F,
-                              DirSave=F, Dir="R01_Results"){
 if(!grepl("^http", EndPoint)){return(message("No EndPoint URL"))}
-if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}else{}
+if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}
 
 LABEL <- EntityName
 if(franc(LABEL, min_length = 1) == "jpn" | franc(LABEL, min_length = 1) == "cmn"){rdfs.l <- "ja" } else { rdfs.l <- "en" }
@@ -58,14 +87,14 @@ if(class(A) == "try-error"){SPA02 <- 0}else{}
 
 Query03A <-paste('
 SELECT  (count(distinct ?parentClass ) as ?Count_Of_ParentClass_Label)
-WHERE {',LAB00, ' ?subject wdt:P279 ?parentClass. }', sep="")
+WHERE {',LAB00, ' ?subject ', Property[[1]], ' ?parentClass. }', sep="")
 A <- try(SPA03A <- SPARQL(url=EndPoint, query=paste(Prefix, Query03A))$results, silent = T)
 if(class(A) == "try-error"){SPA03A <- 0}else{}
 
 Query03B <-paste('
 SELECT  (count(distinct ?parentClass ) as ?Count_Of_ParentClass_altLabel)', ' ',
 FROM, ' ',
-'WHERE {',LAB01,' ?subject wdt:P279 ?parentClass. }', sep="")
+'WHERE {',LAB01,' ?subject ', Property[[1]], ' ?parentClass. }', sep="")
 A <- try(SPA03B <- SPARQL(url=EndPoint, query=paste(Prefix, Query03B))$results, silent = T)
 if(class(A) == "try-error"){SPA03B <- 0}else{}
 
@@ -73,7 +102,7 @@ Query04A <-paste('
 SELECT  (count(distinct ?childClass ) as ?Count_Of_ChildClass_Label)', ' ',
 FROM, ' ',
 'WHERE {',LAB00,'
-?childClass wdt:P279 ?subject.}', sep="")
+?childClass ', Property[[1]], ' ?subject.}', sep="")
 A <- try(SPA04A <- SPARQL(url=EndPoint, query=paste(Prefix, Query04A))$results, silent = T)
 if(class(A) == "try-error"){SPA04A <- 0}else{}
 
@@ -81,7 +110,7 @@ Query04B <-paste('
 SELECT  (count(distinct ?childClass ) as ?Count_Of_ChildClass_altLabel)', ' ',
 FROM, ' ',
 'WHERE {',LAB01,'
-?childClass wdt:P279 ?subject. }', sep="")
+?childClass ', Property[[1]], ' ?subject. }', sep="")
 A <- try(SPA04B <- SPARQL(url=EndPoint, query=paste(Prefix, Query04B))$results, silent = T)
 if(class(A) == "try-error"){SPA04B <- 0}else{}
 
@@ -89,7 +118,7 @@ Query05A <-paste('
 SELECT  (count(distinct ?instance ) as ?Count_Has_Instance_Label)', ' ',
 FROM, ' ',
 'WHERE {',LAB00,'
-?instance wdt:P31 ?subject. }', sep="")
+?instance ', Property[[2]], ' ?subject. }', sep="")
 A <- try(SPA05A <- SPARQL(url=EndPoint, query=paste(Prefix, Query05A))$results, silent = T)
 if(class(A) == "try-error"){SPA05A <- 0}else{}
 
@@ -97,7 +126,7 @@ Query05B <-paste('
 SELECT  (count(distinct ?instance ) as ?Count_Has_Instance_altLabel)', ' ',
 FROM, ' ',
 'WHERE {',LAB01,'
-?instance wdt:P31 ?subject. }', sep="")
+?instance ', Property[[2]], ' ?subject. }', sep="")
 A <- try(SPA05B <- SPARQL(url=EndPoint, query=paste(Prefix, Query05B))$results, silent = T)
 if(class(A) == "try-error"){SPA05B <- 0}else{}
 
@@ -105,7 +134,7 @@ Query06A <-paste('
 SELECT  (count(distinct ?instance ) as ?Count_InstanceOf_Label)', ' ',
 FROM, ' ',
 'WHERE {',LAB00,'
-?subject wdt:P31 ?instance. }', sep="")
+?subject ', Property[[2]], ' ?instance. }', sep="")
 A <- try(SPA06A <- SPARQL(url=EndPoint, query=paste(Prefix, Query06A))$results, silent = T)
 if(class(A) == "try-error"){SPA06A <- 0}else{}
 
@@ -113,22 +142,51 @@ Query06B <-paste('
 SELECT  (count(distinct ?instance ) as ?Count_InstanceOf_altLabel)', ' ',
 FROM, ' ',
 'WHERE {',LAB01,'
-?subject wdt:P31 ?instance. }', sep="")
+?subject ', Property[[2]], ' ?instance. }', sep="")
 A <- try(SPA06B <- SPARQL(url=EndPoint, query=paste(Prefix, Query06B))$results, silent = T)
 if(class(A) == "try-error"){SPA06B <- 0}else{}
 
+#Label
 SPA01.SPA02 <- as.numeric(SPA01) + as.numeric(SPA02)
+#Property[[1]]
 SPA03A.SPA03B <- as.numeric(SPA03A) + as.numeric(SPA03B)
 SPA04A.SPA04B <- as.numeric(SPA04A) + as.numeric(SPA04B)
 SPA03A.SPA03B.SPA04A.SPA04B <- SPA03A.SPA03B + SPA04A.SPA04B
+#Property[[2]]
 SPA06A.SPA06B <- as.numeric(SPA06A) + as.numeric(SPA06B)
 SPA05A.SPA05B <- as.numeric(SPA05A) + as.numeric(SPA05B)
 SPA05A.SPA05B.SPA06A.SPA06B <- SPA05A.SPA05B + SPA06A.SPA06B
+#All
 SPA_Hit_ParentClass_InstanceOf <- SPA03A.SPA03B + SPA06A.SPA06B
+SPA_Hit_childClass_HasInstance <- SPA04A.SPA04B + SPA05A.SPA05B
+SPA_Hit_ALL <- SPA03A.SPA03B.SPA04A.SPA04B+SPA05A.SPA05B.SPA06A.SPA06B
+
+colnames(SPA) <- c("LABEL",
+                   "Hit_Label",
+                   "Hit_ALL",
+                   "Hit_upClass_All",
+                   "Hit_downClass_All",
+                   "Hit_subClassOf",
+                   "Hit_InstanceOf",
+                   "Hit_subClassOf_ParentClass",
+                   "Hit_subClassOf_ChildClass",
+                   "Hit_InstanceOf_ParentClass",
+                   "Hit_InstanceOf_ChildClass",
+                   "Count_As_Label",
+                   "Count_As_AltLabel",
+                   "Count_Of_subClassOf_ParentClass_Label",
+                   "Count_Of_subClassOf_ParentClass_altLabel",
+                   "Count_Of_subClassOf_ChildClass_Label",
+                   "Count_Of_subClassOf_ChildClass_altLabel",
+                   "Count_InstanceOf_ParentClass_Label",
+                   "Count_InstanceOf_ParentClass_altLabel",
+                   "Count_InstanceOf_ChildClass_Label",
+                   "Count_InstanceOf_ChildClass_altLabel")
 
 SPA <- data.frame(LABEL=LABEL,
                   Hit_Label=SPA01.SPA02,
-                  Hit_Class_All=SPA_Hit_ParentClass_InstanceOf,
+                  Hit_All=SPA_Hit_ALL,
+                  Hit_upClass_All=
                   Hit_subClassOf_InstanceOf=SPA03A.SPA03B.SPA04A.SPA04B+SPA05A.SPA05B.SPA06A.SPA06B,
                   Hit_subClassOf=SPA03A.SPA03B.SPA04A.SPA04B,
                   Hit_InstanceOf=SPA05A.SPA05B.SPA06A.SPA06B,
