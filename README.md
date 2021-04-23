@@ -20,10 +20,18 @@ library( "agGraphSearch" )
 An alternative way,
 
 ```{R}
-system("git clone https://github.com/kumeS/agGraphSearch.git ")
-system("R CMD INSTALL agGraphSearch")
-library("agGraphSearch")
+system( "git clone https://github.com/kumeS/agGraphSearch.git" )
+system( "R CMD INSTALL agGraphSearch" )
+library( "agGraphSearch" )
 ```
+
+## Functions in the package
+
+- AAA: XXX
+
+- BBB: YYY
+
+
 
 ## Example
 
