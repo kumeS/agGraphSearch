@@ -2,7 +2,7 @@
 % Please edit documentation in R/agWD_Alt_Wikidata.R
 \name{agWD_Alt_Wikidata}
 \alias{agWD_Alt_Wikidata}
-\title{Searching the label corresponding to the entity url via SPARQL.}
+\title{Searching the labels in the wikidata endopoint via SPARQL.}
 \usage{
 agWD_Alt_Wikidata(Entity_Name)
 }
@@ -18,20 +18,12 @@ searching the RDF data using an entity URI via SPARQL.
 }
 \examples{
 \dontrun{
-#parameters
 
-#polymer (wikidata prefix URI: wd:Q81163)
+#CAS Registry Number (wikidata prefix URI: wd:Q102507)
 Label <- "CAS Registry Number"
 
-print(KzLabEndPoint)
-print(wikidataClassProperty)
-
 #run
-agWD_Alt_Wikidata(
-  Entity_Name=Label,
-  EndPoint=KzLabEndPoint$EndPoint,
-  FROM=KzLabEndPoint$FROM
-  )
+agWD_Alt_Wikidata( Entity_Name=Label )
 
 }
 }

@@ -9,9 +9,9 @@
 ##' if the number is 2, the label contains Japanese label (@ja).
 ##' if the number is 3, the labels contain both English and Japanese labels.
 ##' @param AltLabel logical; default is FALSE.
-##' @param LabelOut logical; default is FALSE.
 ##' @param Property a numeric vector.
 ##' if the number is 1 (default), the properties are set to be "rdfs:label" and "skos:altLabel".
+##' Still no other options in a parameter of Property.
 ##'
 ##' @param Message logical; perform an output of Entity_Name or not.
 ##'
@@ -19,6 +19,7 @@
 ##' searching the RDF data using an entity URI via SPARQL.
 ##'
 ##' @return data.frame
+##' @seealso list2DF {base}
 ##' @author Satoshi Kume
 ##' @import SPARQL franc
 ##' @export agWD_Alt
@@ -40,15 +41,17 @@
 ##'
 ##' }
 
-
 agWD_Alt <- function(Entity_Name,
                      EndPoint,
                      FROM,
                      AltLabel=FALSE,
-                     LabelOut=FALSE,
                      Property=1,
                      lang=1,
                      Message=TRUE){
+
+#Parameters
+# @param LabelOut logical; default is FALSE.
+LabelOut=FALSE
 
 LABEL <- Entity_Name
 if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){
@@ -91,7 +94,6 @@ switch(base::as.character(Property),
       "1" = p <- c("rdfs:label", "skos:altLabel"),
       return(message("Warning: Not proper value of Property"))
 )
-
 
 Query <-paste('
 SELECT distinct ?subject ', Select0, Select, ' ',

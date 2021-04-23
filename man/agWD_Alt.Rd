@@ -9,7 +9,6 @@ agWD_Alt(
   EndPoint,
   FROM,
   AltLabel = FALSE,
-  LabelOut = FALSE,
   Property = 1,
   lang = 1,
   Message = TRUE
@@ -24,10 +23,9 @@ agWD_Alt(
 
 \item{AltLabel}{logical; default is FALSE.}
 
-\item{LabelOut}{logical; default is FALSE.}
-
 \item{Property}{a numeric vector.
-if the number is 1 (default), the properties are set to be "rdfs:label" and "skos:altLabel".}
+if the number is 1 (default), the properties are set to be "rdfs:label" and "skos:altLabel".
+Still no other options in a parameter of Property.}
 
 \item{lang}{a numeric vector.
 if the number is 1 (default), the label contains English label (@en).
@@ -61,6 +59,9 @@ agWD_Alt(
   )
 
 }
+}
+\seealso{
+list2DF {base}
 }
 \author{
 Satoshi Kume
