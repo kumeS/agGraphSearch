@@ -17,18 +17,21 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @import magrittr
-##' @export agCount_ID_Property_Object
+##' @export agCount_ID_Prop_Obj
 ##' @examples \dontrun{
 ##'
+##'
+##' #Tanaka (Q12159869)
 ##' ID <- "wd:Q12159869"
-##' Prop <- "?p"
+##' #family name (Q101352)
 ##' Obj <- "wd:Q101352"
+##' Prop <- "?p"
 ##' Count <- "?p"
 ##'
 ##' EndPoint <- KzLabEndPoint_Wikidata$EndPoint
 ##' FROM <- KzLabEndPoint_Wikidata$FROM
 ##'
-##' agCount_ID_Property_Object(
+##' agCount_ID_Prop_Obj(
 ##'   Entity_ID=ID,
 ##'   Property=Prop,
 ##'   Object=Obj,
@@ -40,7 +43,7 @@
 ##'
 ##' }
 
-agCount_ID_Property_Object <- function(Entity_ID,
+agCount_ID_Prop_Obj <- function(Entity_ID,
                                        Property,
                                        Object,
                                        Count,

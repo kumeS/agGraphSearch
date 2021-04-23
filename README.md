@@ -5,6 +5,9 @@
 agGraphSearch, a R package, supply functions for searching graph data 
 structures of RDF (Resource Description Framework) via SPARQL query.
 
+This set of functions allows us to explore the graph data (triples) 
+as a function of R, without having to create any SPARQL queries on R scripts.
+
 ## Installation
 
 1. Start R.app

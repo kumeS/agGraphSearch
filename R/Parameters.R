@@ -39,3 +39,18 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 '
 
+URI2Prefix <- t(data.frame(wd=c("wd:", "<http://www.wikidata.org/entity/", ">"),
+                         wdt=c("wdt:", "<http://www.wikidata.org/prop/direct/", ">"),
+                         rdfs=c("rdfs:", "<http://www.w3.org/2000/01/rdf-schema#", ">"),
+                         skos=c("skos:", "<http://www.w3.org/2004/02/skos/core#", ">"),
+                         rdf=c("rdf:", "<http://www.w3.org/1999/02/22-rdf-syntax-ns#", ">"),
+                         owl=c("owl:", "<http://www.w3.org/2002/07/owl#", ">"),
+                         dct=c("dct:", "<http://purl.org/dc/terms/", ">"),
+                         foaf=c("foaf:", "<http://xmlns.com/foaf/0.1/", ">"),
+                         wikibase=c("wikibase:", "<http://wikiba.se/ontology#", ">")))
+rownames(URI2Prefix) <- 1:nrow(URI2Prefix)
+colnames(URI2Prefix) <- c("prefix", "uri01", "uri02")
+
+
+
+
