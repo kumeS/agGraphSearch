@@ -3,8 +3,8 @@
 ##' @param Entity_ID a vector of character; an entity URI / prefixed ID, or a variable starting with ?.
 ##' @param Property a vector of character; a property URI / prefixed ID, or a variable starting with ?.
 ##' @param Object a vector of character; a string, a value, an entity URI / prefixed ID, or a variable starting with ?.
-##' @param DISTINCT
-##' @param PREFIX_uri
+##' @param DISTINCT a logical; use Distinct in the section of SELECT in SPARQL
+##' @param PREFIX_uri a logical; use prefix url or not.
 ##'
 ##' @param lang a numeric vector.
 ##' if the number is 1 (default), the label contains English label (@en).
@@ -21,8 +21,8 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import magrittr SPARQL
-##' @export agWD_ID_prop_Obj
+##' @import stringr SPARQL
+##' @export agWD_ID_Prop_Obj
 ##' @examples \dontrun{
 ##'
 ##' #Tanaka (Q12159869)
@@ -35,7 +35,7 @@
 ##' EndPoint <- KzLabEndPoint_Wikidata$EndPoint
 ##' FROM <- KzLabEndPoint_Wikidata$FROM
 ##'
-##' agWD_ID_prop_Obj(
+##' agWD_ID_Prop_Obj(
 ##'   Entity_ID=ID,
 ##'   Property=Prop,
 ##'   Object=Obj,
@@ -48,7 +48,7 @@
 ##' }
 
 
-agWD_ID_prop_Obj <- function(Entity_ID,
+agWD_ID_Prop_Obj <- function(Entity_ID,
                              Property,
                              Object,
                              DISTINCT=TRUE,
@@ -89,20 +89,23 @@ if(lang == 2){ SPA <- SPA[,-3] }
 if(lang == 3){ SPA <- SPA }
 
 if(PREFIX_uri){
-agGraphSearch::URI2Prefix
 
+for(n in 1:dim(agGraphSearch::URI2Prefix)[1]){
+#n <- 1
+try(SPA[,1] <- gsub(paste0("^", agGraphSearch::URI2Prefix[n,2]), agGraphSearch::URI2Prefix[n,1], SPA[,1]), silent = T)
+try(SPA[,1] <- gsub(paste0(agGraphSearch::URI2Prefix[n,3], "$"), "", SPA[,1]), silent = T)
+}
 
-try(SPA[,1] <- gsub("<http://www.wikidata.org/prop/direct/", "wdt:", SPA[,1]), silent = T)
-try(SPA[,1] <- gsub("<http://www.wikidata.org/entity/", "wd:", SPA[,1]), silent = T)
-try(SPA[,1] <- gsub(">", "", SPA[,1]), silent = T)
-try(SPA[,2] <- stringr::str_sub(SPA[,2], start=2, end=-5), silent = T)
-try(SPA[,3] <- stringr::str_sub(SPA[,3], start=2, end=-5), silent = T)
-}else{}
+if(lang == 1){ try(SPA[,2] <- stringr::str_sub(SPA[,2], start=2, end=-5), silent = T) }
+if(lang == 2){ try(SPA[,2] <- stringr::str_sub(SPA[,2], start=2, end=-5), silent = T) }
+if(lang == 3){
+  try(SPA[,2] <- stringr::str_sub(SPA[,2], start=2, end=-5), silent = T)
+  try(SPA[,3] <- stringr::str_sub(SPA[,3], start=2, end=-5), silent = T)
+}
+}
 
 if(!exists("SPA")){return(message(paste("Perhaps No Internet Services: ", ID, sep="")))}
 
-try(SPA$s <- ID, silent = T)
-
-return(data.frame(SPA, stringsAsFactors = F))
+return(data.frame(s=ID, p=Prop, SPA, stringsAsFactors = F))
 
 }
