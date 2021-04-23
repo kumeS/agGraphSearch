@@ -16,9 +16,13 @@
 ##' #polymer (wikidata prefix URI: wd:Q81163)
 ##' ID <- "wd:Q81163"
 ##'
+##' #Run SPARQL
 ##' agCount_ID_Num_Wikidata_QID_P279_P31(
 ##'   Entity_ID=ID,
 ##'   Message=TRUE)
+##'
+##' #show the SPARQL query
+##' CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31( Entity_ID=ID )
 ##'
 ##' #Parallel processing of 4 cores using furrr package
 ##' library(furrr)
@@ -84,42 +88,66 @@ return(data.frame(SPA, stringsAsFactors = F))
 }
 
 
-
-
 CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31 <- function(Entity_ID){
 
 #Parameters
 Prefix <- agGraphSearch::PREFIX
 ID <- Entity_ID
-Prop <- "?p"
-Count <- "?p"
-GroupBy <- FALSE
-Message <- FALSE
+
+#Property
+Property <- wikidataClassProperty
 
 EndPoint <- KzLabEndPoint_Wikidata$EndPoint
 FROM <- KzLabEndPoint_Wikidata$FROM
 
-#GroupBy
-if(GroupBy){
-  GroupBy00 <- paste0('distinct ', Count , ' (count(', Count, ') as ?Count)')
-  GroupBy01 <- paste0('GROUP BY ', Count)
-}else{
-  GroupBy00 <- paste0('(count(distinct ', Count, ') as ?Count)')
-  GroupBy01 <- ""
-}
-
-#create Query
-Query <-paste0("EndPoint: ", EndPoint,
-'
-```````````````````````````````````````````
-SELECT ', GroupBy00, '
+Query03A <-paste('
+SELECT  (count(distinct ?parentClass) as ?Count_Of_ParentClass)', '
 ', FROM, '
 ', 'WHERE {
-',ID, ' ', Prop , ' ', Object, '.
-} ',
-GroupBy01, '
-```````````````````````````````````````````')
+', ID, ' ', Property[[1]], ' ?parentClass.
+}', sep="")
 
+Query04A <-paste('
+SELECT  (count(distinct ?childClass) as ?Count_Of_ChildClass)', '
+', FROM, '
+', 'WHERE {
+?childClass ', Property[[1]], ' ', ID, '.
+}', sep="")
+
+Query05A <-paste('
+SELECT  (count(distinct ?instance) as ?Count_Has_Instance)', '
+', FROM, '
+', 'WHERE {
+?instance ', Property[[2]], ' ', ID, '.
+}', sep="")
+
+Query06A <-paste('
+SELECT  (count(distinct ?instance) as ?Count_InstanceOf)', '
+', FROM, '
+', 'WHERE {
+', ID, ' ', Property[[2]], ' ?instance.
+}', sep="")
+
+#create Query
+Query <-paste0("EndPoint:
+", EndPoint,
+'
+', "Prefix:" , Prefix,
+'```````````````````````````````````````````',
+Query03A, '
+',
+'```````````````````````````````````````````',
+Query04A, '
+',
+'```````````````````````````````````````````',
+Query06A, '
+',
+'```````````````````````````````````````````',
+Query05A, '
+',
+'```````````````````````````````````````````')
+
+#message(Query)
 return( message(Query) )
 
 }

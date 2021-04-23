@@ -103,7 +103,8 @@ optional{?subject ', p[1], ' \"', LABEL, '\"@', rdfs.l, '.}
 optional{?subject ', p[2], ' \"', LABEL, '\"@', rdfs.l, '.} ',
 LabOut,
 Where1,
-Where2,'}', sep="")
+Where2,'
+}', sep="")
 
 if(Message){base::message(paste("Query: ", LABEL, sep=""))}else{}
 A <- try(SPA <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query))$results, silent = T)

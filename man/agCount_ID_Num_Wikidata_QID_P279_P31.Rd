@@ -25,9 +25,13 @@ and instanceOf (wdt:P31) in wikidata RDF data using an entity URI via SPARQL.
 #polymer (wikidata prefix URI: wd:Q81163)
 ID <- "wd:Q81163"
 
+#Run SPARQL
 agCount_ID_Num_Wikidata_QID_P279_P31(
   Entity_ID=ID,
   Message=TRUE)
+
+#show the SPARQL query
+CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31( Entity_ID=ID )
 
 #Parallel processing of 4 cores using furrr package
 library(furrr)

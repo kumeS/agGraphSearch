@@ -29,8 +29,14 @@ Label <- "polymer"
 print(KzLabEndPoint_Wikidata)
 print(wikidataClassProperty)
 
-#run
+#run SPARQL
 agCount_Label_Num_Wikidata_P279_P31(
+  Entity_Name=Label,
+  Message=TRUE
+  )
+
+#show the SPARQL query
+CkeckQuery_agCount_Label_Num_Wikidata_P279_P31(
   Entity_Name=Label,
   Message=TRUE
   )

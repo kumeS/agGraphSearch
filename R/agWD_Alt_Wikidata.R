@@ -13,8 +13,12 @@
 ##' #CAS Registry Number (wikidata prefix URI: wd:Q102507)
 ##' Label <- "CAS Registry Number"
 ##'
-##' #run
+##' #run SPARQL
 ##' agWD_Alt_Wikidata( Entity_Name=Label )
+##'
+##' #show the SPARQL query
+##' CkeckQuery_agWD_Alt_Wikidata( Entity_Name=Label )
+##'
 ##'
 ##' }
 
@@ -49,6 +53,87 @@ return(base::data.frame(subject=SPA, stringsAsFactors = F))
 }else{
 return(base::data.frame(subject=NA, stringsAsFactors = F))
 }
+}
+
+
+CkeckQuery_agWD_Alt_Wikidata <- function(Entity_Name){
+
+#Parameters
+Prefix <- agGraphSearch::PREFIX
+LABEL <- Entity_Name
+
+AltLabel=FALSE
+Property=1
+lang=1
+Message=FALSE
+LabelOut=FALSE
+
+EndPoint <- KzLabEndPoint_Wikidata$EndPoint
+FROM <- KzLabEndPoint_Wikidata$FROM
+
+if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){
+   rdfs.l <- "ja" } else {rdfs.l <- "en"}
+
+if(lang == 1){
+    lang1 <- "en"
+    Select <- "?alsoKnownAse"
+    Where1 <- ""
+    Where2 <- 'optional{ ?subject skos:altLabel ?alsoKnownAse . filter(LANG(?alsoKnownAse) = "en") }'
+} else if(lang == 2){
+    lang1 <- "ja"
+    Select <- "?alsoKnownAsj"
+    Where1 <- 'optional{ ?subject skos:altLabel ?alsoKnownAsj . filter(LANG(?alsoKnownAsj) = "ja") }'
+    Where2 <- ""
+} else if(lang == 3){
+    lang1 <- "ja, en"
+    Select <- "?alsoKnownAsj ?alsoKnownAse"
+    Where1 <- 'optional{ ?subject skos:altLabel ?alsoKnownAsj . filter(LANG(?alsoKnownAsj) = "ja") }'
+    Where2 <- 'optional{ ?subject skos:altLabel ?alsoKnownAse . filter(LANG(?alsoKnownAse) = "en") }'
+}
+
+if(!AltLabel){
+    Select <- " "
+    Where1 <- ''
+    Where2 <- ''
+}
+
+if(LabelOut){
+LabOut <- "?subject rdfs:label ?subjectLabel."
+Select0 <- " ?subjectLabel "
+}else{
+LabOut <- ""
+Select0 <- ""
+}
+
+switch(base::as.character(Property),
+      "1" = p <- c("rdfs:label", "skos:altLabel"),
+      return(message("Warning: Not proper value of Property"))
+)
+
+Query01 <-paste('
+SELECT distinct ?subject ', Select0, Select, '
+',
+FROM, '
+', 'WHERE {
+optional{ ?subject ', p[1], ' \"', LABEL, '\"@', rdfs.l, '. }
+optional{ ?subject ', p[2], ' \"', LABEL, '\"@', rdfs.l, '. }
+', LabOut,
+Where1,
+Where2,'}
+', sep="")
+
+#create Query
+Query <-paste0("EndPoint:
+", EndPoint,
+'
+', "Prefix:" , Prefix,
+'```````````````````````````````````````````',
+Query01,
+'```````````````````````````````````````````')
+
+message(Query)
+
+return( message(Query) )
 
 }
 
