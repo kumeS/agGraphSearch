@@ -37,7 +37,7 @@ plan(multisession(workers = 4))
 #Run multisession
 IDs <- c("wd:Q81163", "wd:Q422649", "wd:Q1241898", "wd:Q706")
 
-future_map(as.character(unlist(IDs)), agCount_ID_Num_Wikidata_QID_P279_P31, .progress = TRUE)
+furrr::future_map2(as.character(unlist(IDs)), agCount_ID_Num_Wikidata_QID_P279_P31, .progress = TRUE)
 
 }
 }

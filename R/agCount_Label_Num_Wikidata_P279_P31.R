@@ -49,7 +49,7 @@ EndPoint <- KzLabEndPoint_Wikidata$EndPoint
 FROM <- KzLabEndPoint_Wikidata$FROM
 
 #Property
-Property <- wikidataClassProperty
+Property <- agGraphSearch::wikidataClassProperty
 
 #Others
 FilterRegex=FALSE
@@ -100,3 +100,174 @@ try(readr::write_excel_csv(SPA, file = paste0(Dir, "/", LABEL00, ".csv"), col_na
 return(data.frame(SPA, stringsAsFactors = F))
 
 }
+
+
+CkeckQuery_agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name){
+
+#Parameters
+Prefix <- agGraphSearch::PREFIX
+LABEL <- Entity_Name
+FilterRegex <- FALSE
+Property <- agGraphSearch::wikidataClassProperty
+
+EndPoint <- KzLabEndPoint_Wikidata$EndPoint
+FROM <- KzLabEndPoint_Wikidata$FROM
+
+if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){rdfs.l <- "ja" } else { rdfs.l <- "en" }
+
+if(FilterRegex){
+LAB00 <- paste('?subject rdfs:label ?text FILTER regex (?text, \"', LABEL, '\", \"i\"). ', sep="")
+LAB01 <- paste('?subject skos:altLabel ?text FILTER regex (?text, \"', LABEL, '\", \"i\"). ', sep="")
+}else{
+LAB00 <- paste('?subject rdfs:label \"', LABEL, '\"@', rdfs.l, '. ', sep="")
+LAB01 <- paste('?subject skos:altLabel \"', LABEL, '\"@', rdfs.l, '. ', sep="")
+}
+
+if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){rdfs.l <- "ja" } else { rdfs.l <- "en" }
+
+Query01 <-paste('
+SELECT (count(distinct ?subject) as ?Count_As_Label)', '
+', FROM, '
+', 'WHERE {
+', LAB00,'
+}', sep="")
+
+Query02 <-paste('
+SELECT (count(distinct ?subject) as ?Count_As_AltLabel)', '
+', FROM, '
+', 'WHERE {
+', LAB01, '
+}', sep="")
+
+Query03A <-paste('
+SELECT  (count(distinct ?parentClass ) as ?Count_Of_ParentClass_Label)', '
+', FROM, '
+', 'WHERE {
+', LAB00, '
+?subject ', Property[[1]], ' ?parentClass.
+}', sep="")
+
+Query03B <-paste('
+SELECT  (count(distinct ?parentClass ) as ?Count_Of_ParentClass_altLabel)', '
+', FROM, '
+', 'WHERE {
+', LAB01, '
+?subject ', Property[[1]], ' ?parentClass.
+}', sep="")
+
+Query04A <-paste('
+SELECT  (count(distinct ?childClass ) as ?Count_Of_ChildClass_Label)', '
+', FROM, '
+', 'WHERE {
+', LAB00, '
+?childClass ', Property[[1]], ' ?subject.
+}', sep="")
+
+Query04B <-paste('
+SELECT  (count(distinct ?childClass ) as ?Count_Of_ChildClass_altLabel)', '
+', FROM, '
+', 'WHERE {
+', LAB01, '
+?childClass ', Property[[1]], ' ?subject.
+}', sep="")
+
+Query05A <-paste('
+SELECT  (count(distinct ?instance ) as ?Count_Has_Instance_Label)', '
+', FROM, '
+', 'WHERE {
+', LAB00, '
+?instance ', Property[[2]], ' ?subject.
+}', sep="")
+
+Query05B <-paste('
+SELECT  (count(distinct ?instance ) as ?Count_Has_Instance_altLabel)', '
+', FROM, '
+', 'WHERE {
+', LAB01, '
+?instance ', Property[[2]], ' ?subject.
+}', sep="")
+
+Query06A <-paste('
+SELECT  (count(distinct ?instance ) as ?Count_InstanceOf_Label)', '
+', FROM, '
+', 'WHERE {
+', LAB00, '
+?subject ', Property[[2]], ' ?instance.
+}', sep="")
+
+Query06B <-paste('
+SELECT  (count(distinct ?instance ) as ?Count_InstanceOf_altLabel)', '
+', FROM, '
+', 'WHERE {
+', LAB01, '
+?subject ', Property[[2]], ' ?instance.
+}', sep="")
+
+#create Query
+Query <-paste0("EndPoint:
+", EndPoint,
+'
+', "Prefix:" , Prefix,
+'```````````````````````````````````````````',
+'
+### 001 ###
+',
+'```````````````````````````````````````````',
+Query01, '
+',
+'```````````````````````````````````````````',
+'
+### 002 ###
+',
+'```````````````````````````````````````````',
+Query02, '
+',
+'```````````````````````````````````````````',
+'
+### 003 ###
+',
+'```````````````````````````````````````````',
+Query03A, '
+',
+'```````````````````````````````````````````',
+Query03B, '
+',
+'```````````````````````````````````````````',
+'
+### 004 ###
+',
+'```````````````````````````````````````````',
+Query04A, '
+',
+'```````````````````````````````````````````',
+Query04B, '
+',
+'```````````````````````````````````````````',
+'
+### 005 ###
+',
+'```````````````````````````````````````````',
+Query06A, '
+',
+'```````````````````````````````````````````',
+Query06B, '
+',
+'```````````````````````````````````````````',
+'
+### 006 ###
+',
+'```````````````````````````````````````````',
+Query05A, '
+',
+'```````````````````````````````````````````',
+Query05B, '
+',
+'```````````````````````````````````````````')
+
+#message(Query)
+return( message(Query) )
+
+}
+
+
+

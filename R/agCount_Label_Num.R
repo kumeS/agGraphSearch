@@ -79,8 +79,9 @@ A <- try(SPA02 <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query02))$res
 if(class(A) == "try-error"){SPA02 <- 0}else{}
 
 Query03A <-paste('
-SELECT  (count(distinct ?parentClass ) as ?Count_Of_ParentClass_Label)
-WHERE {',LAB00, ' ?subject ', Property[[1]], ' ?parentClass. }', sep="")
+SELECT  (count(distinct ?parentClass ) as ?Count_Of_ParentClass_Label)', ' ',
+FROM, ' ',
+'WHERE {',LAB00, ' ?subject ', Property[[1]], ' ?parentClass. }', sep="")
 A <- try(SPA03A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query03A))$results, silent = T)
 if(class(A) == "try-error"){SPA03A <- 0}else{}
 

@@ -28,7 +28,7 @@
 ##' #Run multisession
 ##' IDs <- c("wd:Q81163", "wd:Q422649", "wd:Q1241898", "wd:Q706")
 ##'
-##' future_map(as.character(unlist(IDs)), agCount_ID_Num_Wikidata_QID_P279_P31, .progress = TRUE)
+##' furrr::future_map2(as.character(unlist(IDs)), agCount_ID_Num_Wikidata_QID_P279_P31, .progress = TRUE)
 ##'
 ##' }
 
@@ -83,4 +83,44 @@ return(data.frame(SPA, stringsAsFactors = F))
 
 }
 
+
+
+
+CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31 <- function(Entity_ID){
+
+#Parameters
+Prefix <- agGraphSearch::PREFIX
+ID <- Entity_ID
+Prop <- "?p"
+Count <- "?p"
+GroupBy <- FALSE
+Message <- FALSE
+
+EndPoint <- KzLabEndPoint_Wikidata$EndPoint
+FROM <- KzLabEndPoint_Wikidata$FROM
+
+#GroupBy
+if(GroupBy){
+  GroupBy00 <- paste0('distinct ', Count , ' (count(', Count, ') as ?Count)')
+  GroupBy01 <- paste0('GROUP BY ', Count)
+}else{
+  GroupBy00 <- paste0('(count(distinct ', Count, ') as ?Count)')
+  GroupBy01 <- ""
+}
+
+#create Query
+Query <-paste0("EndPoint: ", EndPoint,
+'
+```````````````````````````````````````````
+SELECT ', GroupBy00, '
+', FROM, '
+', 'WHERE {
+',ID, ' ', Prop , ' ', Object, '.
+} ',
+GroupBy01, '
+```````````````````````````````````````````')
+
+return( message(Query) )
+
+}
 

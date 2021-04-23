@@ -50,8 +50,8 @@ agCount_ID_Property_Object <- function(Entity_ID,
                                        Message=TRUE){
 
 #Parameters
-ID <- Entity_ID
 Prefix <- agGraphSearch::PREFIX
+ID <- Entity_ID
 Prop <- Property
 
 #GroupBy
