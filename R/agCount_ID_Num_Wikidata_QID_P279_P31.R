@@ -40,8 +40,8 @@ agCount_ID_Num_Wikidata_QID_P279_P31 <- function(Entity_ID,
 ID <- Entity_ID
 
 #EndPoint
-EndPoint <- KzLabEndPoint$EndPoint
-FROM <- KzLabEndPoint$FROM
+EndPoint <- KzLabEndPoint_Wikidata$EndPoint
+FROM <- KzLabEndPoint_Wikidata$FROM
 
 #Property
 Property <- wikidataClassProperty

@@ -2,7 +2,7 @@
 #Default Parameters
 ######################################################
 #wikidata
-KzLabEndPoint <- list(EndPoint="http://kozaki-lab.osakac.ac.jp/agraph/NEDO_pj",
+KzLabEndPoint_Wikidata <- list(EndPoint="http://kozaki-lab.osakac.ac.jp/agraph/NEDO_pj",
                       FROM = "From <http://wikidata_nearly_full_201127> ")
 wikidataClassProperty <- list(p1="wdt:P279", p2="wdt:P31")
 

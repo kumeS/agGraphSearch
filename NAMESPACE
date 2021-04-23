@@ -3,6 +3,7 @@
 export(ListDF2DF)
 export(agCount_ID_Num)
 export(agCount_ID_Num_Wikidata_QID_P279_P31)
+export(agCount_ID_Property_Object)
 export(agCount_Label_Num)
 export(agCount_Label_Num_Wikidata_P279_P31)
 export(agIDtoLabel)

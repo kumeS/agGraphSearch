@@ -24,14 +24,14 @@
 ##' #polymer (wikidata prefix URI: wd:Q81163)
 ##' ID <- "wd:Q81163"
 ##'
-##' print(KzLabEndPoint)
+##' print(KzLabEndPoint_Wikidata)
 ##' print(wikidataClassProperty)
 ##'
 ##' #run
 ##' agCount_ID_Num(
 ##'   Entity_ID=ID,
-##'   EndPoint=KzLabEndPoint$EndPoint,
-##'   FROM=KzLabEndPoint$FROM,
+##'   EndPoint=KzLabEndPoint_Wikidata$EndPoint,
+##'   FROM=KzLabEndPoint_Wikidata$FROM,
 ##'   Property=wikidataClassProperty)
 ##'
 ##' }

@@ -37,3 +37,58 @@ return(data.frame(a, stringsAsFactors = F))
 
 }
 
+########################################
+#After agWD_Alt
+########################################
+#Check NA or not
+checkNA_af_agWD_Alt <- function(input){
+a <- table(names(unlist(purrr::map(input, function(x) table(is.na(x))))))
+return(a)
+}
+
+#Check nrow
+checkNrow_af_agWD_Alt <- function(input){
+a <- table(names(unlist(purrr::map(input, function(x) table(nrow(x))))))
+return(a)
+}
+
+##Exclude duplicates by ID with the colname of subject.
+Exclude_duplicates <- function(input, conNum){
+
+if(any(colnames(input) == "subject")){
+if(c(1:ncol(input))[colnames(input) == "subject"] != conNum){
+  return(message("Warning: Not proper value of conNum"))
+}}
+
+colnames(input)[conNum] <- "subject"
+cc <- input["subject"] %>%
+  unique() %>%
+  rownames() %>%
+  as.numeric()
+
+a <- input[cc,]
+return(a)
+
+}
+
+########################################
+#After agCount_Label_Num
+########################################
+#Check nrow
+checkNrow_af_agCount_Label_Num <- function(input){
+a <- unlist(purrr::map(input, function(x){nrow(x)}))
+return(a)
+}
+
+checkColumn_af_agCount_Label_Num <- function(input, colName="Hit_subClassOf_Instance"){
+a <- unlist(purrr::map(input, function(x){ eval(parse(text = paste0("x$", colName))) }))
+return(a)
+}
+
+
+
+
+
+
+
+

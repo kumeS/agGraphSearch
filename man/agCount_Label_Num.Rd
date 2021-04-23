@@ -50,14 +50,14 @@ the specific functions for each endpoint were also prepared.
 #polymer (wikidata prefix URI: wd:Q81163)
 Label <- "polymer"
 
-print(KzLabEndPoint)
+print(KzLabEndPoint_Wikidata)
 print(wikidataClassProperty)
 
 #run
 agCount_Label_Num(
   Entity_Name=Label,
-  EndPoint=KzLabEndPoint$EndPoint,
-  FROM=KzLabEndPoint$FROM,
+  EndPoint=KzLabEndPoint_Wikidata$EndPoint,
+  FROM=KzLabEndPoint_Wikidata$FROM,
   Property=wikidataClassProperty)
 }
 }

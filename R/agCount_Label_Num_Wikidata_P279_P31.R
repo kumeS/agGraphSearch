@@ -3,7 +3,7 @@
 ##' automatically judged to be Japanese (@ja) or English (@en)
 ##' @param Message logical; perform an output of Entity_Name or not.
 ##' @description
-##' For parameters of EndPoint and graph id, the variable of KzLabEndPoint is used.
+##' For parameters of EndPoint and graph id, the variable of KzLabEndPoint_Wikidata is used.
 ##' For parameters of properties, the variable of wikidataClassProperty is used.
 ##' @return data.frame
 ##' @author Satoshi Kume
@@ -15,7 +15,7 @@
 ##' #polymer (wikidata prefix URI: wd:Q81163)
 ##' Label <- "polymer"
 ##'
-##' print(KzLabEndPoint)
+##' print(KzLabEndPoint_Wikidata)
 ##' print(wikidataClassProperty)
 ##'
 ##' #run
@@ -45,8 +45,8 @@ agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name,
 LABEL <- Entity_Name
 
 #EndPoint
-EndPoint <- KzLabEndPoint$EndPoint
-FROM <- KzLabEndPoint$FROM
+EndPoint <- KzLabEndPoint_Wikidata$EndPoint
+FROM <- KzLabEndPoint_Wikidata$FROM
 
 #Property
 Property <- wikidataClassProperty

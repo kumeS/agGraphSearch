@@ -33,8 +33,8 @@ agQIDtoLabel_Wikidata <- function(Entity_ID,
 ID <- Entity_ID
 
 #EndPoint
-EndPoint <- KzLabEndPoint$EndPoint
-FROM <- KzLabEndPoint$FROM
+EndPoint <- KzLabEndPoint_Wikidata$EndPoint
+FROM <- KzLabEndPoint_Wikidata$FROM
 
 #main function
 Res <- agIDtoLabel(Entity_ID=ID,
