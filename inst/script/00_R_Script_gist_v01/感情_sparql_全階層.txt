@@ -1,0 +1,59 @@
+#関係階層を全部取得
+#感情（wd:Q9415）の下位階層（P31、P279）の検索クエリ（下位全部）
+SELECT distinct ?item ?itemLabel ?itemLabelj ?itemLabele ?p ?propLabel ?linkTo ?linkToLabel ?linkToj ?linkToe
+where {
+  ?item wdt:P31*|wdt:P279* wd:Q9415 .
+  OPTIONAL { ?item wdt:P31|wdt:P279 ?linkTo . }
+  OPTIONAL { ?item rdfs:label ?itemLabelj . filter(lang(?itemLabelj) = "ja") }
+  OPTIONAL { ?item rdfs:label ?itemLabele . filter(lang(?itemLabele) = "en") }
+  OPTIONAL { ?linkTo rdfs:label ?linkToj . filter(lang(?linkToj) = "ja") }
+  OPTIONAL { ?linkTo rdfs:label ?linkToe . filter(lang(?linkToe) = "en") }
+  ?item ?p ?linkTo . FILTER (?p IN (wdt:P31, wdt:P279) )
+  ?prop wikibase:directClaim ?p . ?prop rdfs:label ?propLabel . filter(lang(?propLabel) = "ja")
+  SERVICE wikibase:label {bd:serviceParam wikibase:language "ja" }
+}
+
+#感情（wd:Q9415）の上位階層（P31、P279）の検索クエリ（上位全部）
+SELECT distinct ?item ?itemLabel ?itemLabelj ?itemLabele ?p ?propLabel ?linkTo ?linkToLabel ?linkToj ?linkToe
+where {
+  wd:Q9415 wdt:P31*|wdt:P279* ?item .
+  OPTIONAL { ?item wdt:P31|wdt:P279 ?linkTo . }
+  OPTIONAL { ?item rdfs:label ?itemLabelj . filter(lang(?itemLabelj) = "ja") }
+  OPTIONAL { ?item rdfs:label ?itemLabele . filter(lang(?itemLabele) = "en") }
+  OPTIONAL { ?linkTo rdfs:label ?linkToj . filter(lang(?linkToj) = "ja") }
+  OPTIONAL { ?linkTo rdfs:label ?linkToe . filter(lang(?linkToe) = "en") }
+  ?item ?p ?linkTo . FILTER (?p IN (wdt:P31, wdt:P279) )
+  ?prop wikibase:directClaim ?p . ?prop rdfs:label ?propLabel . filter(lang(?propLabel) = "ja")
+  SERVICE wikibase:label {bd:serviceParam wikibase:language "ja" }
+}
+
+#感情（wd:Q9415）の上位・上位階層（P31、P279）の検索クエリ（下位１段、上位全部）
+SELECT distinct ?item ?itemLabel ?itemLabelj ?itemLabele ?p ?propLabel ?linkTo ?linkToLabel ?linkToj ?linkToe
+where {
+  {?item wdt:P31|wdt:P279 wd:Q9415 . } UNION { wd:Q9415 wdt:P31*|wdt:P279* ?item . }
+  OPTIONAL { ?item wdt:P31|wdt:P279 ?linkTo . }
+  OPTIONAL { ?item rdfs:label ?itemLabelj . filter(lang(?itemLabelj) = "ja") }
+  OPTIONAL { ?item rdfs:label ?itemLabele . filter(lang(?itemLabele) = "en") }
+  OPTIONAL { ?linkTo rdfs:label ?linkToj . filter(lang(?linkToj) = "ja") }
+  OPTIONAL { ?linkTo rdfs:label ?linkToe . filter(lang(?linkToe) = "en") }
+  ?item ?p ?linkTo . FILTER (?p IN (wdt:P31, wdt:P279) )
+  ?prop wikibase:directClaim ?p . ?prop rdfs:label ?propLabel . filter(lang(?propLabel) = "ja")
+  SERVICE wikibase:label {bd:serviceParam wikibase:language "ja" }
+}
+
+#感情（wd:Q9415）の上位・上位階層（P31、P279）の検索クエリ（下位全部、上位全部）
+SELECT distinct ?item ?itemLabel ?itemLabelj ?itemLabele ?p ?propLabel ?linkTo ?linkToLabel ?linkToj ?linkToe
+where {
+  {?item wdt:P31*|wdt:P279* wd:Q9415 . } UNION { wd:Q9415 wdt:P31*|wdt:P279* ?item . }
+  OPTIONAL { ?item wdt:P31|wdt:P279 ?linkTo . }
+  OPTIONAL { ?item rdfs:label ?itemLabelj . filter(lang(?itemLabelj) = "ja") }
+  OPTIONAL { ?item rdfs:label ?itemLabele . filter(lang(?itemLabele) = "en") }
+  OPTIONAL { ?linkTo rdfs:label ?linkToj . filter(lang(?linkToj) = "ja") }
+  OPTIONAL { ?linkTo rdfs:label ?linkToe . filter(lang(?linkToe) = "en") }
+  ?item ?p ?linkTo . FILTER (?p IN (wdt:P31, wdt:P279) )
+  ?prop wikibase:directClaim ?p . ?prop rdfs:label ?propLabel . filter(lang(?propLabel) = "ja")
+  SERVICE wikibase:label {bd:serviceParam wikibase:language "ja" }
+}
+
+
+
