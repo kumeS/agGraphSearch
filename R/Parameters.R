@@ -1,8 +1,7 @@
-##' @title Default Parameters
-
-######################################################
+#########################################################################
 #Default Parameters
-######################################################
+#these parameters are for developer, and are used as "agGraphSearch:::".
+#########################################################################
 #wikidata
 KzLabEndPoint_Wikidata <- list(EndPoint="http://kozaki-lab.osakac.ac.jp/agraph/NEDO_pj",
                       FROM = "From <http://wikidata_nearly_full_201127> ")

@@ -44,11 +44,11 @@ agCount_ID_Num_Wikidata_QID_P279_P31 <- function(Entity_ID,
 ID <- Entity_ID
 
 #EndPoint
-EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
 
 #Property
-Property <- agGraphSearch::wikidataClassProperty
+Property <- agGraphSearch:::wikidataClassProperty
 
 #Others
 DirSave=TRUE
@@ -91,14 +91,14 @@ return(data.frame(SPA, stringsAsFactors = F))
 CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31 <- function(Entity_ID){
 
 #Parameters
-Prefix <- agGraphSearch::PREFIX
+Prefix <- agGraphSearch:::PREFIX
 ID <- Entity_ID
 
 #Property
-Property <- agGraphSearch::wikidataClassProperty
+Property <- agGraphSearch:::wikidataClassProperty
 
-EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
 
 Query03A <-paste('
 SELECT  (count(distinct ?parentClass) as ?Count_Of_ParentClass)', '
