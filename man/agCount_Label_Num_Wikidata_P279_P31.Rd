@@ -4,13 +4,11 @@
 \alias{agCount_Label_Num_Wikidata_P279_P31}
 \title{Count triples from a label query for Wikidata local endpoint via SPARQL.}
 \usage{
-agCount_Label_Num_Wikidata_P279_P31(Entity_Name, Message = FALSE)
+agCount_Label_Num_Wikidata_P279_P31(Entity_Name)
 }
 \arguments{
 \item{Entity_Name}{a character vector. The string was
 automatically judged to be Japanese (@ja) or English (@en)}
-
-\item{Message}{logical; perform an output of Entity_Name or not.}
 }
 \value{
 data.frame
@@ -26,20 +24,20 @@ For parameters of properties, the variable of wikidataClassProperty is used.
 #parameters
 
 #polymer (wikidata prefix URI: wd:Q81163)
-Label <- "polymer"
+Entity_Name <- "polymer"
 
 print(KzLabEndPoint_Wikidata)
 print(wikidataClassProperty)
 
 #run SPARQL
 agCount_Label_Num_Wikidata_P279_P31(
-  Entity_Name=Label,
+  Entity_Name=Entity_Name,
   Message=TRUE
   )
 
 #show the SPARQL query
 CkeckQuery_agCount_Label_Num_Wikidata_P279_P31(
-  Entity_Name=Label,
+  Entity_Name=Entity_Name,
   Message=TRUE
   )
 
@@ -49,10 +47,6 @@ library(furrr)
 plan(multisession(workers = 4))
 #plan()
 
-#Run multisession
-lab <- c("polymer", "biopolymer", "pterophyta", "calcium")
-
-future_map(as.character(unlist(lab)), agCount_Label_Num_Wikidata_P279_P31, .progress = TRUE)
 
 }
 }

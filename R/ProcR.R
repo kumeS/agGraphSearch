@@ -8,6 +8,7 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export ListDF2DF
+##' @import magrittr
 ##' @examples \dontrun{
 ##' #parameters
 ##'

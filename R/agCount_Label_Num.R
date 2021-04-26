@@ -20,6 +20,7 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export agCount_Label_Num
+##' @import SPARQL
 ##' @examples \dontrun{
 ##' #parameters
 ##'
@@ -66,10 +67,9 @@ Query01 <-paste('
 SELECT (count(distinct ?subject) as ?Count_As_Label)', ' ',
 FROM, ' ',
 'WHERE {',LAB00,'}', sep="")
-if(Message){message(paste("Query: ", LABEL, sep=""))}else{}
-
+if(Message){message(paste("Query: ", LABEL, sep=""))}
 A <- try(SPA01 <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query01))$results, silent = T)
-if(class(A) == "try-error"){SPA01 <- 0}else{}
+if(class(A) == "try-error"){SPA01 <- 0}
 
 Query02 <-paste('
 SELECT (count(distinct ?subject) as ?Count_As_AltLabel)', ' ',

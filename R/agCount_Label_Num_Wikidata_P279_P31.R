@@ -2,7 +2,6 @@
 ##'
 ##' @param Entity_Name a character vector. The string was
 ##' automatically judged to be Japanese (@ja) or English (@en)
-##' @param Message logical; perform an output of Entity_Name or not.
 ##' @description
 ##' This function allow to count labels and class relations for
 ##' wikidata local endpoint at OECU via SPARQL.
@@ -12,25 +11,26 @@
 ##' @author Satoshi Kume
 ##' @export agCount_Label_Num_Wikidata_P279_P31
 ##' @export CkeckQuery_agCount_Label_Num_Wikidata_P279_P31
+##' @import SPARQL
 ##'
 ##' @examples \dontrun{
 ##' #parameters
 ##'
 ##' #polymer (wikidata prefix URI: wd:Q81163)
-##' Label <- "polymer"
+##' Entity_Name <- "polymer"
 ##'
 ##' print(KzLabEndPoint_Wikidata)
 ##' print(wikidataClassProperty)
 ##'
 ##' #run SPARQL
 ##' agCount_Label_Num_Wikidata_P279_P31(
-##'   Entity_Name=Label,
+##'   Entity_Name=Entity_Name,
 ##'   Message=TRUE
 ##'   )
 ##'
 ##' #show the SPARQL query
 ##' CkeckQuery_agCount_Label_Num_Wikidata_P279_P31(
-##'   Entity_Name=Label,
+##'   Entity_Name=Entity_Name,
 ##'   Message=TRUE
 ##'   )
 ##'
@@ -40,19 +40,15 @@
 ##' plan(multisession(workers = 4))
 ##' #plan()
 ##'
-##' #Run multisession
-##' lab <- c("polymer", "biopolymer", "pterophyta", "calcium")
-##'
-##' future_map(as.character(unlist(lab)), agCount_Label_Num_Wikidata_P279_P31, .progress = TRUE)
 ##'
 ##' }
 
-agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name,
-                                                Message=FALSE){
+
+agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name){
 
 #Parameter set
 #Labels
-LABEL <- Entity_Name
+#LABEL <- Entity_Name
 
 #EndPoint
 EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
@@ -65,19 +61,20 @@ Property <- agGraphSearch:::wikidataClassProperty
 FilterRegex=FALSE
 DirSave=TRUE
 Dir="R01_Results"
+Message=FALSE
 
 #Script
 if(!grepl("^http", EndPoint)){return(message("No EndPoint URL"))}
 if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}
 
-SPA <- agCount_Label_Num(Entity_Name=LABEL,
+SPA <- agCount_Label_Num(Entity_Name=Entity_Name,
                          EndPoint=EndPoint,
                          FROM = FROM,
                          Property=Property,
                          Message=Message,
                          FilterRegex=FilterRegex,
-                         DirSave=FALSE,
-                         Dir="")
+                         DirSave=DirSave,
+                         Dir=Dir)
 
 #change the colnames
 colnames(SPA) <- c("LABEL",
