@@ -5,10 +5,10 @@
 \title{Count triples from a label query via SPARQL.}
 \usage{
 agCount_Label_Num(
-  Entity_Name,
-  EndPoint,
+  Entity_Name = "",
+  EndPoint = "",
   FROM = "",
-  Property,
+  Property = "",
   Message = FALSE,
   FilterRegex = FALSE,
   DirSave = FALSE,
@@ -50,16 +50,17 @@ the specific functions for each endpoint were also prepared.
 
 #polymer (wikidata prefix URI: wd:Q81163)
 Label <- "polymer"
+# Label <- "2官能性モノマー"
 
-print(KzLabEndPoint_Wikidata)
-print(wikidataClassProperty)
+print(agGraphSearch:::KzLabEndPoint_Wikidata)
+print(agGraphSearch:::wikidataClassProperty)
 
 #run
 agCount_Label_Num(
   Entity_Name=Label,
-  EndPoint=KzLabEndPoint_Wikidata$EndPoint,
-  FROM=KzLabEndPoint_Wikidata$FROM,
-  Property=wikidataClassProperty)
+  EndPoint=agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint,
+  FROM=agGraphSearch:::KzLabEndPoint_Wikidata$FROM,
+  Property=agGraphSearch:::wikidataClassProperty)
 }
 }
 \author{

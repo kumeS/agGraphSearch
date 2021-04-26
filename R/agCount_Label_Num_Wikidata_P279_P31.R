@@ -34,28 +34,32 @@
 ##'   Message=TRUE
 ##'   )
 ##'
-##' ##' #Parallel processing of 4 cores using furrr package
-##'
+##' #Parallel processing of 4 cores using furrr package
 ##' library(furrr)
 ##' plan(multisession(workers = 4))
 ##' #plan()
 ##'
+##' #prepare a vector of labels
+##' Labs <- c("polymer", "protein", "Pteridophyta", "material substance")
+##'
+##' #run multisession
+##' results <- future_map(Labs, agCount_Label_Num_Wikidata_P279_P31, .progress=T)
+##' results
 ##'
 ##' }
-
 
 agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name){
 
 #Parameter set
 #Labels
-#LABEL <- Entity_Name
+LABEL <- Entity_Name
 
 #EndPoint
-EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
+EndPoint=agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
+FROM=agGraphSearch:::KzLabEndPoint_Wikidata$FROM
 
 #Property
-Property <- agGraphSearch:::wikidataClassProperty
+Property=agGraphSearch:::wikidataClassProperty
 
 #Others
 FilterRegex=FALSE
@@ -67,7 +71,7 @@ Message=FALSE
 if(!grepl("^http", EndPoint)){return(message("No EndPoint URL"))}
 if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}
 
-SPA <- agCount_Label_Num(Entity_Name=Entity_Name,
+SPA <- agCount_Label_Num(Entity_Name=LABEL,
                          EndPoint=EndPoint,
                          FROM = FROM,
                          Property=Property,

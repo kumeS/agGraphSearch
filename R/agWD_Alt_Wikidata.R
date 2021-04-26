@@ -28,8 +28,10 @@ agWD_Alt_Wikidata <- function(Entity_Name){
 LABEL <- Entity_Name
 
 #EndPoint
-EndPoint <- agGraphSearch:::KzLabEndPoint$EndPoint
-FROM <- agGraphSearch:::KzLabEndPoint$FROM
+EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
+Prefix <- agGraphSearch:::PREFIX
+
 
 SPA <- agWD_Alt(Entity_Name=LABEL,
                 EndPoint=EndPoint,

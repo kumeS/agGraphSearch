@@ -20,28 +20,29 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export agCount_Label_Num
-##' @import SPARQL
+##' @import SPARQL XML RCurl franc
 ##' @examples \dontrun{
 ##' #parameters
 ##'
 ##' #polymer (wikidata prefix URI: wd:Q81163)
 ##' Label <- "polymer"
+##' # Label <- "2官能性モノマー"
 ##'
-##' print(KzLabEndPoint_Wikidata)
-##' print(wikidataClassProperty)
+##' print(agGraphSearch:::KzLabEndPoint_Wikidata)
+##' print(agGraphSearch:::wikidataClassProperty)
 ##'
 ##' #run
 ##' agCount_Label_Num(
 ##'   Entity_Name=Label,
-##'   EndPoint=KzLabEndPoint_Wikidata$EndPoint,
-##'   FROM=KzLabEndPoint_Wikidata$FROM,
-##'   Property=wikidataClassProperty)
+##'   EndPoint=agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint,
+##'   FROM=agGraphSearch:::KzLabEndPoint_Wikidata$FROM,
+##'   Property=agGraphSearch:::wikidataClassProperty)
 ##' }
 
-agCount_Label_Num <- function(Entity_Name,
-                              EndPoint,
+agCount_Label_Num <- function(Entity_Name="",
+                              EndPoint="",
                               FROM = "",
-                              Property,
+                              Property="",
                               Message=FALSE,
                               FilterRegex=FALSE,
                               DirSave=FALSE,
@@ -67,6 +68,7 @@ Query01 <-paste('
 SELECT (count(distinct ?subject) as ?Count_As_Label)', ' ',
 FROM, ' ',
 'WHERE {',LAB00,'}', sep="")
+
 if(Message){message(paste("Query: ", LABEL, sep=""))}
 A <- try(SPA01 <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query01))$results, silent = T)
 if(class(A) == "try-error"){SPA01 <- 0}
@@ -76,21 +78,21 @@ SELECT (count(distinct ?subject) as ?Count_As_AltLabel)', ' ',
 FROM, ' ',
 'WHERE {',LAB01, '}', sep="")
 A <- try(SPA02 <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query02))$results, silent = T)
-if(class(A) == "try-error"){SPA02 <- 0}else{}
+if(class(A) == "try-error"){SPA02 <- 0}
 
 Query03A <-paste('
 SELECT  (count(distinct ?parentClass ) as ?Count_Of_ParentClass_Label)', ' ',
 FROM, ' ',
 'WHERE {',LAB00, ' ?subject ', Property[[1]], ' ?parentClass. }', sep="")
 A <- try(SPA03A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query03A))$results, silent = T)
-if(class(A) == "try-error"){SPA03A <- 0}else{}
+if(class(A) == "try-error"){SPA03A <- 0}
 
 Query03B <-paste('
 SELECT  (count(distinct ?parentClass ) as ?Count_Of_ParentClass_altLabel)', ' ',
 FROM, ' ',
 'WHERE {',LAB01,' ?subject ', Property[[1]], ' ?parentClass. }', sep="")
 A <- try(SPA03B <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query03B))$results, silent = T)
-if(class(A) == "try-error"){SPA03B <- 0}else{}
+if(class(A) == "try-error"){SPA03B <- 0}
 
 Query04A <-paste('
 SELECT  (count(distinct ?childClass ) as ?Count_Of_ChildClass_Label)', ' ',
@@ -98,7 +100,7 @@ FROM, ' ',
 'WHERE {',LAB00,'
 ?childClass ', Property[[1]], ' ?subject.}', sep="")
 A <- try(SPA04A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query04A))$results, silent = T)
-if(class(A) == "try-error"){SPA04A <- 0}else{}
+if(class(A) == "try-error"){SPA04A <- 0}
 
 Query04B <-paste('
 SELECT  (count(distinct ?childClass ) as ?Count_Of_ChildClass_altLabel)', ' ',
@@ -106,7 +108,7 @@ FROM, ' ',
 'WHERE {',LAB01,'
 ?childClass ', Property[[1]], ' ?subject. }', sep="")
 A <- try(SPA04B <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query04B))$results, silent = T)
-if(class(A) == "try-error"){SPA04B <- 0}else{}
+if(class(A) == "try-error"){SPA04B <- 0}
 
 Query05A <-paste('
 SELECT  (count(distinct ?instance ) as ?Count_Has_Instance_Label)', ' ',
@@ -114,7 +116,7 @@ FROM, ' ',
 'WHERE {',LAB00,'
 ?instance ', Property[[2]], ' ?subject. }', sep="")
 A <- try(SPA05A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query05A))$results, silent = T)
-if(class(A) == "try-error"){SPA05A <- 0}else{}
+if(class(A) == "try-error"){SPA05A <- 0}
 
 Query05B <-paste('
 SELECT  (count(distinct ?instance ) as ?Count_Has_Instance_altLabel)', ' ',
@@ -122,7 +124,7 @@ FROM, ' ',
 'WHERE {',LAB01,'
 ?instance ', Property[[2]], ' ?subject. }', sep="")
 A <- try(SPA05B <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query05B))$results, silent = T)
-if(class(A) == "try-error"){SPA05B <- 0}else{}
+if(class(A) == "try-error"){SPA05B <- 0}
 
 Query06A <-paste('
 SELECT  (count(distinct ?instance ) as ?Count_InstanceOf_Label)', ' ',
@@ -130,7 +132,7 @@ FROM, ' ',
 'WHERE {',LAB00,'
 ?subject ', Property[[2]], ' ?instance. }', sep="")
 A <- try(SPA06A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query06A))$results, silent = T)
-if(class(A) == "try-error"){SPA06A <- 0}else{}
+if(class(A) == "try-error"){SPA06A <- 0}
 
 Query06B <-paste('
 SELECT  (count(distinct ?instance ) as ?Count_InstanceOf_altLabel)', ' ',
@@ -138,7 +140,7 @@ FROM, ' ',
 'WHERE {',LAB01,'
 ?subject ', Property[[2]], ' ?instance. }', sep="")
 A <- try(SPA06B <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query06B))$results, silent = T)
-if(class(A) == "try-error"){SPA06B <- 0}else{}
+if(class(A) == "try-error"){SPA06B <- 0}
 
 #Label
 SPA01.SPA02 <- as.numeric(SPA01) + as.numeric(SPA02)
@@ -187,3 +189,5 @@ try(saveRDS(SPA, file = paste(Dir, "/", LABEL00, ".Rdata", sep=""), compress = T
 return(data.frame(SPA, stringsAsFactors = F))
 
 }
+
+

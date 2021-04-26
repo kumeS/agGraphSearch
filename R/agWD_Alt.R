@@ -28,14 +28,14 @@
 ##' #polymer (wikidata prefix URI: wd:Q81163)
 ##' Label <- "CAS Registry Number"
 ##'
-##' print(KzLabEndPoint)
+##' print(KzLabEndPoint_Wikidata)
 ##' print(wikidataClassProperty)
 ##'
 ##' #run
 ##' agWD_Alt(
 ##'   Entity_Name=Label,
-##'   EndPoint=KzLabEndPoint$EndPoint,
-##'   FROM=KzLabEndPoint$FROM
+##'   EndPoint=KzLabEndPoint_Wikidata$EndPoint,
+##'   FROM=KzLabEndPoint_Wikidata$FROM
 ##'   )
 ##'
 ##' }

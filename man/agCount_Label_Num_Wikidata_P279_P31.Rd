@@ -41,12 +41,17 @@ CkeckQuery_agCount_Label_Num_Wikidata_P279_P31(
   Message=TRUE
   )
 
-##' #Parallel processing of 4 cores using furrr package
-
+#Parallel processing of 4 cores using furrr package
 library(furrr)
 plan(multisession(workers = 4))
 #plan()
 
+#prepare a vector of labels
+Labs <- c("polymer", "protein", "Pteridophyta", "material substance")
+
+#run multisession
+results <- future_map(Labs, agCount_Label_Num_Wikidata_P279_P31, .progress=T)
+results
 
 }
 }
