@@ -55,11 +55,11 @@ agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name,
 LABEL <- Entity_Name
 
 #EndPoint
-EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
 
 #Property
-Property <- agGraphSearch::wikidataClassProperty
+Property <- agGraphSearch:::wikidataClassProperty
 
 #Others
 FilterRegex=FALSE
@@ -115,13 +115,13 @@ return(data.frame(SPA, stringsAsFactors = F))
 CkeckQuery_agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name){
 
 #Parameters
-Prefix <- agGraphSearch::PREFIX
+Prefix <- agGraphSearch:::PREFIX
 LABEL <- Entity_Name
 FilterRegex <- FALSE
-Property <- agGraphSearch::wikidataClassProperty
+Property <- agGraphSearch:::wikidataClassProperty
 
-EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
 
 if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){rdfs.l <- "ja" } else { rdfs.l <- "en" }
 

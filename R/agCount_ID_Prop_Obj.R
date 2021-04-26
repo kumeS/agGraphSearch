@@ -52,7 +52,7 @@ agCount_ID_Prop_Obj <- function(Entity_ID,
                                        Message=TRUE){
 
 #Parameters
-Prefix <- agGraphSearch::PREFIX
+Prefix <- agGraphSearch:::PREFIX
 ID <- Entity_ID
 Prop <- Property
 

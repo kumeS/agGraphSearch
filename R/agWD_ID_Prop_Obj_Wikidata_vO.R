@@ -37,11 +37,11 @@ agWD_ID_Prop_Obj_Wikidata_vO <- function(Entity_ID,
 
 #Parameters
 ID <- Entity_ID
-Prefix <- agGraphSearch::PREFIX
+Prefix <- agGraphSearch:::PREFIX
 Prop <- Property
 Obj <- "?o"
-EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
 DISTINCT <- TRUE
 PREFIX_uri <- TRUE
 Message <- FALSE
@@ -65,11 +65,11 @@ return(data.frame(SPA, stringsAsFactors = F))
 CkeckQuery_agWD_ID_Prop_Obj_Wikidata_vO <- function(Entity_ID,
                                                     Property){
 ID <- Entity_ID
-Prefix <- agGraphSearch::PREFIX
+Prefix <- agGraphSearch:::PREFIX
 Prop <- Property
 Obj <- "?o"
-EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
 DISTINCT <- TRUE
 
 if(DISTINCT){

@@ -87,7 +87,7 @@ LabOut <- ""
 Select0 <- ""
 }
 
-Prefix <- agGraphSearch::PREFIX
+Prefix <- agGraphSearch:::PREFIX
 
 switch(base::as.character(Property),
       "1" = p <- c("rdfs:label", "skos:altLabel"),

@@ -47,7 +47,7 @@ agIDtoLabel <- function(Entity_ID,
 #Parameters
 ID <- Entity_ID
 
-Prefix <- agGraphSearch::PREFIX
+Prefix <- agGraphSearch:::PREFIX
 
 switch(as.character(PropertyForLabel),
       "1" = Property <- "rdfs:label",

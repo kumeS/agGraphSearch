@@ -59,7 +59,7 @@ agWD_ID_Prop_Obj <- function(Entity_ID,
 
 #Parameters
 ID <- Entity_ID
-Prefix <- agGraphSearch::PREFIX
+Prefix <- agGraphSearch:::PREFIX
 Prop <- Property
 Obj <- Object
 

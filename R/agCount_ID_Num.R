@@ -44,7 +44,7 @@ agCount_ID_Num <- function(Entity_ID,
                            Dir="R01_Results"){
 ID <- Entity_ID
 
-Prefix <- agGraphSearch::PREFIX
+Prefix <- agGraphSearch:::PREFIX
 
 if(Message){message(paste("Query: ", ID, sep=""))}
 
