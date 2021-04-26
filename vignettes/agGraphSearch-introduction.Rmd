@@ -1,0 +1,47 @@
+---
+title: "Introduction to agGraphSearch"
+author: 
+- name: Satoshi Kume
+date: "`r Sys.Date()`"
+graphics: no
+package: agGraphSearch, knitr, SPARQL
+output:
+  BiocStyle::html_document:
+  toc_float: true
+vignette: >
+  %\VignetteIndexEntry{Introduction to agGraphSearch}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{agGraphSearch}
+---
+
+```{r style, echo = FALSE, results = 'asis', message=FALSE}
+BiocStyle::markdown()
+```
+
+**Last modified:** `r file.info("BioImageDbs.Rmd")$mtime`<br />
+**Compiled**: `r date()`
+
+# Getting started
+
+`r Rpackage("agGraphSearch")` is an R package distributed in kumeS's GitHub site.
+To install the package, start R and enter:
+
+```{r installation, eval=FALSE}
+install.packages( "devtools" )
+devtools::install_github( "kumeS/agGraphSearch" )
+library( "agGraphSearch" )
+```
+
+Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
+
+```{r library, message=FALSE}
+library("agGraphSearch")
+```
+
+
+
+# Session information {.unnumbered}
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
