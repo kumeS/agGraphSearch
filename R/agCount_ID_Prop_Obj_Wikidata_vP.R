@@ -11,8 +11,8 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import magrittr
 ##' @export agCount_ID_Prop_Obj_Wikidata_vP
+##' @export CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vP
 ##' @examples \dontrun{
 ##'
 ##' #Tanaka (Q12159869)
@@ -52,8 +52,8 @@ Count <- "?p"
 GroupBy <- FALSE
 Message <- FALSE
 
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 SPA <- agCount_ID_Property_Object(Entity_ID=ID,
                                   Property=Prop,
@@ -83,8 +83,8 @@ Count <- "?p"
 GroupBy <- FALSE
 Message <- FALSE
 
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 #GroupBy
 if(GroupBy){

@@ -16,7 +16,6 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import SPARQL
 ##' @export agCount_ID_Num
 ##' @examples \dontrun{
 ##' #parameters

@@ -14,8 +14,8 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import stringr SPARQL
 ##' @export agWD_ID_Prop_Obj_Wikidata_vO
+##' @export CkeckQuery_agWD_ID_Prop_Obj_Wikidata_vO
 ##' @examples \dontrun{
 ##'
 ##' #Tanaka (Q12159869)
@@ -40,8 +40,8 @@ ID <- Entity_ID
 Prefix <- agGraphSearch::PREFIX
 Prop <- Property
 Obj <- "?o"
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 DISTINCT <- TRUE
 PREFIX_uri <- TRUE
 Message <- FALSE
@@ -68,8 +68,8 @@ ID <- Entity_ID
 Prefix <- agGraphSearch::PREFIX
 Prop <- Property
 Obj <- "?o"
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 DISTINCT <- TRUE
 
 if(DISTINCT){

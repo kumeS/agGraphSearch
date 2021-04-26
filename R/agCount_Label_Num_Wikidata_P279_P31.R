@@ -1,14 +1,18 @@
-##' @title Count of labels and class relations for wikidata local endpoint at OECU via SPARQL.
+##' @title Count triples from a label query for Wikidata local endpoint via SPARQL.
+##'
 ##' @param Entity_Name a character vector. The string was
 ##' automatically judged to be Japanese (@ja) or English (@en)
 ##' @param Message logical; perform an output of Entity_Name or not.
 ##' @description
+##' This function allow to count labels and class relations for
+##' wikidata local endpoint at OECU via SPARQL.
 ##' For parameters of EndPoint and graph id, the variable of KzLabEndPoint_Wikidata is used.
 ##' For parameters of properties, the variable of wikidataClassProperty is used.
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import readr
 ##' @export agCount_Label_Num_Wikidata_P279_P31
+##' @export CkeckQuery_agCount_Label_Num_Wikidata_P279_P31
+##'
 ##' @examples \dontrun{
 ##' #parameters
 ##'
@@ -51,8 +55,8 @@ agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name,
 LABEL <- Entity_Name
 
 #EndPoint
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 #Property
 Property <- agGraphSearch::wikidataClassProperty
@@ -116,8 +120,8 @@ LABEL <- Entity_Name
 FilterRegex <- FALSE
 Property <- agGraphSearch::wikidataClassProperty
 
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){rdfs.l <- "ja" } else { rdfs.l <- "en" }
 

@@ -28,8 +28,8 @@ agWD_Alt_Wikidata <- function(Entity_Name){
 LABEL <- Entity_Name
 
 #EndPoint
-EndPoint <- KzLabEndPoint$EndPoint
-FROM <- KzLabEndPoint$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint$FROM
 
 SPA <- agWD_Alt(Entity_Name=LABEL,
                 EndPoint=EndPoint,
@@ -68,8 +68,8 @@ lang=1
 Message=FALSE
 LabelOut=FALSE
 
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){
    rdfs.l <- "ja" } else {rdfs.l <- "en"}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/agCount_Label_Num.R
 \name{agCount_Label_Num}
 \alias{agCount_Label_Num}
-\title{Count of labels and concept relations using labels via SPARQL.}
+\title{Count triples from a label query via SPARQL.}
 \usage{
 agCount_Label_Num(
   Entity_Name,
@@ -39,6 +39,7 @@ The second element of list contain the second property ID.}
 data.frame
 }
 \description{
+this function count labels and concept relations using labels via SPARQL.
 this function is a general function for
 searching the RDF data using a label information via SPARQL.
 the specific functions for each endpoint were also prepared.

@@ -13,7 +13,6 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import SPARQL
 ##' @export agQIDtoLabel_Wikidata
 ##' @examples \dontrun{
 ##' #parameters
@@ -33,8 +32,8 @@ agQIDtoLabel_Wikidata <- function(Entity_ID,
 ID <- Entity_ID
 
 #EndPoint
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 #main function
 Res <- agIDtoLabel(Entity_ID=ID,

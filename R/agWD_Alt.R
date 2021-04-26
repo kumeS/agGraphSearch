@@ -21,7 +21,6 @@
 ##' @return data.frame
 ##' @seealso list2DF {base}
 ##' @author Satoshi Kume
-##' @import SPARQL franc
 ##' @export agWD_Alt
 ##' @examples \dontrun{
 ##' #parameters

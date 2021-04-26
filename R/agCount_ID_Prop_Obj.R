@@ -16,7 +16,6 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import magrittr
 ##' @export agCount_ID_Prop_Obj
 ##' @examples \dontrun{
 ##'

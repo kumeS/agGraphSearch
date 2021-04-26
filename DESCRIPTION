@@ -9,9 +9,9 @@ Description: This package provides a tool for searching RDF graph data via SPARQ
 Depends: R (>= 4.0.0)
 Imports: SPARQL, RCurl, rmarkdown, franc, magrittr, htmlwidgets, 
   networkD3, visNetwork, DT, formattable, data.tree, htmltools,
-  purrr, readr, tidyverse, stringr, VennDiagram, plotly,
+  purrr, readr, tidyverse, stringr, VennDiagram,
   testthat
-Suggests: furrr, progress
+Suggests: furrr, progress, plotly
 License: Artistic-2.0
 URL: https://github.com/kumeS/agGraphSearch
 LazyData: true

@@ -18,7 +18,6 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import SPARQL
 ##' @export agIDtoLabel
 ##' @examples \dontrun{
 ##' #parameters

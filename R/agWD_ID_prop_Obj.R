@@ -21,7 +21,6 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import stringr SPARQL
 ##' @export agWD_ID_Prop_Obj
 ##' @examples \dontrun{
 ##'

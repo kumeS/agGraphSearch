@@ -2,7 +2,7 @@
 % Please edit documentation in R/agCount_Label_Num_Wikidata_P279_P31.R
 \name{agCount_Label_Num_Wikidata_P279_P31}
 \alias{agCount_Label_Num_Wikidata_P279_P31}
-\title{Count of labels and class relations for wikidata local endpoint at OECU via SPARQL.}
+\title{Count triples from a label query for Wikidata local endpoint via SPARQL.}
 \usage{
 agCount_Label_Num_Wikidata_P279_P31(Entity_Name, Message = FALSE)
 }
@@ -16,6 +16,8 @@ automatically judged to be Japanese (@ja) or English (@en)}
 data.frame
 }
 \description{
+This function allow to count labels and class relations for
+wikidata local endpoint at OECU via SPARQL.
 For parameters of EndPoint and graph id, the variable of KzLabEndPoint_Wikidata is used.
 For parameters of properties, the variable of wikidataClassProperty is used.
 }

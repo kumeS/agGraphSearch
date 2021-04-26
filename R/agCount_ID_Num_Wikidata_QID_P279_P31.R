@@ -8,8 +8,8 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import readr
 ##' @export agCount_ID_Num_Wikidata_QID_P279_P31
+##' @export CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31
 ##' @examples \dontrun{
 ##' #parameters
 ##'
@@ -44,11 +44,11 @@ agCount_ID_Num_Wikidata_QID_P279_P31 <- function(Entity_ID,
 ID <- Entity_ID
 
 #EndPoint
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 #Property
-Property <- wikidataClassProperty
+Property <- agGraphSearch::wikidataClassProperty
 
 #Others
 DirSave=TRUE
@@ -95,10 +95,10 @@ Prefix <- agGraphSearch::PREFIX
 ID <- Entity_ID
 
 #Property
-Property <- wikidataClassProperty
+Property <- agGraphSearch::wikidataClassProperty
 
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 Query03A <-paste('
 SELECT  (count(distinct ?parentClass) as ?Count_Of_ParentClass)', '

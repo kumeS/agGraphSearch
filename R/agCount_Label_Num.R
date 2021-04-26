@@ -1,4 +1,4 @@
-##' @title Count of labels and concept relations using labels via SPARQL.
+##' @title Count triples from a label query via SPARQL.
 ##'
 ##' @param Entity_Name a character vector. The string was
 ##' automatically judged to be Japanese (@ja) or English (@en)
@@ -12,13 +12,13 @@
 ##' @param DirSave logical; save the results in the Dir path or not
 ##' @param Dir a folder path for output files.
 ##'
-##' @description this function is a general function for
+##' @description this function count labels and concept relations using labels via SPARQL.
+##' this function is a general function for
 ##' searching the RDF data using a label information via SPARQL.
 ##' the specific functions for each endpoint were also prepared.
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @import SPARQL
 ##' @export agCount_Label_Num
 ##' @examples \dontrun{
 ##' #parameters
