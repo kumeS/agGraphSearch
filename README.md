@@ -32,11 +32,11 @@ library( "agGraphSearch" )
 
 - CkeckQuery_agCount_Label_Num_Wikidata_P279_P31
 
-<img src="inst/images/CkeckQuery_agCount_Label_Num_Wikidata_P279_P31.png" width="300px">
+<img src="inst/images/CkeckQuery_agCount_Label_Num_Wikidata_P279_P31.png" width="400px">
 
 - agCount_Label_Num_Wikidata_P279_P31
 
-![agCount_Label_Num_Wikidata_P279_P31](inst/images/agCount_Label_Num_Wikidata_P279_P31.png)
+<img src="inst/images/agCount_Label_Num_Wikidata_P279_P31.png" width="400px">
 
 ## Representative SPARQL endpoints 
 
