@@ -13,12 +13,11 @@
 ##' #CAS Registry Number (wikidata prefix URI: wd:Q102507)
 ##' Label <- "CAS Registry Number"
 ##'
-##' #run SPARQL
-##' agWD_Alt_Wikidata( Entity_Name=Label )
-##'
-##' #show the SPARQL query
+##' #view the SPARQL query
 ##' CkeckQuery_agWD_Alt_Wikidata( Entity_Name=Label )
 ##'
+##' #run SPARQL
+##' agWD_Alt_Wikidata( Entity_Name=Label )
 ##'
 ##' }
 
@@ -31,7 +30,6 @@ LABEL <- Entity_Name
 EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
 FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 Prefix <- agGraphSearch::PREFIX
-
 
 SPA <- agWD_Alt(Entity_Name=LABEL,
                 EndPoint=EndPoint,
@@ -50,13 +48,21 @@ if(length(Lab) != 0){
   SPA <- SPA[-Lab,]
 }
 
-if(!is.null(nrow(SPA))){
+if(all(is.na(unlist(SPA)))){
+return(base::data.frame(subject=NA, stringsAsFactors = F))
+}
+
+if(length(unlist(SPA)) != 0){
 return(base::data.frame(subject=SPA, stringsAsFactors = F))
 }else{
 return(base::data.frame(subject=NA, stringsAsFactors = F))
 }
 }
 
+##' @title View SPARQ Query of agWD_Alt_Wikidata.
+##' @param Entity_Name a character vector corresponing to the entity label.
+##' @export CkeckQuery_agWD_Alt_Wikidata
+##' @seealso agWD_Alt_Wikidata
 
 CkeckQuery_agWD_Alt_Wikidata <- function(Entity_Name){
 
@@ -66,7 +72,7 @@ LABEL <- Entity_Name
 
 AltLabel=FALSE
 Property=1
-lang=1
+lang=3
 Message=FALSE
 LabelOut=FALSE
 
@@ -133,8 +139,7 @@ Query <-paste0("EndPoint:
 Query01,
 '```````````````````````````````````````````')
 
-message(Query)
-
+#message(Query)
 return( message(Query) )
 
 }

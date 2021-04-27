@@ -28,17 +28,29 @@ system( "R CMD INSTALL agGraphSearch" )
 library( "agGraphSearch" )
 ```
 
-## Examples of function execution in the package
+## Some examples of function execution in the package
 
 - CkeckQuery_agCount_Label_Num_Wikidata_P279_P31
 
 <img src="inst/images/CkeckQuery_agCount_Label_Num_Wikidata_P279_P31.png" width="400px">
 
-- agCount_Label_Num_Wikidata_P279_P31
+- agCount_Label_Num_Wikidata_P279_P31 & agTableDT
 
 <img src="inst/images/agCount_Label_Num_Wikidata_P279_P31.png" width="400px">
 
-## Representative SPARQL endpoints 
+- CkeckQuery_agWD_Alt_Wikidata
+
+<img src="inst/images/CkeckQuery_agWD_Alt_Wikidata.png" width="400px">
+
+- CkeckQuery_agQIDtoLabel_Wikidata
+
+<img src="inst/images/CkeckQuery_agQIDtoLabel_Wikidata.png" width="400px">
+
+- CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31
+
+<img src="inst/images/CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31.png" width="400px">
+
+## SPARQL endpoints 
 
 - KzLab at OECU
   - Wikidata

@@ -4,7 +4,7 @@
 \alias{agQIDtoLabel_Wikidata}
 \title{Searching the label corresponding to the entity url in wikidata via SPARQL.}
 \usage{
-agQIDtoLabel_Wikidata(Entity_ID, lang = 3, Message = TRUE)
+agQIDtoLabel_Wikidata(Entity_ID, lang = 3, Message = FALSE)
 }
 \arguments{
 \item{Entity_ID}{a character vector corresponing to the entity ID.}

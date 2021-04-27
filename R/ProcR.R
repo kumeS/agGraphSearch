@@ -1,7 +1,7 @@
 ##' @title Bind list to Data Frame
 ##'
 ##' @param input A list of data frames. their colnames should be same.
-##'
+##' @param NA.omit logical: perform na.omit() or not after combining the data.
 ##' @description
 ##' Create a data frame from a list of multiple data frames with the same colnames.
 ##'
@@ -23,7 +23,7 @@
 ##'
 ##' }
 
-ListDF2DF <- function(input){
+ListDF2DF <- function(input, NA.omit=FALSE){
 
 if(!is.list(input)){return(message("Warning: Not proper value of input"))}
 if(!is.data.frame(input[[1]])){return(message("Warning: Not proper value of input"))}
@@ -32,6 +32,8 @@ a <- c()
 for(n in base::seq_len(length(input))){
 a <- a %>% base::rbind(input[[n]])
 }
+
+if(NA.omit){a <- stats::na.omit(a)}
 
 rownames(a) <- 1:nrow(a)
 return(data.frame(a, stringsAsFactors = F))
@@ -43,17 +45,52 @@ return(data.frame(a, stringsAsFactors = F))
 ########################################
 #Check NA or not
 checkNA_af_agWD_Alt <- function(input){
+if(!is.list(input)){return(message("Warning: Not proper value of input"))}
 a <- table(names(unlist(purrr::map(input, function(x) table(is.na(x))))))
 return(a)
 }
 
 #Check nrow
 checkNrow_af_agWD_Alt <- function(input){
+if(!is.list(input)){return(message("Warning: Not proper value of input"))}
 a <- table(names(unlist(purrr::map(input, function(x) table(nrow(x))))))
 return(a)
 }
 
+########################################
+#After agQIDtoLabel
+########################################
+#Check nrow
+checkNrow_af_agQIDtoLabel <- function(input){
+if(!is.list(input)){return(message("Warning: Not proper value of input"))}
+a <- table(unlist(purrr::map(input, function(x){nrow(x)})))
+return(a)
+}
+
+checkNrowVec_af_agQIDtoLabel <- function(input){
+if(!is.list(input)){return(message("Warning: Not proper value of input"))}
+a <- unlist(purrr::map(input, function(x){nrow(x)}))
+return(a)
+}
+
+########################################
+#After agCount_Label_Num
+########################################
+checkHitLabel_af_agCount_Label_Num <- function(input){
+if(!is.list(input)){return(message("Warning: Not proper value of input"))}
+a <- unlist(purrr::map(input, function(x){ x$Hit_Label }))
+return(a)
+}
+
+checkHitALL_af_agCount_Label_Num <- function(input){
+if(!is.list(input)){return(message("Warning: Not proper value of input"))}
+a <- unlist(purrr::map(input, function(x){ x$Hit_ALL }))
+return(a)
+}
+
+########################################
 ##Exclude duplicates by ID with the colname of subject.
+########################################
 Exclude_duplicates <- function(input, conNum){
 
 if(any(colnames(input) == "subject")){

@@ -22,12 +22,11 @@ searching the RDF data using an entity URI via SPARQL.
 #CAS Registry Number (wikidata prefix URI: wd:Q102507)
 Label <- "CAS Registry Number"
 
-#run SPARQL
-agWD_Alt_Wikidata( Entity_Name=Label )
-
-#show the SPARQL query
+#view the SPARQL query
 CkeckQuery_agWD_Alt_Wikidata( Entity_Name=Label )
 
+#run SPARQL
+agWD_Alt_Wikidata( Entity_Name=Label )
 
 }
 }

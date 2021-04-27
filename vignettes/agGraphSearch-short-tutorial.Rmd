@@ -1,0 +1,93 @@
+---
+title: "Workflow to use agGraphSearch"
+shorttitle: "WF-001: load the search seeds"
+author:
+  - name: Satoshi Kume
+date: "`r Sys.Date()`"
+graphics: no
+package: agGraphSearch, knitr, SPARQL
+output:
+  BiocStyle::html_document:
+  toc_float: true
+vignette: >
+  %\VignetteIndexEntry{WF-001: load the search seeds}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{agGraphSearch}
+---
+
+```{r style, echo = FALSE, results = 'asis', message=FALSE}
+BiocStyle::markdown()
+```
+
+**Last modified:** `r file.info("agGraphSearch-WF-001.Rmd")$mtime`<br />
+**Compiled**: `r date()`
+
+# Getting started
+
+Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
+
+```{r library, message=FALSE}
+library("agGraphSearch")
+```
+
+This workflow can be skipped. The next workflow should be started. 
+
+# Read the csv files from extdata
+
+```{r echo=TRUE, eval=FALSE}
+f <- system.file("extdata", "PoLyInfo_metadata_ALL_v02.csv", package="agGraphSearch")
+words <- data.frame(readr::read_csv(f, col_names = T))
+
+f <- system.file("extdata", "PoLyInfo_metadata_Jpn_v03.csv", package="agGraphSearch")
+wordsj <- data.frame(readr::read_csv(f, col_names = T))
+
+```
+
+# Check the data
+
+```{r echo=TRUE, eval=FALSE}
+head(words)
+dim(words)
+
+head(wordsj)
+dim(wordsj)
+```
+
+# Delete blanks
+
+```{r echo=TRUE, eval=FALSE}
+words.c <- unique(as.character(unlist(words)[unlist(words) != ""]))
+wordsj.c <- unique(as.character(unlist(wordsj)[unlist(wordsj) != ""]))
+```
+
+# combind the search seeds and delete the deplicates
+
+```{r echo=TRUE, eval=FALSE}
+words.cc <- unique(c(wordsj.c, words.c))
+
+agTableFM(data.frame(words.cc))
+```
+
+# Extract Japanese vocabulary
+
+```{r echo=TRUE, eval=FALSE}
+words.lab <- words.cc[1:515]
+
+agTableFM(as.data.frame(words.lab))
+```
+
+# save file
+
+```{r echo=TRUE, eval=FALSE}
+#create a new folder
+if(!dir.exists("00_Input")){dir.create("00_Input")}
+
+#save to csv
+readr::write_excel_csv(data.frame(words.lab), file="./00_Input/words.lab.csv", col_names = F)
+```
+
+# Session information {.unnumbered}
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```

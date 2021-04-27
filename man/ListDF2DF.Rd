@@ -4,10 +4,12 @@
 \alias{ListDF2DF}
 \title{Bind list to Data Frame}
 \usage{
-ListDF2DF(input)
+ListDF2DF(input, NA.omit = FALSE)
 }
 \arguments{
 \item{input}{A list of data frames. their colnames should be same.}
+
+\item{NA.omit}{logical: perform na.omit() or not after combining the data.}
 }
 \value{
 data.frame

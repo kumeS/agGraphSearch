@@ -13,7 +13,7 @@ agTableDT(
   Browse = TRUE,
   Editable = FALSE,
   Caption = "Table. results",
-  Width = "300px",
+  Width = "100px",
   PageLength = 25
 )
 }

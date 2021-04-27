@@ -37,7 +37,7 @@ agTableDT <- function(Data,
                       Browse=TRUE,
                       Editable=FALSE,
                       Caption="Table. results",
-                      Width='300px',
+                      Width='100px',
                       PageLength=25){
 
 if(!is.data.frame(Data)){return(message("Warning: Not proper value of Data"))}

@@ -9,7 +9,6 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export agCount_ID_Num_Wikidata_QID_P279_P31
-##' @export CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31
 ##' @importFrom  SPARQL SPARQL
 ##' @examples \dontrun{
 ##' #parameters
@@ -88,6 +87,14 @@ return(data.frame(SPA, stringsAsFactors = F))
 
 }
 
+##' @title View the SPARQL query of agCount_ID_Num_Wikidata_QID_P279_P31.
+##'
+##' @param Entity_ID a character vector corresponing to the entity ID.
+##'
+##' @return message
+##' @author Satoshi Kume
+##' @export CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31
+##' @seealso agCount_ID_Num_Wikidata_QID_P279_P31
 
 CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31 <- function(Entity_ID){
 
@@ -148,7 +155,6 @@ Query05A, '
 ',
 '```````````````````````````````````````````')
 
-#message(Query)
 return( message(Query) )
 
 }

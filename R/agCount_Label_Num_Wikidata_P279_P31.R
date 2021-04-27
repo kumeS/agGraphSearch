@@ -10,7 +10,6 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export agCount_Label_Num_Wikidata_P279_P31
-##' @export CkeckQuery_agCount_Label_Num_Wikidata_P279_P31
 ##' @importFrom SPARQL SPARQL
 ##'
 ##' @examples \dontrun{
@@ -111,6 +110,14 @@ return(data.frame(SPA, stringsAsFactors = F))
 
 }
 
+##' @title View the SPARQL query of agCount_Label_Num_Wikidata_P279_P31.
+##'
+##' @param Entity_Name a character vector. The string was
+##' automatically judged to be Japanese (@ja) or English (@en)
+##' @return message
+##' @author Satoshi Kume
+##' @export CkeckQuery_agCount_Label_Num_Wikidata_P279_P31
+##' @seealso agCount_Label_Num_Wikidata_P279_P31
 
 CkeckQuery_agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name){
 
