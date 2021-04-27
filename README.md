@@ -32,7 +32,7 @@ library( "agGraphSearch" )
 
 - CkeckQuery_agCount_Label_Num_Wikidata_P279_P31
 
-![CkeckQuery_agCount_Label_Num_Wikidata_P279_P31](inst/images/CkeckQuery_agCount_Label_Num_Wikidata_P279_P31.png)
+<img src="inst/images/CkeckQuery_agCount_Label_Num_Wikidata_P279_P31.png" width="300px">
 
 - agCount_Label_Num_Wikidata_P279_P31
 
