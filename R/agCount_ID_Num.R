@@ -23,15 +23,15 @@
 ##' #polymer (wikidata prefix URI: wd:Q81163)
 ##' ID <- "wd:Q81163"
 ##'
-##' print(KzLabEndPoint_Wikidata)
-##' print(wikidataClassProperty)
+##' print(agGraphSearch::KzLabEndPoint_Wikidata)
+##' print(agGraphSearch::wikidataClassProperty)
 ##'
 ##' #run
 ##' agCount_ID_Num(
 ##'   Entity_ID=ID,
-##'   EndPoint=KzLabEndPoint_Wikidata$EndPoint,
-##'   FROM=KzLabEndPoint_Wikidata$FROM,
-##'   Property=wikidataClassProperty)
+##'   EndPoint=agGraphSearch::KzLabEndPoint_Wikidata$EndPoint,
+##'   FROM=agGraphSearch::KzLabEndPoint_Wikidata$FROM,
+##'   Property=agGraphSearch::wikidataClassProperty)
 ##'
 ##' }
 
@@ -44,7 +44,7 @@ agCount_ID_Num <- function(Entity_ID,
                            Dir="R01_Results"){
 ID <- Entity_ID
 
-Prefix <- agGraphSearch:::PREFIX
+Prefix <- agGraphSearch::PREFIX
 
 if(Message){message(paste("Query: ", ID, sep=""))}
 

@@ -25,14 +25,14 @@
 ##' #polymer (wikidata prefix URI: wd:Q81163)
 ##' ID <- "wd:Q81163"
 ##'
-##' print(KzLabEndPoint)
-##' print(wikidataClassProperty)
+##' print(agGraphSearch::KzLabEndPoint_Wikidata)
+##' print(agGraphSearch::wikidataClassProperty)
 ##'
 ##' #run
 ##' agIDtoLabel(
 ##'   Entity_ID=ID,
-##'   EndPoint=KzLabEndPoint$EndPoint,
-##'   FROM=KzLabEndPoint$FROM
+##'   EndPoint=agGraphSearch::KzLabEndPoint_Wikidata$EndPoint,
+##'   FROM=agGraphSearch::KzLabEndPoint_Wikidata$FROM
 ##'   )
 ##'
 ##' }
@@ -47,7 +47,7 @@ agIDtoLabel <- function(Entity_ID,
 #Parameters
 ID <- Entity_ID
 
-Prefix <- agGraphSearch:::PREFIX
+Prefix <- agGraphSearch::PREFIX
 
 switch(as.character(PropertyForLabel),
       "1" = Property <- "rdfs:label",

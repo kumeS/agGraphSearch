@@ -7,12 +7,12 @@ Author: Satoshi Kume
 Maintainer: Satoshi Kume <satoshi.kume.1984@gmail.com>
 Description: This package provides a tool for searching RDF graph data via SPARQL and data mining.
 Depends: R (>= 4.0.0)
-Imports: SPARQL, RCurl, rmarkdown, franc, magrittr, htmlwidgets, 
-  networkD3, visNetwork, DT, formattable, data.tree, htmltools,
-  purrr, readr, tidyverse, stringr, VennDiagram,
-  testthat
-Suggests: furrr, progress, plotly, rlang
+Imports: SPARQL, RCurl, franc, magrittr, 
+  purrr, readr, stringr, BiocStyle, knitr
+Suggests: furrr, progress, plotly, rlang, networkD3, visNetwork, DT, formattable, data.tree,
+  testthat, VennDiagram, htmltools, htmlwidgets, tidyverse, rmarkdown
 License: Artistic-2.0
+VignetteBuilder: knitr
 URL: https://github.com/kumeS/agGraphSearch
 LazyData: true
 RoxygenNote: 7.1.1

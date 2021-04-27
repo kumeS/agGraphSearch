@@ -26,9 +26,6 @@ For parameters of properties, the variable of wikidataClassProperty is used.
 #polymer (wikidata prefix URI: wd:Q81163)
 Entity_Name <- "polymer"
 
-print(KzLabEndPoint_Wikidata)
-print(wikidataClassProperty)
-
 #run SPARQL
 agCount_Label_Num_Wikidata_P279_P31(
   Entity_Name=Entity_Name,

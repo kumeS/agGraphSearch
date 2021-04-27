@@ -1,5 +1,7 @@
 
-agCount_Label_Num_Wikidata_P279_P31_multi <- function(Entity_Name="データサイエンス",
+#What part of furrr::future_map can and cannot be executed?
+
+agCount_Label_Num_Wikidata_P279_P31_multi <- function(Entity_Name="data science",
                               Message=F, FilterRegex=F,
                               DirSave=F, Dir="R01_Results",
                               FROM= "From <http://wikidata_nearly_full_201127> ",
@@ -166,7 +168,7 @@ if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}
 LABEL <- Entity_Name
 if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){rdfs.l <- "ja" } else { rdfs.l <- "en" }
 
-#Prefix <- agGraphSearch:::PREFIX
+#Prefix <- agGraphSearch::PREFIX
 
 Prefix <- '
 PREFIX wd: <http://www.wikidata.org/entity/>

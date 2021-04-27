@@ -54,8 +54,8 @@ Obj <- "wd:Q101352"
 Prop <- "?p"
 Count <- "?p"
 
-EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-FROM <- KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 agCount_ID_Prop_Obj(
   Entity_ID=ID,

@@ -45,14 +45,14 @@ searching the RDF data using an entity URI via SPARQL.
 #polymer (wikidata prefix URI: wd:Q81163)
 ID <- "wd:Q81163"
 
-print(KzLabEndPoint)
-print(wikidataClassProperty)
+print(agGraphSearch::KzLabEndPoint_Wikidata)
+print(agGraphSearch::wikidataClassProperty)
 
 #run
 agIDtoLabel(
   Entity_ID=ID,
-  EndPoint=KzLabEndPoint$EndPoint,
-  FROM=KzLabEndPoint$FROM
+  EndPoint=agGraphSearch::KzLabEndPoint_Wikidata$EndPoint,
+  FROM=agGraphSearch::KzLabEndPoint_Wikidata$FROM
   )
 
 }

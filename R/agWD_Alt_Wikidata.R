@@ -28,9 +28,9 @@ agWD_Alt_Wikidata <- function(Entity_Name){
 LABEL <- Entity_Name
 
 #EndPoint
-EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
-Prefix <- agGraphSearch:::PREFIX
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
+Prefix <- agGraphSearch::PREFIX
 
 
 SPA <- agWD_Alt(Entity_Name=LABEL,
@@ -61,7 +61,7 @@ return(base::data.frame(subject=NA, stringsAsFactors = F))
 CkeckQuery_agWD_Alt_Wikidata <- function(Entity_Name){
 
 #Parameters
-Prefix <- agGraphSearch:::PREFIX
+Prefix <- agGraphSearch::PREFIX
 LABEL <- Entity_Name
 
 AltLabel=FALSE
@@ -70,8 +70,8 @@ lang=1
 Message=FALSE
 LabelOut=FALSE
 
-EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){
    rdfs.l <- "ja" } else {rdfs.l <- "en"}

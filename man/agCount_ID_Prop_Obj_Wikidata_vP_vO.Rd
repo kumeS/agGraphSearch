@@ -12,8 +12,6 @@ agCount_ID_Prop_Obj_Wikidata_vP_vO(Entity_ID, Val = TRUE)
 \item{Val}{return the results as values or TRUE/FALSE.
 If TRUE, this gives a value to hit in the data.
 If FALSE, this gives a logical to hit in the data or not.}
-
-\item{Object}{a vector of character; a string, a value, an entity URI / prefixed ID, or a variable starting with ?.}
 }
 \value{
 data.frame

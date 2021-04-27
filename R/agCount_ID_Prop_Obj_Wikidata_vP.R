@@ -44,7 +44,7 @@ agCount_ID_Prop_Obj_Wikidata_vP <- function(Entity_ID,
                                             Object,
                                             Val=TRUE){
 #Parameters
-Prefix <- agGraphSearch:::PREFIX
+Prefix <- agGraphSearch::PREFIX
 ID <- Entity_ID
 Obj <- Object
 Prop <- "?p"
@@ -52,8 +52,8 @@ Count <- "?p"
 GroupBy <- FALSE
 Message <- FALSE
 
-EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 SPA <- agCount_ID_Property_Object(Entity_ID=ID,
                                   Property=Prop,
@@ -75,7 +75,7 @@ return(data.frame(SPA > 0, stringsAsFactors = F))
 CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vP <- function(Entity_ID,
                                                        Object){
 #Parameters
-Prefix <- agGraphSearch:::PREFIX
+Prefix <- agGraphSearch::PREFIX
 ID <- Entity_ID
 Obj <- Object
 Prop <- "?p"
@@ -83,8 +83,8 @@ Count <- "?p"
 GroupBy <- FALSE
 Message <- FALSE
 
-EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 #GroupBy
 if(GroupBy){

@@ -20,23 +20,22 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export agCount_Label_Num
-##' @import SPARQL XML RCurl franc
+##' @import SPARQL RCurl franc
 ##' @examples \dontrun{
 ##' #parameters
 ##'
 ##' #polymer (wikidata prefix URI: wd:Q81163)
 ##' Label <- "polymer"
-##' # Label <- "2官能性モノマー"
 ##'
-##' print(agGraphSearch:::KzLabEndPoint_Wikidata)
-##' print(agGraphSearch:::wikidataClassProperty)
+##' print(agGraphSearch::KzLabEndPoint_Wikidata)
+##' print(agGraphSearch::wikidataClassProperty)
 ##'
 ##' #run
 ##' agCount_Label_Num(
 ##'   Entity_Name=Label,
-##'   EndPoint=agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint,
-##'   FROM=agGraphSearch:::KzLabEndPoint_Wikidata$FROM,
-##'   Property=agGraphSearch:::wikidataClassProperty)
+##'   EndPoint=agGraphSearch::KzLabEndPoint_Wikidata$EndPoint,
+##'   FROM=agGraphSearch::KzLabEndPoint_Wikidata$FROM,
+##'   Property=agGraphSearch::wikidataClassProperty)
 ##' }
 
 agCount_Label_Num <- function(Entity_Name="",
@@ -54,7 +53,7 @@ if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}
 LABEL <- Entity_Name
 if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){rdfs.l <- "ja" } else { rdfs.l <- "en" }
 
-Prefix <- agGraphSearch:::PREFIX
+Prefix <- agGraphSearch::PREFIX
 
 if(FilterRegex){
 LAB00 <- paste('?subject rdfs:label ?text FILTER regex (?text, \"', LABEL, '\", \"i\"). ', sep="")

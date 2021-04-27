@@ -50,17 +50,16 @@ the specific functions for each endpoint were also prepared.
 
 #polymer (wikidata prefix URI: wd:Q81163)
 Label <- "polymer"
-# Label <- "2官能性モノマー"
 
-print(agGraphSearch:::KzLabEndPoint_Wikidata)
-print(agGraphSearch:::wikidataClassProperty)
+print(agGraphSearch::KzLabEndPoint_Wikidata)
+print(agGraphSearch::wikidataClassProperty)
 
 #run
 agCount_Label_Num(
   Entity_Name=Label,
-  EndPoint=agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint,
-  FROM=agGraphSearch:::KzLabEndPoint_Wikidata$FROM,
-  Property=agGraphSearch:::wikidataClassProperty)
+  EndPoint=agGraphSearch::KzLabEndPoint_Wikidata$EndPoint,
+  FROM=agGraphSearch::KzLabEndPoint_Wikidata$FROM,
+  Property=agGraphSearch::wikidataClassProperty)
 }
 }
 \author{

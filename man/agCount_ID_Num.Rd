@@ -46,15 +46,15 @@ the specific functions for each endpoint were also prepared.
 #polymer (wikidata prefix URI: wd:Q81163)
 ID <- "wd:Q81163"
 
-print(KzLabEndPoint_Wikidata)
-print(wikidataClassProperty)
+print(agGraphSearch::KzLabEndPoint_Wikidata)
+print(agGraphSearch::wikidataClassProperty)
 
 #run
 agCount_ID_Num(
   Entity_ID=ID,
-  EndPoint=KzLabEndPoint_Wikidata$EndPoint,
-  FROM=KzLabEndPoint_Wikidata$FROM,
-  Property=wikidataClassProperty)
+  EndPoint=agGraphSearch::KzLabEndPoint_Wikidata$EndPoint,
+  FROM=agGraphSearch::KzLabEndPoint_Wikidata$FROM,
+  Property=agGraphSearch::wikidataClassProperty)
 
 }
 }

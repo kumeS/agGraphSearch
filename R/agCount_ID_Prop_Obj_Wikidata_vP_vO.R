@@ -1,7 +1,6 @@
 ##' @title Counting the particular triples w/wo GroupBy Option in WIkidata.
 ##'
 ##' @param Entity_ID a vector of character; an entity URI / prefixed ID, or a variable starting with ?.
-##' @param Object a vector of character; a string, a value, an entity URI / prefixed ID, or a variable starting with ?.
 ##' @param Val return the results as values or TRUE/FALSE.
 ##' If TRUE, this gives a value to hit in the data.
 ##' If FALSE, this gives a logical to hit in the data or not.
@@ -38,7 +37,7 @@ agCount_ID_Prop_Obj_Wikidata_vP_vO <- function(Entity_ID,
 if(!is.logical(Val)){return(message("Warning: Not proper value of Val"))}
 
 #Parameters
-Prefix <- agGraphSearch:::PREFIX
+Prefix <- agGraphSearch::PREFIX
 ID <- Entity_ID
 Obj <- "?o"
 Prop <- "?p"
@@ -46,8 +45,8 @@ Count <- "?p"
 GroupBy <- FALSE
 Message <- FALSE
 
-EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 SPA <- agCount_ID_Property_Object(Entity_ID=ID,
                                   Property=Prop,
@@ -68,7 +67,7 @@ return(data.frame(SPA > 0, stringsAsFactors = F))
 CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vP_vO <- function(Entity_ID){
 
 #Parameters
-Prefix <- agGraphSearch:::PREFIX
+Prefix <- agGraphSearch::PREFIX
 ID <- Entity_ID
 Obj <- "?o"
 Prop <- "?p"
@@ -76,8 +75,8 @@ Count <- "?p"
 GroupBy <- FALSE
 Message <- FALSE
 
-EndPoint <- agGraphSearch:::KzLabEndPoint_Wikidata$EndPoint
-FROM <- agGraphSearch:::KzLabEndPoint_Wikidata$FROM
+EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 #GroupBy
 if(GroupBy){

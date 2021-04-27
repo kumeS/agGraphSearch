@@ -27,8 +27,8 @@
 ##' Prop <- "?p"
 ##' Count <- "?p"
 ##'
-##' EndPoint <- KzLabEndPoint_Wikidata$EndPoint
-##' FROM <- KzLabEndPoint_Wikidata$FROM
+##' EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+##' FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 ##'
 ##' agCount_ID_Prop_Obj(
 ##'   Entity_ID=ID,
@@ -52,7 +52,7 @@ agCount_ID_Prop_Obj <- function(Entity_ID,
                                        Message=TRUE){
 
 #Parameters
-Prefix <- agGraphSearch:::PREFIX
+Prefix <- agGraphSearch::PREFIX
 ID <- Entity_ID
 Prop <- Property
 
