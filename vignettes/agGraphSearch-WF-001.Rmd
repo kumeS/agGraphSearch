@@ -1,8 +1,8 @@
 ---
 title: "Workflow to use agGraphSearch"
 shorttitle: "WF-001: load the search seeds"
-author: 
-- name: Satoshi Kume
+author:
+  - name: Satoshi Kume
 date: "`r Sys.Date()`"
 graphics: no
 package: agGraphSearch, knitr, SPARQL
@@ -10,7 +10,7 @@ output:
   BiocStyle::html_document:
   toc_float: true
 vignette: >
-  %\VignetteIndexEntry{Workflow to use agGraphSearch}
+  %\VignetteIndexEntry{WF-001: load the search seeds}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}

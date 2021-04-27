@@ -1,7 +1,7 @@
 ---
 title: "Introduction to agGraphSearch"
-author: 
-- name: Satoshi Kume
+author:
+  - name: Satoshi Kume
 date: "`r Sys.Date()`"
 graphics: no
 package: agGraphSearch, knitr, SPARQL
