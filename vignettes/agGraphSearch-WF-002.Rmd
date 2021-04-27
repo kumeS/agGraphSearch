@@ -73,7 +73,10 @@ agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 #SPARQL
 #library(SPARQL)
-agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab00)
+res <- agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab00)
+res
+
+agTableDT(res, Width = "100px")
 
 ```
 

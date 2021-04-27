@@ -28,21 +28,38 @@ system( "R CMD INSTALL agGraphSearch" )
 library( "agGraphSearch" )
 ```
 
-## Functions in the package
+## Examples of function execution in the package
 
-- AAA: XXX
+- CkeckQuery_agCount_Label_Num_Wikidata_P279_P31
 
-- BBB: YYY
+![CkeckQuery_agCount_Label_Num_Wikidata_P279_P31](inst/images/CkeckQuery_agCount_Label_Num_Wikidata_P279_P31.png)
 
+- agCount_Label_Num_Wikidata_P279_P31
 
-
-## Example
-
-under preparation.
+![agCount_Label_Num_Wikidata_P279_P31](inst/images/agCount_Label_Num_Wikidata_P279_P31.png)
 
 ## Representative SPARQL endpoints 
 
-under preparation.
+- KzLab at OECU
+  - Wikidata
+    - Endpoint URL: http://kozaki-lab.osakac.ac.jp/agraph/NEDO_pj
+    - Graph ID: http://wikidata_nearly_full_201127
+
+  - Polymer ontology 1.1
+    - Endpoint URL: http://kozaki-lab.osakac.ac.jp/agraph/NEDO_pj_11
+
+  - DBpedia Japanese 2016
+    - Endpoint URL: http://kozaki-lab.osakac.ac.jp/agraph/DBpedia2016_RDF
+    - Graph ID: http://DBpedia_2016_jpn
+
+  - IOBC / Mesh / LSD / Nikkaji / ICD10
+    - Endpoint URL: http://kozaki-lab.osakac.ac.jp/agraph/IOBC_Mesh_LOD
+		- Graph ID:
+		  - http://iobc
+		  - http://mesh
+		  - http://lsd
+		  - http://nikkaji
+		  - http://icd10
 
 ## Author / maintainer
 
