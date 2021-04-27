@@ -19,7 +19,7 @@ vignette: >
 BiocStyle::markdown()
 ```
 
-**Last modified:** `r file.info("BioImageDbs.Rmd")$mtime`<br />
+**Last modified:** `r file.info("agGraphSearch-introduction.Rmd")$mtime`<br />
 **Compiled**: `r date()`
 
 # Getting started

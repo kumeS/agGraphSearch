@@ -19,12 +19,13 @@
 ##' @importFrom DT datatable
 ##' @importFrom htmlwidgets saveWidget
 ##' @importFrom magrittr %>%
+##'
 ##' @examples \dontrun{
 ##'
-##' print(agGraphSearch::URI2Prefix)
+##' head(iris)
 ##'
 ##' #run
-##' agTableDT( Data = agGraphSearch::URI2Prefix, PageLength = 10 )
+##' agTableDT( Data = iris, PageLength = 10 )
 ##'
 ##' }
 

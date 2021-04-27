@@ -11,7 +11,7 @@
 ##' @author Satoshi Kume
 ##' @export agCount_Label_Num_Wikidata_P279_P31
 ##' @export CkeckQuery_agCount_Label_Num_Wikidata_P279_P31
-##' @import SPARQL
+##' @importFrom SPARQL SPARQL
 ##'
 ##' @examples \dontrun{
 ##' #parameters
@@ -67,6 +67,8 @@ Message=FALSE
 #Script
 if(!grepl("^http", EndPoint)){return(message("No EndPoint URL"))}
 if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}
+
+#Entity_Name=lab$X1[1]; EndPoint=EndPoint; FROM = FROM; Property=Property; Message=Message; FilterRegex=FilterRegex; DirSave=DirSave; Dir=Dir
 
 SPA <- agCount_Label_Num(Entity_Name=LABEL,
                          EndPoint=EndPoint,

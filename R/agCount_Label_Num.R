@@ -20,7 +20,9 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export agCount_Label_Num
-##' @import SPARQL RCurl franc
+##' @importFrom SPARQL SPARQL
+##' @importFrom RCurl getURL
+##' @importFrom franc franc
 ##' @examples \dontrun{
 ##' #parameters
 ##'

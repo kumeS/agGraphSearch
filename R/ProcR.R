@@ -8,7 +8,7 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export ListDF2DF
-##' @import magrittr
+##' @importFrom magrittr %>%
 ##' @examples \dontrun{
 ##' #parameters
 ##'
@@ -33,6 +33,7 @@ for(n in base::seq_len(length(input))){
 a <- a %>% base::rbind(input[[n]])
 }
 
+rownames(a) <- 1:nrow(a)
 return(data.frame(a, stringsAsFactors = F))
 
 }

@@ -6,9 +6,9 @@ Encoding: UTF-8
 Author: Satoshi Kume
 Maintainer: Satoshi Kume <satoshi.kume.1984@gmail.com>
 Description: This package provides a tool for searching RDF graph data via SPARQL and data mining.
-Depends: R (>= 4.0.0)
-Imports: SPARQL, 
-  RCurl, 
+Depends: R (>= 4.0.0), SPARQL
+Imports: RCurl,
+  XML,
   franc, 
   magrittr, 
   purrr, 

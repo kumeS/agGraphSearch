@@ -20,7 +20,7 @@ vignette: >
 BiocStyle::markdown()
 ```
 
-**Last modified:** `r file.info("BioImageDbs.Rmd")$mtime`<br />
+**Last modified:** `r file.info("agGraphSearch-WF-002.Rmd")$mtime`<br />
 **Compiled**: `r date()`
 
 # Getting started
@@ -43,8 +43,118 @@ if the WF-001 is skipped, start with the command as follows.
 
 ```{r echo=TRUE, eval=FALSE}
 f <- system.file("extdata", "words.lab.csv", package="agGraphSearch")
-lab <- data.frame(readr::read_csv(f, col_names = T))
+lab <- data.frame(readr::read_csv(f, col_names = F))
 ```
+
+# check the data
+
+```{r echo=TRUE, eval=FALSE}
+head(lab)
+dim(lab)
+
+#unique number
+length(unique(lab$X1))
+
+#table
+agTableKB(lab)
+```
+
+# Check SPARQL query
+```{r echo=TRUE, eval=FALSE}
+lab00 <- lab$X1[1]
+
+#Query
+CkeckQuery_agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab00)
+
+#Endpoint
+agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+#Graph id
+agGraphSearch::KzLabEndPoint_Wikidata$FROM
+
+#SPARQL
+#library(SPARQL)
+agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab00)
+
+```
+
+# Executing SPARQL 
+
+This program executes SPARQL with a for-loop.
+
+```{r echo=TRUE, eval=FALSE}
+m <- c()
+for(n in 1:nrow(lab)){
+message(n)
+m[[n]] <-agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab$X1[n])
+}
+
+#convert list to data.frame
+fm <- ListDF2DF(m)
+
+#view the data
+agTableDT(fm)
+```
+
+In an alternative way, this executes SPARQL with a multisession of furrr::future_map function.
+
+```{r echo=TRUE, eval=FALSE}
+library(furrr)
+plan(multisession(workers = 4))
+plan()
+
+mm <- furrr::future_map(as.character(unlist(lab)), 
+                        agGraphSearch:::agCount_Label_Num_Wikidata_P279_P31, 
+                        .progress=T)
+
+#convert list to data.frame
+fmm <- ListDF2DF(mm)
+
+#view the data
+agTableDT(fmm)
+fm <- fmm
+```
+# Aggregating search results 
+
+```{r echo=TRUE, eval=FALSE}
+fm1 <- fm
+
+#colnames
+colnames(fm1)
+
+#Hit_Label
+table(fm1$Hit_Label > 0)
+
+#Hit_ALL
+table(fm1$Hit_ALL > 0)
+table(fm1$Hit_upClass_All > 0)
+table(fm1$Hit_downClass_All > 0)
+
+#New column: Relation
+fm1$Relation <- fm1$Hit_upClass_All + fm1$Hit_downClass_All
+table(fm1$Hit_ALL == fm1$Relation)
+
+```
+
+# Extract only results with label hits
+
+```{r echo=TRUE, eval=FALSE}
+fm2 <- fm1[c(fm1$Hit_Label > 0),]
+dim(fm2)
+```
+
+# Extract only results with upper classes
+
+```{r echo=TRUE, eval=FALSE}
+fm3 <- fm2[c(fm2$Hit_ALL > 0),]
+dim(fm3)
+
+agTableDT(fm3)
+```
+
+# Convert them to rdfs:label.
+
+
+
 
 
 # Session information {.unnumbered}

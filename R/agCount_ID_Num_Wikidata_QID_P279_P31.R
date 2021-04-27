@@ -10,7 +10,7 @@
 ##' @author Satoshi Kume
 ##' @export agCount_ID_Num_Wikidata_QID_P279_P31
 ##' @export CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31
-##' @import SPARQL
+##' @importFrom  SPARQL SPARQL
 ##' @examples \dontrun{
 ##' #parameters
 ##'
