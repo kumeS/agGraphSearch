@@ -1,5 +1,6 @@
 ---
-title: "Introduction to agGraphSearch"
+title: "Workflow to use agGraphSearch"
+shorttitle: "WF-002: match labels to the wikidata via SPARQL"
 author: 
 - name: Satoshi Kume
 date: "`r Sys.Date()`"
@@ -9,7 +10,7 @@ output:
   BiocStyle::html_document:
   toc_float: true
 vignette: >
-  %\VignetteIndexEntry{Introduction to agGraphSearch}
+  %\VignetteIndexEntry{Workflow to use agGraphSearch}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
@@ -24,24 +25,26 @@ BiocStyle::markdown()
 
 # Getting started
 
-`r Rpackage("agGraphSearch")` is an R package distributed in kumeS's GitHub site.
-To install the package, start R and enter:
-
-```{r installation, echo=TRUE, eval=FALSE}
-install.packages( "devtools" )
-devtools::install_github( "kumeS/agGraphSearch" )
-library( "agGraphSearch" )
-```
-
 Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
 
-```{r library, echo=TRUE, eval=FALSE, message=FALSE}
+```{r library, message=FALSE}
 library("agGraphSearch")
 ```
 
-# Basic functions
+This workflow can be skipped. The next workflow should be started. 
 
+# Read the csv files
 
+```{r echo=TRUE, eval=FALSE}
+lab <- data.frame(readr::read_csv("./00_Input/words.lab.csv", col_names = F))
+```
+
+if the WF-001 is skipped, start with the command as follows.
+
+```{r echo=TRUE, eval=FALSE}
+f <- system.file("extdata", "words.lab.csv", package="agGraphSearch")
+lab <- data.frame(readr::read_csv(f, col_names = T))
+```
 
 
 # Session information {.unnumbered}
