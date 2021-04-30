@@ -1,16 +1,16 @@
 ---
 title: "Workflow to use agGraphSearch"
-shorttitle: "WF-001: load the search seeds"
+shorttitle: "Short tutorial: leukemia"
 author:
   - name: Satoshi Kume
 date: "`r Sys.Date()`"
 graphics: no
-package: agGraphSearch, knitr, SPARQL
+package: agGraphSearch, knitr, SPARQL, EBImage
 output:
   BiocStyle::html_document:
   toc_float: true
 vignette: >
-  %\VignetteIndexEntry{WF-001: load the search seeds}
+  %\VignetteIndexEntry{Short tutorial: leukemia}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
@@ -23,6 +23,27 @@ BiocStyle::markdown()
 **Last modified:** `r file.info("agGraphSearch-WF-001.Rmd")$mtime`<br />
 **Compiled**: `r date()`
 
+# Introduction
+
+The agGraphSearch package is a tool-set to support the construction of domain ontologies.
+This package provides a methodology for extracting target domain concepts from a large-scale public Linked Open Data (LOD) system. 
+In the proposed method, the class-related hierarchy of the domain concept by the occurrences of common upper entities and the chain of those path relationships is obtained. 
+The proposed method was described in Figure 1.
+
+```{r Fig01, fig.cap = "Overview of the upper-level concept graph and analysis algorithm. The numbers in the nodes indicate the number of search entities that exist in the subordinate concepts.", echo = FALSE}
+library(EBImage)
+img <- system.file("images", "Fig_01.png", package="agGraphSearch")
+EBImage::display(EBImage::readImage(files = img))
+```
+
+
+As an example of class hierarchy extraction from LOD, 
+this short tutorial provides a workflow to obtain and visualize 
+conceptual hierarchies related to leukemia from wikidata endpoint 
+using its some entity labels.
+
+This result is similar to [the network graph obtained with wikidata graph builder](https://angryloki.github.io/wikidata-graph-builder/?property=P279&item=Q29496&iterations=2&mode=reverse).
+
 # Getting started
 
 Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
@@ -31,17 +52,24 @@ Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the followi
 library("agGraphSearch")
 ```
 
-This workflow can be skipped. The next workflow should be started. 
+# Vocabularies related to leukemia.
 
-# Read the csv files from extdata
+In this tutorial, 4 terms related to leukemia are used as follows.
+
+- acute lymphocytic leukemia (wd:Q180664)
+- Chronic eosinophilic leukemia (wd:Q5113976)
+- Congenital leukemia (wd:Q56325830)
+- philadelphia-positive myelogenous leukemia (wd:Q55790812)
+
+The proper number of search terms is under researching.
+If the locally extraction of domain hierarchy is performed,
+Search terms should be used more than 2 or 3 terms at least.
 
 ```{r echo=TRUE, eval=FALSE}
-f <- system.file("extdata", "PoLyInfo_metadata_ALL_v02.csv", package="agGraphSearch")
-words <- data.frame(readr::read_csv(f, col_names = T))
-
-f <- system.file("extdata", "PoLyInfo_metadata_Jpn_v03.csv", package="agGraphSearch")
-wordsj <- data.frame(readr::read_csv(f, col_names = T))
-
+terms <- c("acute lymphocytic leukemia",
+           "Chronic eosinophilic leukemia",
+           "Congenital leukemia",
+           "philadelphia-positive myelogenous leukemia")
 ```
 
 # Check the data
