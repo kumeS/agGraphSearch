@@ -32,15 +32,23 @@ The proposed method was described in Figure 1.
 
 ```{r Fig01, fig.cap = "Overview of the upper-level concept graph and analysis algorithm. The numbers in the nodes indicate the number of search entities that exist in the subordinate concepts.", echo = FALSE}
 library(EBImage)
+options(EBImage.display = "raster")
 img <- system.file("images", "Fig_01.png", package="agGraphSearch")
 EBImage::display(EBImage::readImage(files = img))
 ```
-
-
 As an example of class hierarchy extraction from LOD, 
 this short tutorial provides a workflow to obtain and visualize 
 conceptual hierarchies related to leukemia from wikidata endpoint 
 using its some entity labels.
+
+Overview of the workflow of the proposed method was descrived in Figure 2.
+
+```{r Fig02, fig.cap = "Overview of the workflow of the proposed method", echo = FALSE}
+library(EBImage)
+options(EBImage.display = "raster")
+img <- system.file("images", "Fig_02.png", package="agGraphSearch")
+EBImage::display(EBImage::readImage(files = img))
+```
 
 This result is similar to [the network graph obtained with wikidata graph builder](https://angryloki.github.io/wikidata-graph-builder/?property=P279&item=Q29496&iterations=2&mode=reverse).
 
@@ -58,7 +66,6 @@ In this tutorial, 4 terms related to leukemia are used as follows.
 
 - acute lymphocytic leukemia (wd:Q180664)
 - Chronic eosinophilic leukemia (wd:Q5113976)
-- Congenital leukemia (wd:Q56325830)
 - philadelphia-positive myelogenous leukemia (wd:Q55790812)
 
 The proper number of search terms is under researching.
@@ -68,52 +75,267 @@ Search terms should be used more than 2 or 3 terms at least.
 ```{r echo=TRUE, eval=FALSE}
 terms <- c("acute lymphocytic leukemia",
            "Chronic eosinophilic leukemia",
-           "Congenital leukemia",
            "philadelphia-positive myelogenous leukemia")
+terms
 ```
 
-# Check the data
+# Check SPARQL query
+```{r echo=TRUE, eval=FALSE}
+ter00 <- terms[1]
+
+#check Query
+CkeckQuery_agCount_Label_Num_Wikidata_P279_P31(Entity_Name = ter00)
+
+#Endpoint
+agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+#Graph id
+agGraphSearch::KzLabEndPoint_Wikidata$FROM
+
+#run SPARQL
+#library(SPARQL)
+res <- agCount_Label_Num_Wikidata_P279_P31(Entity_Name = ter00)
+res
+
+agTableDT(res, Width = "100px")
+
+```
+
+# Executing SPARQL (1)
+
+This program executes SPARQL with a for-loop.
+
+Inputs are 3 terms.
 
 ```{r echo=TRUE, eval=FALSE}
-head(words)
-dim(words)
+m <- c()
+for(n in 1:length(terms)){
+message(n)
+m[[n]] <-agCount_Label_Num_Wikidata_P279_P31(Entity_Name = terms[n])
+}
 
-head(wordsj)
-dim(wordsj)
+#convert list to data.frame
+fm <- ListDF2DF(m)
+
+#view the data
+agTableDT(fm)
 ```
 
-# Delete blanks
+# Extract only results with label and upper-level class
 
 ```{r echo=TRUE, eval=FALSE}
-words.c <- unique(as.character(unlist(words)[unlist(words) != ""]))
-wordsj.c <- unique(as.character(unlist(wordsj)[unlist(wordsj) != ""]))
+fm1 <- fm[c(fm$Hit_Label > 0),]
+fm2 <- fm1[c(fm1$Hit_ALL > 0),]
+
+dim(fm)
+dim(fm1)
+dim(fm2)
 ```
 
-# combind the search seeds and delete the deplicates
+# Assigning Label information to QID
 
 ```{r echo=TRUE, eval=FALSE}
-words.cc <- unique(c(wordsj.c, words.c))
+Lab01 <- fm2$LABEL
 
-agTableFM(data.frame(words.cc))
+#Check Query
+CkeckQuery_agWD_Alt_Wikidata(Lab01[1])
+
+#run agWD_Alt_Wikidata
+Lab01_res <- c()
+for(n in 1:length(Lab01)){
+Lab01_res[[n]] <- agWD_Alt_Wikidata(Lab01[n])
+}
+
+#assign results to a new variable
+QID <- as.character(unlist(Lab01_res))
 ```
 
-# Extract Japanese vocabulary
+
+# Retry SPARQL by QID
 
 ```{r echo=TRUE, eval=FALSE}
-words.lab <- words.cc[1:515]
+#View query
+CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31(QID[1])
 
-agTableFM(as.data.frame(words.lab))
+#Try SPARQL
+QID_res <- c()
+for(n in 1:length(Lab01)){
+QID_res[[n]] <- agCount_ID_Num_Wikidata_QID_P279_P31(QID[n])
+}
+
+#convert list to data.frame
+QID_res2 <- ListDF2DF(QID_res)
+
+#check it
+head(QID_res2)
+dim(QID_res2)
+colnames(QID_res2)
+
+#All
+table(QID_res2$Hit_All)
+table(QID_res2$Hit_All > 0)
+table(QID_res2$Hit_All_Parent > 0)
+table(QID_res2$Hit_All_Child > 0)
+
+#View the results
+agTableDT(QID_res2, Width = "100px")
 ```
 
-# save file
+# Excluding the particular relations
+
+This step search for neighboring entities and properties, 
+and then count their presence or absence.
+If the particular entity exists in the neighbor, the search entity is excluded.
+
+Ex. examples of neighboring entities 
+- Family name (wd:Q101352)
+- movie (wd:Q11424)
+
+Ex. examples of neighboring properties 
+- sex or gender (wdt:P21)
+- located in the administrative territorial entity (wdt:P131)
+
 
 ```{r echo=TRUE, eval=FALSE}
 #create a new folder
-if(!dir.exists("00_Input")){dir.create("00_Input")}
+if(!dir.exists("02_Out")){dir.create("02_Out")}
 
-#save to csv
-readr::write_excel_csv(data.frame(words.lab), file="./00_Input/words.lab.csv", col_names = F)
+#For neighboring entities
+#Check query
+CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vP( Entity_ID=QID[1], Object="wd:Q101352" )
+
+#create List
+ExcluQ <- c("Q101352", "Q11424")
+NumQ <- length(ExcluQ)
+QIDdf <- data.frame(QID=QID)
+
+#run SPARQL
+for(m in seq_len(NumQ)){
+print(ExcluQ[m])
+
+res <- c()
+for(n in seq_len(length(QID))){
+res[[n]] <- agCount_ID_Prop_Obj_Wikidata_vP(Entity_ID=QID[n], Object=paste0("wd:", ExcluQ[m]))
+}
+res1 <- ListDF2DF(res)
+eval(parse(text=paste0("QIDdf$", ExcluQ[m], " <- c(as.numeric(unlist(res1)) > 0)")))
+}
+
+#view the result
+agTableKB(QIDdf)
+
+#For neighboring properties
+#Check query
+CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vO( Entity_ID=QID[1], Property="wdt:P21" )
+
+#create List
+ExcluP <- c("P21", "P131")
+NumP <- length(ExcluP)
+
+#run SPARQL
+for(m in seq_len(NumP)){
+print(ExcluP[m])
+
+res <- c()
+for(n in seq_len(length(QID))){
+res[[n]] <- agCount_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property=paste0("wdt:", ExcluP[m]))
+}
+res1 <- ListDF2DF(res)
+eval(parse(text=paste0("QIDdf$", ExcluP[m], " <- c(as.numeric(unlist(res1)) > 0)")))
+}
+
+#view the result
+agTableKB(QIDdf)
+
 ```
+
+# Examining the class relations via SPARQL
+
+```{r echo=TRUE, eval=FALSE}
+# instanceOf (wdt:P31)
+CkeckQuery_agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P31")
+
+res3 <- c()
+for(n in seq_len(length(QID))){
+res3[[n]] <- agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P31")
+}
+
+# subClassOf (wdt:P279)
+CkeckQuery_agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P279")
+
+res4 <- c()
+for(n in seq_len(length(QID))){
+res4[[n]] <- agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P279")
+}
+
+#convert list to data.frame
+res3b <- ListDF2DF(res3)
+res4b <- ListDF2DF(res4)
+res <- rbind(res3b, res4b)
+
+#remove rows with NA
+res.na <- na.omit(res)
+
+#view the result
+agTableKB(res.na)
+```
+
+# Searching for the upper-level concepts
+
+```{r echo=TRUE, eval=FALSE}
+#create a new folder
+if(!dir.exists("03_Out")){dir.create("03_Out")}
+
+#search the upper classes
+Res03 <- c()
+for(n in 1:length(QID)){
+  Res03[[n]] <- PropertyPath_GraphUp_Wikidata(Entity_ID = QID[n], Depth = 30)  
+}
+
+#check results
+head(Res03[[1]])
+agTableDT(Res03[[1]])
+
+#Count rows
+checkNrow_af(Res03)
+
+#Detect loop
+checkLoop_af(Res03)
+
+```
+
+# Save individual network diagrams.
+
+```{r echo=TRUE, eval=FALSE}
+#create a new folder
+if(!dir.exists("03_Out_vis")){dir.create("03_Out_vis")}
+
+#create networks
+for(n in 1:length(Res03)){
+#n <- 1
+
+a <- agQIDtoLabel_Wikidata(Entity_ID = QID[n])
+Lab00 <- paste(a[,c(2, 1)], collapse = ".")
+FileName <- paste0("agVisNetwork_", Lab00,"_", format(Sys.time(), "%y%m%d"),".html")
+
+agVisNetwork(Graph=Res03[[n]], 
+             Selected=Lab00, 
+             Browse=TRUE, 
+             Output=TRUE,
+             FilePath=FileName)
+
+filesstrings::file.move(files=FileName,
+                        destinations="./03_Out_vis",
+                        overwrite = TRUE)
+
+if(dir.exists(paste0("./agVisNetwork_", formatC(n, flag="0", width=4), "_", Lab00, "_files"))){
+  system(paste0('rm -rf "./agVisNetwork_', formatC(n, flag="0", width=4), '_', Lab00, '_files"'))
+}}
+
+```
+
+```{r echo=TRUE, eval=FALSE}
+```
+
 
 # Session information {.unnumbered}
 ```{r sessionInfo, echo=FALSE}

@@ -47,7 +47,7 @@ agCount_Label_Num <- function(Entity_Name="",
                               Message=FALSE,
                               FilterRegex=FALSE,
                               DirSave=FALSE,
-                              Dir="R01_Results"){
+                              Dir="01_Results"){
 
 if(!grepl("^http", EndPoint)){return(message("No EndPoint URL"))}
 if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}

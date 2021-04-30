@@ -52,7 +52,7 @@ Property <- agGraphSearch::wikidataClassProperty
 
 #Others
 DirSave=TRUE
-Dir="R01_Results"
+Dir="01_Results"
 
 #Script
 if(!grepl("^http", EndPoint)){return(message("No EndPoint URL"))}

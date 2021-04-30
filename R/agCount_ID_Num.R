@@ -41,7 +41,7 @@ agCount_ID_Num <- function(Entity_ID,
                            Property,
                            Message=TRUE,
                            DirSave=FALSE,
-                           Dir="R01_Results"){
+                           Dir="01_Results"){
 ID <- Entity_ID
 
 Prefix <- agGraphSearch::PREFIX

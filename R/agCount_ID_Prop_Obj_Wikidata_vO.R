@@ -1,6 +1,7 @@
 ##' @title Counting the particular triples w/wo GroupBy Option in WIkidata.
 ##'
 ##' @param Entity_ID a vector of character; an entity URI / prefixed ID, or a variable starting with ?.
+##' @param Property a vector of character; a property URI / prefixed ID, or a variable starting with ?.
 ##' @param Val return the results as values or TRUE/FALSE.
 ##' If TRUE, this gives a value to hit in the data.
 ##' If FALSE, this gives a logical to hit in the data or not.
@@ -10,15 +11,15 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @export agCount_ID_Prop_Obj_Wikidata_vP_vO
-##' @export CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vP_vO
+##' @export agCount_ID_Prop_Obj_Wikidata_vO
+##' @export CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vO
 ##' @examples \dontrun{
 ##'
 ##' ID <- "wd:P31"
-##' agCount_ID_Prop_Obj_Wikidata_vP_vO( Entity_ID=ID, Val=TRUE )
+##' agCount_ID_Prop_Obj_Wikidata_vO( Entity_ID=ID, Val=TRUE )
 ##'
 ##' #show the SPARQL query
-##' CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vP_vO( ID )
+##' CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vO( ID )
 ##'
 ##' #Parallel processing of two variables and 4 cores using furrr package
 ##' library(furrr)
@@ -27,28 +28,29 @@
 ##'
 ##' #Run multisession
 ##' IDs <- c("wd:Q81163", "wd:Q422649", "wd:Q1241898", "wd:Q706")
-##' furrr::future_map(IDs, agCount_ID_Prop_Obj_Wikidata_vP_vO, .progress = TRUE)
+##' furrr::future_map(IDs, agCount_ID_Prop_Obj_Wikidata_vO, .progress = TRUE)
 ##'
 ##' }
 
-agCount_ID_Prop_Obj_Wikidata_vP_vO <- function(Entity_ID,
-                                               Val=TRUE){
+agCount_ID_Prop_Obj_Wikidata_vO <- function(Entity_ID,
+                                            Property,
+                                            Val=TRUE){
 
 if(!is.logical(Val)){return(message("Warning: Not proper value of Val"))}
 
 #Parameters
 Prefix <- agGraphSearch::PREFIX
 ID <- Entity_ID
+Prop <- Property
 Obj <- "?o"
-Prop <- "?p"
-Count <- "?p"
+Count <- "?o"
 GroupBy <- FALSE
 Message <- FALSE
 
 EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
 FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
-SPA <- agCount_ID_Property_Object(Entity_ID=ID,
+SPA <- agCount_ID_Prop_Obj(Entity_ID=ID,
                                   Property=Prop,
                                   Object=Obj,
                                   Count=Count,
@@ -64,14 +66,15 @@ return(data.frame(SPA > 0, stringsAsFactors = F))
 }
 }
 
-CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vP_vO <- function(Entity_ID){
+CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vO <- function(Entity_ID,
+                                                       Property){
 
 #Parameters
 Prefix <- agGraphSearch::PREFIX
 ID <- Entity_ID
+Prop <- Property
 Obj <- "?o"
-Prop <- "?p"
-Count <- "?p"
+Count <- "?o"
 GroupBy <- FALSE
 Message <- FALSE
 

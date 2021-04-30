@@ -59,11 +59,11 @@ length(unique(lab$X1))
 agTableKB(lab)
 ```
 
-# Check SPARQL query
+# Check SPARQL query and run SPARQL
 ```{r echo=TRUE, eval=FALSE}
 lab00 <- lab$X1[1]
 
-#Query
+#check Query
 CkeckQuery_agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab00)
 
 #Endpoint
@@ -71,7 +71,7 @@ agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
 #Graph id
 agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
-#SPARQL
+#run SPARQL
 #library(SPARQL)
 res <- agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab00)
 res
@@ -295,6 +295,10 @@ Labs_B2 <- ListDF2DF(Labs_B1)
 agTableDT(Labs_B2, Width = "100px")
 
 ```
+
+
+
+
 
 # Session information {.unnumbered}
 ```{r sessionInfo, echo=FALSE}

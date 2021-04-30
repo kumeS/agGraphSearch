@@ -55,7 +55,7 @@ Message <- FALSE
 EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
 FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
-SPA <- agCount_ID_Property_Object(Entity_ID=ID,
+SPA <- agCount_ID_Prop_Obj(Entity_ID=ID,
                                   Property=Prop,
                                   Object=Obj,
                                   Count=Count,

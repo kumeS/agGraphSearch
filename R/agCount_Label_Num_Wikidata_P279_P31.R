@@ -60,7 +60,7 @@ Property=agGraphSearch::wikidataClassProperty
 #Others
 FilterRegex=FALSE
 DirSave=TRUE
-Dir="R01_Results"
+Dir="01_Results"
 Message=FALSE
 
 #Script

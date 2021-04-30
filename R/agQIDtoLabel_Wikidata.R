@@ -80,7 +80,7 @@ PropertyForLabel <- 1
 switch(as.character(PropertyForLabel),
       "1" = Property <- "rdfs:label",
       "2" = Property <- "skos:prefLabel",
-      return(message("Warning: Not  proper value of PropertyForLabel"))
+      return(message("Warning: Not proper value of PropertyForLabel"))
 )
 
 Query01 <-paste('

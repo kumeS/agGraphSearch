@@ -123,8 +123,39 @@ a <- unlist(purrr::map(input, function(x){ eval(parse(text = paste0("x$", colNam
 return(a)
 }
 
+##' @title Check list data
+##' @author Satoshi Kume
+##' @export checkNrow_af
+##' @export checkColumn_af
+##' @export checkLoop_af
+##' @export removeLoop_af
+##'
 
 
+#Check nrow
+checkNrow_af <- function(input){
+a <- unlist(purrr::map(input, function(x){nrow(x)}))
+return(a)
+}
+
+checkColumn_af <- function(input, colName="Hit_subClassOf_Instance"){
+a <- unlist(purrr::map(input, function(x){ eval(parse(text = paste0("x$", colName))) }))
+return(a)
+}
+
+checkLoop_af <- function(input, col1=3,  col2=5){
+a <- unlist(purrr::map(input, function(x){ sum(x[,col1] == x[,col2]) }))
+return(a)
+}
+
+
+removeLoop_af <- function(input, col1=3,  col2=5){
+input0 <- input
+for(n in seq_len(length(input0))){
+input0[[n]] <- input0[[n]][input0[[n]][,col1] != input0[[n]][,col2],]
+}
+return(input0)
+}
 
 
 

@@ -43,13 +43,13 @@
 ##' }
 
 agCount_ID_Prop_Obj <- function(Entity_ID,
-                                       Property,
-                                       Object,
-                                       Count,
-                                       GroupBy=FALSE,
-                                       EndPoint,
-                                       FROM,
-                                       Message=TRUE){
+                                Property,
+                                Object,
+                                Count,
+                                GroupBy=FALSE,
+                                EndPoint,
+                                FROM,
+                                Message=TRUE){
 
 #Parameters
 Prefix <- agGraphSearch::PREFIX

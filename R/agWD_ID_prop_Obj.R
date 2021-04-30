@@ -83,6 +83,31 @@ if(class(A) == "try-error"){
 SPA <- data.frame(p=Prop, o=NA, oLabelj=NA, oLabele=NA, stringsAsFactors = F)
 }
 
+if(nrow(SPA) == 0){
+if(lang == 1){
+  return(data.frame(s=ID,
+                    p=Prop,
+                    o=NA,
+                    oLabele=NA,
+                    stringsAsFactors = F))
+  }
+if(lang == 2){
+  return(data.frame(s=ID,
+                    p=Prop,
+                    o=NA,
+                    oLabelj=NA,
+                    stringsAsFactors = F))
+  }
+if(lang == 3){
+  return(data.frame(s=ID,
+                    p=Prop,
+                    o=NA,
+                    oLabelj=NA,
+                    oLabele=NA,
+                    stringsAsFactors = F))
+  }
+}
+
 if(lang == 1){ SPA <- SPA[,-2] }
 if(lang == 2){ SPA <- SPA[,-3] }
 if(lang == 3){ SPA <- SPA }
