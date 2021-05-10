@@ -10,10 +10,12 @@ output:
   BiocStyle::html_document:
   toc_float: true
 vignette: >
-  %\VignetteIndexEntry{Short tutorial: leukemia}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
+  %\VignetteIndexEntry{Short tutorial: leukemia}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r style, echo = FALSE, results = 'asis', message=FALSE}
