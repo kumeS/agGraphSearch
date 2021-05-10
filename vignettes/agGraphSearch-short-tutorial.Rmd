@@ -1,6 +1,6 @@
 ---
-title: "Workflow to use agGraphSearch"
-shorttitle: "Short tutorial: leukemia"
+title: "Workflow to use agGraphSearch for leukemia terms"
+shorttitle: "Short tutorial: graph search for leukemia"
 author:
   - name: Satoshi Kume
 date: "`r Sys.Date()`"
@@ -22,22 +22,53 @@ editor_options:
 BiocStyle::markdown()
 ```
 
-**Last modified:** `r file.info("agGraphSearch-WF-001.Rmd")$mtime`<br />
-**Compiled**: `r date()`
+**Last modified:** `r file.info("agGraphSearch-short-tutorial.Rmd")$mtime`<br />
 
 # Introduction
 
-The agGraphSearch package is a tool-set to support the construction of domain ontologies.
-This package provides a methodology for extracting target domain concepts from a large-scale public Linked Open Data (LOD) system. 
-In the proposed method, the class-related hierarchy of the domain concept by the occurrences of common upper entities and the chain of those path relationships is obtained. 
-The proposed method was described in Figure 1.
+## Background
 
-```{r Fig01, fig.cap = "Overview of the upper-level concept graph and analysis algorithm. The numbers in the nodes indicate the number of search entities that exist in the subordinate concepts.", echo = FALSE}
-library(EBImage)
+テキストや語彙の集合などは、非構造化データと位置付けられる。
+一方、構造化データは、データ同士が関係を持つように、整理されたデータとも言われる。
+オントロジーはその代表例である。構造化データは、しばしばRDF data modelによって記述される。
+
+現在、構造化されたデータは、Linked open data (LOD)としての公開が進んでいる。
+公共で最も大規模なLODとしては、wikidataやDBpediaが挙げられる。
+
+興味対象のデータ構造が知りたい場合、あるいは興味対象のデータ構造を構築したい場合がある。
+しかし、LODを熟知した専門家でない限り、
+LODから、興味対象である構造化データ全体を取得することは難しい。
+また、興味対象のデータはデータ範囲が曖昧であり、
+それを明確に定義して、データ取得を行うことはより困難である。
+
+今回、興味対象の小規模な語彙リストをもとに、
+そのLODでのデータの箇所を同定して、
+その周辺の構造化データを取得する手法を提案する。
+
+```{r Fig01, fig.cap = "Overview of the domain ontology construction.", echo = FALSE}
+suppressWarnings(library(EBImage))
 options(EBImage.display = "raster")
 img <- system.file("images", "Fig_01.png", package="agGraphSearch")
 EBImage::display(EBImage::readImage(files = img))
 ```
+
+本チュートリアルでは、実際の事例として、
+LODから構造化データを取得する手順について紹介する。
+
+## agGraphSearch package
+
+The agGraphSearch package is a tool-set to support the construction of domain ontology.
+This package provides a methodology for extracting target domain concepts from a large-scale public Linked Open Data (LOD) system. 
+In the proposed method, the class-related hierarchy of the domain concept by the occurrences of common upper-level entities and the chain of those path relationships is obtained. 
+The proposed method was described in Figure 1.
+
+```{r Fig02, fig.cap = "Overview of the upper-level concept graph and analysis algorithm. The numbers in the nodes indicate the number of search entities that exist in the subordinate concepts.", echo = FALSE}
+suppressWarnings(library(EBImage))
+options(EBImage.display = "raster")
+img <- system.file("images", "Fig_02.png", package="agGraphSearch")
+EBImage::display(EBImage::readImage(files = img))
+```
+
 As an example of class hierarchy extraction from LOD, 
 this short tutorial provides a workflow to obtain and visualize 
 conceptual hierarchies related to leukemia from wikidata endpoint 
@@ -45,49 +76,80 @@ using its some entity labels.
 
 Overview of the workflow of the proposed method was descrived in Figure 2.
 
-```{r Fig02, fig.cap = "Overview of the workflow of the proposed method", echo = FALSE}
-library(EBImage)
+```{r Fig03, fig.cap = "Overview of the workflow of the proposed method", echo = FALSE}
+suppressWarnings(library(EBImage))
 options(EBImage.display = "raster")
-img <- system.file("images", "Fig_02.png", package="agGraphSearch")
+img <- system.file("images", "Fig_03.png", package="agGraphSearch")
 EBImage::display(EBImage::readImage(files = img))
 ```
 
 This result is similar to [the network graph obtained with wikidata graph builder](https://angryloki.github.io/wikidata-graph-builder/?property=P279&item=Q29496&iterations=2&mode=reverse).
 
-# Getting started
+## Getting started
 
 Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
 
 ```{r library, message=FALSE}
+#install
+if(!require("agGraphSearch")){
+  install.packages( "devtools" )
+  devtools::install_github( "kumeS/agGraphSearch" )
+}
+
+#load
 library("agGraphSearch")
+
 ```
 
-# Vocabularies related to leukemia.
+# Workflow for searching the graph for leukemia.
 
-In this tutorial, 4 terms related to leukemia are used as follows.
+## Vocabularies related to leukemia.
 
-- acute lymphocytic leukemia (wd:Q180664)
+In this tutorial, 3 terms related to leukemia are used as follows.
+
+- Acute lymphocytic leukemia (wd:Q180664)
 - Chronic eosinophilic leukemia (wd:Q5113976)
-- philadelphia-positive myelogenous leukemia (wd:Q55790812)
+- Philadelphia-positive myelogenous leukemia (wd:Q55790812)
 
 The proper number of search terms is under researching.
 If the locally extraction of domain hierarchy is performed,
-Search terms should be used more than 2 or 3 terms at least.
+Search terms should be used more than 3 terms at least.
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=TRUE, eval=TRUE}
 terms <- c("acute lymphocytic leukemia",
            "Chronic eosinophilic leukemia",
            "philadelphia-positive myelogenous leukemia")
 terms
+
 ```
 
-# Check SPARQL query
-```{r echo=TRUE, eval=FALSE}
+## SPARQL query (1) counting labels and class relations
+
+```{r Fig04, fig.cap = "Data model for the Wikidata class hierarchy", echo = FALSE}
+suppressWarnings(library(EBImage))
+options(EBImage.display = "raster")
+img <- system.file("images", "Fig_04.png", package="agGraphSearch")
+EBImage::display(EBImage::readImage(files = img))
+```
+
+In this tutorial, the data model for class hierarchies in Wikidata 
+will be mainly focused. It is shown in Figure 3.
+The class hierarchy of Wikidata is represented using the properties of 
+subClassOf (wdt:P279) and instanceOf (wdt:P31) as a conceptual relationship between entities.
+In addition, the Wikidata entities are represented by IDs called QIDs.
+In this tutorial, in addition to QIDs, we used the property relations of representative name (rdfs:label) and alias (skos:altLabel), which represent links to label information of QIDs.
+
+### Check SPARQL query
+
+```{r echo=TRUE, eval=TRUE}
 ter00 <- terms[1]
 
 #check Query
 CkeckQuery_agCount_Label_Num_Wikidata_P279_P31(Entity_Name = ter00)
 
+```
+
+```{r echo=TRUE, eval=FALSE}
 #Endpoint
 agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
 #Graph id
@@ -98,68 +160,84 @@ agGraphSearch::KzLabEndPoint_Wikidata$FROM
 res <- agCount_Label_Num_Wikidata_P279_P31(Entity_Name = ter00)
 res
 
-agTableDT(res, Width = "100px")
+#View table
+#agTableDT(res, Width = "100px", Transpose = TRUE, AutoWidth=FALSE)
 
 ```
 
-# Executing SPARQL (1)
+### Counting labels and class relations with a for-loop
 
 This program executes SPARQL with a for-loop.
 
 Inputs are 3 terms.
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=TRUE, eval=TRUE}
+#create an empty variable
 m <- c()
+
+#Run
 for(n in 1:length(terms)){
-message(n)
+#message(n)
 m[[n]] <-agCount_Label_Num_Wikidata_P279_P31(Entity_Name = terms[n])
 }
 
 #convert list to data.frame
 fm <- ListDF2DF(m)
 
-#view the data
-agTableDT(fm)
+#View the data
+#agTableDT(fm, Width = "100px", Transpose = TRUE, AutoWidth=FALSE)
+
 ```
 
-# Extract only results with label and upper-level class
+### Extract only results with label and upper-level class
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=TRUE, eval=TRUE}
 fm1 <- fm[c(fm$Hit_Label > 0),]
 fm2 <- fm1[c(fm1$Hit_ALL > 0),]
 
-dim(fm)
-dim(fm1)
-dim(fm2)
+#dim(fm)
+#dim(fm1)
+#dim(fm2)
+
 ```
 
-# Assigning Label information to QID
+### Assigning Label information to QID
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=TRUE, eval=TRUE}
 Lab01 <- fm2$LABEL
 
 #Check Query
 CkeckQuery_agWD_Alt_Wikidata(Lab01[1])
 
-#run agWD_Alt_Wikidata
+```
+
+```{r echo=FALSE, eval=TRUE}
+#create an empty variable
 Lab01_res <- c()
+
+#run agWD_Alt_Wikidata
 for(n in 1:length(Lab01)){
 Lab01_res[[n]] <- agWD_Alt_Wikidata(Lab01[n])
 }
 
 #assign results to a new variable
 QID <- as.character(unlist(Lab01_res))
+
 ```
 
+### Retry SPARQL by QID
 
-# Retry SPARQL by QID
-
-```{r echo=TRUE, eval=FALSE}
+```{r eval=TRUE, echo=TRUE}
 #View query
 CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31(QID[1])
 
-#Try SPARQL
+```
+
+```{r echo=TRUE, eval=FALSE}
+#create an empty variable
 QID_res <- c()
+
+#Try SPARQL with QID
 for(n in 1:length(Lab01)){
 QID_res[[n]] <- agCount_ID_Num_Wikidata_QID_P279_P31(QID[n])
 }
@@ -179,14 +257,16 @@ table(QID_res2$Hit_All_Parent > 0)
 table(QID_res2$Hit_All_Child > 0)
 
 #View the results
-agTableDT(QID_res2, Width = "100px")
+#agTableDT(QID_res2, Width = "100px", Transpose = TRUE, AutoWidth=FALSE)
+
 ```
 
-# Excluding the particular relations
+## SPARQL query (2) Excluding the particular relations
 
 This step search for neighboring entities and properties, 
 and then count their presence or absence.
 If the particular entity exists in the neighbor, the search entity is excluded.
+It is shown in Figure 4.
 
 Ex. examples of neighboring entities 
 - Family name (wd:Q101352)
@@ -196,23 +276,31 @@ Ex. examples of neighboring properties
 - sex or gender (wdt:P21)
 - located in the administrative territorial entity (wdt:P131)
 
+```{r Fig05, fig.cap = "Exclusion of non-applicable entities by relationships with the adjacent entity and the property", echo = FALSE}
+suppressWarnings(library(EBImage))
+options(EBImage.display = "raster")
+img <- system.file("images", "Fig_05.png", package="agGraphSearch")
+EBImage::display(EBImage::readImage(files = img))
+```
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=TRUE, eval=TRUE}
 #create a new folder
-if(!dir.exists("02_Out")){dir.create("02_Out")}
+#if(!dir.exists("01_Short_Out")){dir.create("01_Short_Out")}
 
 #For neighboring entities
 #Check query
 CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vP( Entity_ID=QID[1], Object="wd:Q101352" )
+```
 
-#create List
+```{r echo=TRUE, eval=TRUE}
+#create an exclusion QID list without "wd:"
 ExcluQ <- c("Q101352", "Q11424")
 NumQ <- length(ExcluQ)
 QIDdf <- data.frame(QID=QID)
 
 #run SPARQL
 for(m in seq_len(NumQ)){
-print(ExcluQ[m])
+#print(ExcluQ[m])
 
 res <- c()
 for(n in seq_len(length(QID))){
@@ -222,14 +310,20 @@ res1 <- ListDF2DF(res)
 eval(parse(text=paste0("QIDdf$", ExcluQ[m], " <- c(as.numeric(unlist(res1)) > 0)")))
 }
 
-#view the result
+#View the result
 agTableKB(QIDdf)
 
+```
+
+```{r echo=TRUE, eval=TRUE}
 #For neighboring properties
 #Check query
-CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vO( Entity_ID=QID[1], Property="wdt:P21" )
+CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vO( Entity_ID=QID[1], Property="wdt:P21")
 
-#create List
+```
+
+```{r echo=TRUE, eval=FALSE}
+#create an exclusion list without "wdt:"
 ExcluP <- c("P21", "P131")
 NumP <- length(ExcluP)
 
@@ -250,21 +344,33 @@ agTableKB(QIDdf)
 
 ```
 
-# Examining the class relations via SPARQL
+## SPARQL query (3) Examining the upper-level class relations
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=TRUE, eval=TRUE}
 # instanceOf (wdt:P31)
 CkeckQuery_agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P31")
+```
 
+```{r echo=TRUE, eval=FALSE}
+#create an empty variable
 res3 <- c()
+
+#run SPARQL
 for(n in seq_len(length(QID))){
 res3[[n]] <- agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P31")
 }
+```
 
+```{r echo=TRUE, eval=TRUE}
 # subClassOf (wdt:P279)
 CkeckQuery_agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P279")
+```
 
+```{r echo=TRUE, eval=FALSE}
+#create an empty variable
 res4 <- c()
+
+#run SPARQL
 for(n in seq_len(length(QID))){
 res4[[n]] <- agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P279")
 }
@@ -274,68 +380,103 @@ res3b <- ListDF2DF(res3)
 res4b <- ListDF2DF(res4)
 res <- rbind(res3b, res4b)
 
-#remove rows with NA
-res.na <- na.omit(res)
+#remove rows with NA on "o" col
+res.na <- res[!is.na(res$o),]
 
-#view the result
-agTableKB(res.na)
+#View the result
+#agTableDT(res.na, Width = "100px", Transpose = FALSE, AutoWidth=FALSE)
+
 ```
 
-# Searching for the upper-level concepts
+## SPARQL query (4) Searching for the upper-level concepts
+
+### Obtaining the upper-level concepts from the input terms
 
 ```{r echo=TRUE, eval=FALSE}
 #create a new folder
-if(!dir.exists("03_Out")){dir.create("03_Out")}
+#if(!dir.exists("02_Short_Out")){dir.create("02_Short_Out")}
 
-#search the upper classes
-Res03 <- c()
+#create an empty variable
+res5 <- c()
+
+#run SPARQL; search the upper-level classes
 for(n in 1:length(QID)){
-  Res03[[n]] <- PropertyPath_GraphUp_Wikidata(Entity_ID = QID[n], Depth = 30)  
+  message(n)
+  res5[[n]] <- PropertyPath_GraphUp_Wikidata(Entity_ID = QID[n], Depth = 30)  
 }
 
 #check results
-head(Res03[[1]])
-agTableDT(Res03[[1]])
+head(res5[[1]])
+agTableDT(res5[[1]])
 
 #Count rows
-checkNrow_af(Res03)
+checkNrow_af(res5)
 
 #Detect loop
-checkLoop_af(Res03)
+checkLoop_af(res5)
 
 ```
 
-# Save individual network diagrams.
+An alternative way,
+
+```{r echo=TRUE, eval=FALSE}
+#run SPARQL with purrr::map function
+res5m <- purrr::map(QID, PropertyPath_GraphUp_Wikidata, Depth = 30)
+
+#check results
+#Count rows
+checkNrow_af(res5m)
+
+#Detect loop
+checkLoop_af(res5m)
+
+```
+
+### Individual network diagrams
 
 ```{r echo=TRUE, eval=FALSE}
 #create a new folder
-if(!dir.exists("03_Out_vis")){dir.create("03_Out_vis")}
+if(!dir.exists("Short_Out_vis")){dir.create("Short_Out_vis")}
 
 #create networks
-for(n in 1:length(Res03)){
+for(n in 1:length(res5)){
 #n <- 1
-
 a <- agQIDtoLabel_Wikidata(Entity_ID = QID[n])
+if(is.na(a[,2])){a[,2] <- a[,3]}
+
 Lab00 <- paste(a[,c(2, 1)], collapse = ".")
 FileName <- paste0("agVisNetwork_", Lab00,"_", format(Sys.time(), "%y%m%d"),".html")
 
-agVisNetwork(Graph=Res03[[n]], 
+agVisNetwork(Graph=res5[[n]], 
              Selected=Lab00, 
-             Browse=TRUE, 
+             Browse=FALSE, 
              Output=TRUE,
              FilePath=FileName)
+Sys.sleep(1)
 
 filesstrings::file.move(files=FileName,
-                        destinations="./03_Out_vis",
+                        destinations="./Short_Out_vis",
                         overwrite = TRUE)
 
 if(dir.exists(paste0("./agVisNetwork_", formatC(n, flag="0", width=4), "_", Lab00, "_files"))){
   system(paste0('rm -rf "./agVisNetwork_', formatC(n, flag="0", width=4), '_', Lab00, '_files"'))
 }}
 
+#View the results
+#browseURL(paste0("./Short_Out_vis/", dir("Short_Out_vis", pattern=".html")[1]))
+#browseURL(paste0("./Short_Out_vis/", dir("Short_Out_vis", pattern=".html")[2]))
+#browseURL(paste0("./Short_Out_vis/", dir("Short_Out_vis", pattern=".html")[3]))
+
 ```
 
+### define the common upper-level concepts
+
+The common upper-level concept is defined based on the edge list of triples obtained above.
+
 ```{r echo=TRUE, eval=FALSE}
+
+
+
 ```
 
 

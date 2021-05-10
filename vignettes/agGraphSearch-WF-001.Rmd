@@ -1,5 +1,5 @@
 ---
-title: "Workflow to use agGraphSearch"
+title: "Workflow to use agGraphSearch: WF-001"
 shorttitle: "WF-001: load the search seeds"
 author:
   - name: Satoshi Kume
@@ -10,10 +10,12 @@ output:
   BiocStyle::html_document:
   toc_float: true
 vignette: >
-  %\VignetteIndexEntry{WF-001: load the search seeds}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
+  %\VignetteIndexEntry{WF-001: load the search seeds}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r style, echo = FALSE, results = 'asis', message=FALSE}

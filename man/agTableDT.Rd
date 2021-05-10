@@ -14,7 +14,8 @@ agTableDT(
   Editable = FALSE,
   Caption = "Table. results",
   Width = "100px",
-  PageLength = 25
+  PageLength = 25,
+  Transpose = FALSE
 )
 }
 \arguments{

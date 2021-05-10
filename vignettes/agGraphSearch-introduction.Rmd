@@ -10,9 +10,11 @@ output:
   toc_float: true
 vignette: >
   %\VignetteIndexEntry{Introduction to agGraphSearch}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r style, echo = FALSE, results = 'asis', message=FALSE}

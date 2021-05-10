@@ -1,6 +1,6 @@
 ---
-title: "Workflow to use agGraphSearch"
-shorttitle: "WF-002: match labels to the wikidata via SPARQL"
+title: "Workflow to use agGraphSearch: WF-003"
+shorttitle: "WF-003: match labels to the wikidata via SPARQL"
 author:
   - name: Satoshi Kume
 date: "`r Sys.Date()`"
@@ -10,10 +10,12 @@ output:
   BiocStyle::html_document:
   toc_float: true
 vignette: >
-  %\VignetteIndexEntry{WF-002: match labels to the wikidata via SPARQL}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
+  %\VignetteIndexEntry{WF-002: match labels to the wikidata via SPARQL}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r style, echo = FALSE, results = 'asis', message=FALSE}

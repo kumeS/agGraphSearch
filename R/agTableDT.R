@@ -38,9 +38,14 @@ agTableDT <- function(Data,
                       Editable=FALSE,
                       Caption="Table. results",
                       Width='100px',
-                      PageLength=25){
+                      PageLength=25,
+                      Transpose=FALSE){
 
 if(!is.data.frame(Data)){return(message("Warning: Not proper value of Data"))}
+
+if(Transpose){
+Data <- data.frame(col=colnames(Data), res=t(Data))
+}
 
 targets <- c(0:(ncol(Data)-1))
 DTtable <- DT::datatable(Data,
@@ -61,12 +66,15 @@ DTtable <- DT::datatable(Data,
                                         columnDefs = list(list( targets=targets, width = Width))
                                         ),
                          editable = Editable)
+
 if(Output){
   DTtable %>% htmlwidgets::saveWidget(file = File)
   if(Browse){ browseURL(File) }
   return(DTtable)
-} else{
+} else {
   return(DTtable)
-}}
+}
+
+}
 
 
