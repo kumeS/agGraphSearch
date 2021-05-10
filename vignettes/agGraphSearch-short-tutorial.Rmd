@@ -28,7 +28,9 @@ BiocStyle::markdown()
 
 ## Background
 
-テキストや語彙の集合などは、非構造化データと位置付けられる。
+In the context of the Semantic Web,
+information such as text or a set of vocabulary is positioned as unstructured data.
+
 一方、構造化データは、データ同士が関係を持つように、整理されたデータとも言われる。
 オントロジーはその代表例である。構造化データは、しばしばRDF data modelによって記述される。
 
