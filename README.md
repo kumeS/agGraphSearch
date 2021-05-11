@@ -2,7 +2,7 @@
 
 ## Intoduction
 
-agGraphSearch, a R package, supply functions for searching graph data 
+agGraphSearch, a R package, supply a tool-set for searching graph data 
 structures of RDF (Resource Description Framework) via SPARQL query.
 
 This set of functions allows us to explore the graph data (triples) 
@@ -34,6 +34,12 @@ system( "git clone https://github.com/kumeS/agGraphSearch.git" )
 system( "R CMD INSTALL agGraphSearch" )
 library( "agGraphSearch" )
 ```
+
+## Tutorial
+
+- [Introduction to agGraphSearch](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-introduction.html)
+
+- [A short-tutorial for agGraphSearch](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-short-tutorial.html)
 
 ## Some examples of function execution in the package
 
