@@ -40,10 +40,10 @@
 ##'   Property=agGraphSearch::wikidataClassProperty)
 ##' }
 
-agCount_Label_Num <- function(Entity_Name="",
-                              EndPoint="",
+agCount_Label_Num <- function(Entity_Name,
+                              EndPoint,
                               FROM = "",
-                              Property="",
+                              Property,
                               Message=FALSE,
                               FilterRegex=FALSE,
                               DirSave=FALSE,

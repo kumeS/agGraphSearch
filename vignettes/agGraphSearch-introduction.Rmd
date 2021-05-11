@@ -43,8 +43,23 @@ library("agGraphSearch")
 
 # Basic functions
 
+- agCount_ID_Num
 
+- agCount_ID_Prop_Obj
 
+- agCount_Label_Num
+
+- agIDtoLabel
+
+- agWD_Alt
+
+- agWD_ID_Prop_Obj
+
+- PropertyPath
+
+- agTableDT
+
+- agVisNetwork
 
 # Session information {.unnumbered}
 ```{r sessionInfo, echo=FALSE}

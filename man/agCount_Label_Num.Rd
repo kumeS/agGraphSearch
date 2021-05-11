@@ -5,10 +5,10 @@
 \title{Count triples from a label query via SPARQL.}
 \usage{
 agCount_Label_Num(
-  Entity_Name = "",
-  EndPoint = "",
+  Entity_Name,
+  EndPoint,
   FROM = "",
-  Property = "",
+  Property,
   Message = FALSE,
   FilterRegex = FALSE,
   DirSave = FALSE,

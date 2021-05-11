@@ -28,24 +28,26 @@ BiocStyle::markdown()
 
 ## Background
 
-In the context of the Semantic Web,
-information such as text or a set of vocabulary is positioned as unstructured data.
+In the context of the semantic web, 
+構造化データは、決まりに則って記述され、データ間に参照関係を持たせたデータを指す。つまりは、メタデータを付与することで、機械可読性を高めたデータである。
+その代表的な構造化データあるいは構造化された知識の例として、
+オントロジーやwikidataやDBpediaなどのLinked Open Dataが挙げられる。
+構造化データは、しばしばRDF data modelによって記述される。
 
-一方、構造化データは、データ同士が関係を持つように、整理されたデータとも言われる。
-オントロジーはその代表例である。構造化データは、しばしばRDF data modelによって記述される。
+興味がある対象・ドメインを、構造化された知識によって理解したいというニーズがある。
+しかし、興味がある対象は、しばしば、非構造化データ、
+つまりは、テキストや語彙のリストと与えられる曖昧なデータ範囲にて記述される。
+そのため、それらのデータ間のマッピングには、大きなギャップがある。
 
-現在、構造化されたデータは、Linked open data (LOD)としての公開が進んでいる。
-公共で最も大規模なLODとしては、wikidataやDBpediaが挙げられる。
+オントロジーやLODを熟知した専門家でない限り、
+初期の段階で、興味がある対象を明確に定義して、
+構造化データとの対応付けを行うことは困難である。
 
-興味対象のデータ構造が知りたい場合、あるいは興味対象のデータ構造を構築したい場合がある。
-しかし、LODを熟知した専門家でない限り、
-LODから、興味対象である構造化データ全体を取得することは難しい。
-また、興味対象のデータはデータ範囲が曖昧であり、
-それを明確に定義して、データ取得を行うことはより困難である。
-
-今回、興味対象の小規模な語彙リストをもとに、
-そのLODでのデータの箇所を同定して、
-その周辺の構造化データを取得する手法を提案する。
+そこで、興味対象であるドメインの構造化データの初期モデル構築を
+サポートするために、
+興味対象の小規模な語彙リストをもとに、
+対応する構造化データのサブセット抽出する
+ツールセットを構築した。
 
 ```{r Fig01, fig.cap = "Overview of the domain ontology construction.", echo = FALSE}
 suppressWarnings(library(EBImage))
@@ -449,6 +451,7 @@ if(is.na(a[,2])){a[,2] <- a[,3]}
 Lab00 <- paste(a[,c(2, 1)], collapse = ".")
 FileName <- paste0("agVisNetwork_", Lab00,"_", format(Sys.time(), "%y%m%d"),".html")
 
+#run the network creation
 agVisNetwork(Graph=res5[[n]], 
              Selected=Lab00, 
              Browse=FALSE, 
