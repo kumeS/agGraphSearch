@@ -288,9 +288,6 @@ EBImage::display(EBImage::readImage(files = img))
 ```
 
 ```{r echo=TRUE, eval=TRUE}
-#create a new folder
-#if(!dir.exists("01_Short_Out")){dir.create("01_Short_Out")}
-
 #For neighboring entities
 #Check query
 CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vP( Entity_ID=QID[1], Object="wd:Q101352" )
@@ -398,7 +395,7 @@ res.na <- res[!is.na(res$o),]
 
 ```{r echo=TRUE, eval=FALSE}
 #create a new folder
-#if(!dir.exists("02_Short_Out")){dir.create("02_Short_Out")}
+if(!dir.exists("02_Short_Out")){dir.create("02_Short_Out")}
 
 #create an empty variable
 res5 <- c()
@@ -419,6 +416,10 @@ checkNrow_af(res5)
 #Detect loop
 checkLoop_af(res5)
 
+#Save
+saveRDS(res5,
+        file="./02_Short_Out/Individual_upGraph.Rdata",
+        compress = TRUE)
 ```
 
 An alternative way,
@@ -445,7 +446,7 @@ if(!dir.exists("Short_Out_vis")){dir.create("Short_Out_vis")}
 #create networks
 for(n in 1:length(res5)){
 #n <- 1
-a <- agQIDtoLabel_Wikidata(Entity_ID = QID[n])
+a <- agIDtoLabel_Wikidata(Entity_ID = QID[n])
 if(is.na(a[,2])){a[,2] <- a[,3]}
 
 Lab00 <- paste(a[,c(2, 1)], collapse = ".")
@@ -474,14 +475,147 @@ if(dir.exists(paste0("./agVisNetwork_", formatC(n, flag="0", width=4), "_", Lab0
 
 ```
 
-### define the common upper-level concepts
+### Merged network diagrams
+
+```{r echo=TRUE, eval=FALSE}
+#Merge them to one dataset
+res6 <- ListDF2DF(res5)
+
+#check NAs
+table(is.na(res6))
+
+#Delete deplicates
+res6d <- Exclude_Graph_duplicates(input=res6)
+
+#check dim
+dim(res6); dim(res6d)
+
+#Save
+saveRDS(res6d,
+        file="./02_Short_Out/Merged_upGraph.Rdata",
+        compress = TRUE)
+
+#run the network creation
+FileName <- paste0("agVisNetwork_Merged", "_", 
+                   format(Sys.time(), "%y%m%d"),".html")
+
+agVisNetwork(Graph=res6d,
+             Browse=FALSE,
+             Output=TRUE,
+             FilePath=FileName)
+filesstrings::file.move(files=FileName,
+                        destinations="./Short_Out_vis",
+                        overwrite = TRUE)
+
+#View the results
+#browseURL(paste0("./Short_Out_vis/", FileName))
+
+```
+
+```{r Fig06, fig.cap = "Merged network diagrams for search terms related to leukemia", echo = FALSE}
+suppressWarnings(library(EBImage))
+options(EBImage.display = "raster")
+img <- system.file("images", "Fig_06.png", package="agGraphSearch")
+EBImage::display(EBImage::readImage(files = img))
+```
+
+### Identification of the common upper-level entities using individual networks
 
 The common upper-level concept is defined based on the edge list of triples obtained above.
 
 ```{r echo=TRUE, eval=FALSE}
+##Graph data without the uplicates
+#Number of entities
+(E01 <- length(unique(c(res6d$subject, res6d$parentClass))))
+#Number of labels
+(E02 <- length(unique(c(res6d$subjectLabel, res6d$parentClassLabel))))
+#Number of Triples
+(E03 <- length(unique(res6d$triples)))
 
+#Gathering the parent concepts
+upEntity <- unlist(purrr::map(res5, function(x){unique(x$parentClass)}))
 
+#convert it to data frame
+Count_upEntity <- table(upEntity)
+Count_upEntity_DF <- data.frame(parentClass=names(Count_upEntity),
+                                Freq=as.numeric(Count_upEntity), 
+                                row.names = 1:length(Count_upEntity),
+                                stringsAsFactors = F)
 
+#Count and view table
+agTableDT(Count_upEntity_DF, Transpose = F, AutoWidth = FALSE)
+
+#Count Freq
+table(Count_upEntity_DF$Freq)
+
+#extarct parentClass & parentClassLabel from the merged dataset
+Dat <- data.frame(res6d[,c(colnames(res6d) == "parentClass" | 
+                          colnames(res6d) == "parentClassLabel")], 
+                  stringsAsFactors = F)
+head(Dat)
+
+#Delete the deplicates
+Dat0 <- Exclude_duplicates(Dat, 1)
+head(Dat0)
+
+#define the common upper-level entities
+dim(Count_upEntity_DF); dim(Dat0)
+Count_upEntity_DF2 <- Cutoff_FreqNum(input1=Count_upEntity_DF, 
+                                     input2=Dat0, 
+                                     By="parentClass", 
+                                     Sort="Freq", 
+                                     FreqNum=1)
+
+#check the results
+head(Count_upEntity_DF2, n=10)
+table(Count_upEntity_DF2$Freq)
+
+#save
+saveRDS(Count_upEntity_DF2,
+        file = "./02_Short_Out/Count_upEntity_DF2.Rdata", compress = TRUE)
+readr::write_excel_csv(Count_upEntity_DF2,
+                       file=paste("./02_Short_Out/Count_upEntity_DF2.csv", sep=""))
+
+#Calculation of inclusion rate
+QID <- QIDdf$QID
+
+##QID
+qid <- unique(res6d$subject, res6d$parentClass)
+b <- setdiff(QID, qid)
+b; length(b)
+
+##rdfsLabel
+#RdfsLabel <- unique(res6d$subjectLabel, res6d$parentClassLabel)
+```
+
+### Results for the common upper-level entities
+
+```{r echo=TRUE, eval=FALSE}
+FileName <- paste0("./FrequencyGraph_", format(Sys.time(), "%y%m%d_%H%M"),".html")
+
+pc_plot(input=Count_upEntity_DF2, 
+        SaveFolder="Short_Out_vis", 
+        FileName=FileName, 
+        IDnum=3)
+
+#View the results
+#browseURL(paste0("./Short_Out_vis/", dir("Short_Out_vis", pattern="FrequencyGraph_")[2]))
+#browseURL(paste0("./Short_Out_vis/", dir("Short_Out_vis", pattern="FrequencyGraph_")[1]))
+
+```
+
+## XXX
+
+### YYY
+
+```{r}
+```
+
+## XXX
+
+### YYY
+
+```{r}
 ```
 
 

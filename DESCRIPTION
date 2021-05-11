@@ -34,10 +34,10 @@ Imports: RCurl,
   htmlwidgets,
   filesstrings,
   visNetwork,
-  networkD3
+  networkD3,
+  plotly
 Suggests: furrr, 
   progress, 
-  plotly, 
   rlang,
   data.tree,
   testthat, 

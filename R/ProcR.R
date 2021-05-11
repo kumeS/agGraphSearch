@@ -91,7 +91,7 @@ return(a)
 ########################################
 ##Exclude duplicates by ID with the colname of subject.
 ########################################
-Exclude_duplicates <- function(input, conNum){
+Exclude_Subject_duplicates <- function(input, conNum){
 
 if(any(colnames(input) == "subject")){
 if(c(1:ncol(input))[colnames(input) == "subject"] != conNum){
@@ -106,6 +106,79 @@ cc <- input["subject"] %>%
 
 a <- input[cc,]
 return(a)
+
+}
+
+########################################
+##Exclude duplicates by ID with the colname of subject.
+########################################
+#library(magrittr)
+
+Exclude_Graph_duplicates <- function(input, conNum="Last"){
+if(!is.data.frame(input)){ return(message("Warning: Not proper value of input")) }
+if(nrow(input) == 0){ return(message("Warning: Not proper value of input")) }
+if(dim(input)[2] != 11){ return(message("Warning: Not proper value of input")) }
+if(conNum == "Last"){
+conNum0 <- ncol(input)
+conName <- colnames(input)[ncol(input)]
+}else{
+if(is.numeric(conNum)){
+  conNum0 <- conNum
+  conName <- colnames(input)[conNum]
+}else{
+  return(message("Warning: Not proper value of conNum"))
+}}
+
+cc <- input[conName] %>%
+  unique() %>%
+  rownames() %>%
+  as.numeric()
+
+a <- input[cc,]
+rownames(a) <- 1:nrow(a)
+
+return(a)
+
+}
+
+Exclude_duplicates <- function(input, conNum="Last"){
+if(!is.data.frame(input)){ return(message("Warning: Not proper value of input")) }
+if(nrow(input) == 0){ return(message("Warning: Not proper value of input")) }
+if(conNum == "Last"){
+conNum0 <- ncol(input)
+conName <- colnames(input)[ncol(input)]
+}else{
+if(is.numeric(conNum)){
+  conNum0 <- conNum
+  conName <- colnames(input)[conNum]
+}else{
+  return(message("Warning: Not proper value of conNum"))
+}}
+
+cc <- input[conName] %>%
+  unique() %>%
+  rownames() %>%
+  as.numeric()
+
+a <- input[cc,]
+rownames(a) <- 1:nrow(a)
+
+return(a)
+
+}
+
+Cutoff_FreqNum <- function(input1, input2, By="parentClass", Sort="Freq", FreqNum=1){
+if(!is.data.frame(input1)){ return(message("Warning: Not proper value of input1")) }
+if(!is.data.frame(input2)){ return(message("Warning: Not proper value of input2")) }
+
+a <- merge(input1, input2, by=By, all = T, sort = F)
+if(!all(is.numeric(unlist(a[Sort], use.names=FALSE)))){return(message("Warning: Not proper value of Sort"))}
+
+b <- a[order(a[Sort]),]
+d <- b[b[Sort] > FreqNum,]
+rownames(d) <- 1:nrow(d)
+
+return(d)
 
 }
 
@@ -129,7 +202,10 @@ return(a)
 ##' @export checkColumn_af
 ##' @export checkLoop_af
 ##' @export removeLoop_af
-##'
+##' @export Exclude_Graph_duplicates
+##' @export Exclude_Subject_duplicates
+##' @export Exclude_duplicates
+##' @export Cutoff_FreqNum
 
 
 #Check nrow
