@@ -37,7 +37,7 @@ library( "agGraphSearch" )
 
 ## Tutorial
 
-- [Introduction to agGraphSearch](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-introduction.html)
+- [Installation & Basic functions](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-installation.html)
 
 - [A short-tutorial for agGraphSearch](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-short-tutorial.html)
 
