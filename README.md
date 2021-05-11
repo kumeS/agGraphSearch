@@ -21,6 +21,13 @@ library( "agGraphSearch" )
 ```
 
 An alternative way,
+if you use MacOSX, install Git by installing Homebrew on Terminal first.
+
+```{r}
+system("brew install git")
+```
+
+Then,
 
 ```{R}
 system( "git clone https://github.com/kumeS/agGraphSearch.git" )
@@ -79,5 +86,5 @@ library( "agGraphSearch" )
 
 ## License
 
-Copyright (c) 2021 Satoshi Kume released under the [Artistic License 2.0](http://www.perlfoundation.org/artistic_license_2_0).
+[Artistic License 2.0](http://www.perlfoundation.org/artistic_license_2_0).
 
