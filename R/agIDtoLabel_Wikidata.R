@@ -13,7 +13,7 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @export agQIDtoLabel_Wikidata
+##' @export agIDtoLabel_Wikidata
 ##' @examples \dontrun{
 ##' #parameters
 ##'
@@ -21,11 +21,11 @@
 ##' ID <- "wd:Q81163"
 ##'
 ##' #run
-##' agQIDtoLabel_Wikidata( Entity_ID = ID )
+##' agIDtoLabel_Wikidata( Entity_ID = ID )
 ##'
 ##' }
 
-agQIDtoLabel_Wikidata <- function(Entity_ID,
+agIDtoLabel_Wikidata <- function(Entity_ID,
                                   lang=3,
                                   Message=FALSE){
 #Parameters
@@ -51,7 +51,7 @@ return(data.frame(Res, stringsAsFactors = F))
 }
 
 
-##' @title View the SPARQL query of agQIDtoLabel_Wikidata
+##' @title View the SPARQL query of agIDtoLabel_Wikidata
 ##'
 ##' @param Entity_Name a character vector. The string was
 ##' automatically judged to be Japanese (@ja) or English (@en)
@@ -62,11 +62,11 @@ return(data.frame(Res, stringsAsFactors = F))
 ##'
 ##' @return message
 ##' @author Satoshi Kume
-##' @export CkeckQuery_agQIDtoLabel_Wikidata
+##' @export CkeckQuery_agIDtoLabel_Wikidata
 ##' @seealso agCount_Label_Num_Wikidata_P279_P31
 
 
-CkeckQuery_agQIDtoLabel_Wikidata <- function(Entity_ID,
+CkeckQuery_agIDtoLabel_Wikidata <- function(Entity_ID,
                                              lang=3){
 #Parameters
 ID <- Entity_ID
