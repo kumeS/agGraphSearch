@@ -12,7 +12,7 @@ agCount_Label_Num(
   Message = FALSE,
   FilterRegex = FALSE,
   DirSave = FALSE,
-  Dir = "01_Results"
+  Dir = "01_Out"
 )
 }
 \arguments{

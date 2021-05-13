@@ -4,11 +4,13 @@
 \alias{agCount_Label_Num_Wikidata_P279_P31}
 \title{Count triples from a label query for Wikidata local endpoint via SPARQL.}
 \usage{
-agCount_Label_Num_Wikidata_P279_P31(Entity_Name)
+agCount_Label_Num_Wikidata_P279_P31(Entity_Name, Dir)
 }
 \arguments{
 \item{Entity_Name}{a character vector. The string was
 automatically judged to be Japanese (@ja) or English (@en)}
+
+\item{Dir}{a folder path for output files.}
 }
 \value{
 data.frame

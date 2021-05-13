@@ -2,6 +2,7 @@
 ##'
 ##' @param Entity_Name a character vector. The string was
 ##' automatically judged to be Japanese (@ja) or English (@en)
+##' @param Dir  a folder path for output files.
 ##' @description
 ##' This function allow to count labels and class relations for
 ##' wikidata local endpoint at OECU via SPARQL.
@@ -44,7 +45,8 @@
 ##'
 ##' }
 
-agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name){
+agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name,
+                                                Dir){
 
 #Parameter set
 #Labels
@@ -60,7 +62,7 @@ Property=agGraphSearch::wikidataClassProperty
 #Others
 FilterRegex=FALSE
 DirSave=TRUE
-Dir="01_Results"
+Dir=Dir
 Message=FALSE
 
 #Script

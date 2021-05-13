@@ -4,7 +4,7 @@
 \alias{pc_plot}
 \title{Visualize the results for common upper-level entities}
 \usage{
-pc_plot(input = Count_upEntity_DF2, SaveFolder, FileName, IDnum)
+pc_plot(input, SaveFolder, FileName, IDnum)
 }
 \value{
 data.frame

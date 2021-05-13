@@ -43,8 +43,8 @@ img <- system.file("images", "Fig_01.png", package="agGraphSearch")
 EBImage::display(EBImage::readImage(files = img))
 ```
 
-本チュートリアルでは、実際の事例として、
-LODから構造化データを取得する手順について紹介する。
+This tutorial will provide the procedure to obtain structured data from LOD as a real case study.
+
 
 ## agGraphSearch package
 
@@ -112,6 +112,9 @@ terms <- c("acute lymphocytic leukemia",
            "philadelphia-positive myelogenous leukemia")
 terms
 
+#create a new folder
+if(!dir.exists("01_Short_Out")){dir.create("01_Short_Out")}
+saveRDS(terms, file="./01_Short_Out/SearchEntities.Rdata")
 ```
 
 ## SPARQL query (1) counting labels and class relations
@@ -169,11 +172,12 @@ m <- c()
 #Run
 for(n in 1:length(terms)){
 #message(n)
-m[[n]] <-agCount_Label_Num_Wikidata_P279_P31(Entity_Name = terms[n])
+m[[n]] <-agCount_Label_Num_Wikidata_P279_P31(Entity_Name = terms[n],
+                                             Dir="02_Short_Out")
 }
 
 #convert list to data.frame
-fm <- ListDF2DF(m)
+(fm <- ListDF2DF(m))
 
 #View the data
 #agTableDT(fm, Width = "100px", Transpose = TRUE, AutoWidth=FALSE)
@@ -186,9 +190,7 @@ fm <- ListDF2DF(m)
 fm1 <- fm[c(fm$Hit_Label > 0),]
 fm2 <- fm1[c(fm1$Hit_ALL > 0),]
 
-#dim(fm)
-#dim(fm1)
-#dim(fm2)
+#dim(fm); dim(fm1); dim(fm2)
 
 ```
 
@@ -214,6 +216,9 @@ Lab01_res[[n]] <- agWD_Alt_Wikidata(Lab01[n])
 #assign results to a new variable
 QID <- as.character(unlist(Lab01_res))
 
+#create a new folder
+if(!dir.exists("02_Short_Out")){dir.create("02_Short_Out")}
+saveRDS(QID, file="./02_Short_Out/SearchEntities.Rdata")
 ```
 
 ### Retry SPARQL by QID
@@ -382,7 +387,7 @@ res.na <- res[!is.na(res$o),]
 
 ```{r echo=TRUE, eval=FALSE}
 #create a new folder
-if(!dir.exists("02_Short_Out")){dir.create("02_Short_Out")}
+if(!dir.exists("03_Short_Out")){dir.create("03_Short_Out")}
 
 #create an empty variable
 res5 <- c()
@@ -405,7 +410,7 @@ checkLoop_af(res5)
 
 #Save
 saveRDS(res5,
-        file="./02_Short_Out/Individual_upGraph.Rdata",
+        file="./03_Short_Out/Individual_upGraph.Rdata",
         compress = TRUE)
 ```
 
@@ -428,7 +433,7 @@ checkLoop_af(res5m)
 
 ```{r echo=TRUE, eval=FALSE}
 #create a new folder
-if(!dir.exists("Short_Out_vis")){dir.create("Short_Out_vis")}
+if(!dir.exists("03_Short_Out_vis")){dir.create("03_Short_Out_vis")}
 
 #create networks
 for(n in 1:length(res5)){
@@ -448,7 +453,7 @@ agVisNetwork(Graph=res5[[n]],
 Sys.sleep(1)
 
 filesstrings::file.move(files=FileName,
-                        destinations="./Short_Out_vis",
+                        destinations="./03_Short_Out_vis",
                         overwrite = TRUE)
 
 if(dir.exists(paste0("./agVisNetwork_", formatC(n, flag="0", width=4), "_", Lab00, "_files"))){
@@ -456,9 +461,9 @@ if(dir.exists(paste0("./agVisNetwork_", formatC(n, flag="0", width=4), "_", Lab0
 }}
 
 #View the results
-#browseURL(paste0("./Short_Out_vis/", dir("Short_Out_vis", pattern=".html")[1]))
-#browseURL(paste0("./Short_Out_vis/", dir("Short_Out_vis", pattern=".html")[2]))
-#browseURL(paste0("./Short_Out_vis/", dir("Short_Out_vis", pattern=".html")[3]))
+#browseURL(paste0("./03_Short_Out_vis/", dir("03_Short_Out_vis", pattern=".html")[1]))
+#browseURL(paste0("./03_Short_Out_vis/", dir("03_Short_Out_vis", pattern=".html")[2]))
+#browseURL(paste0("./03_Short_Out_vis/", dir("03_Short_Out_vis", pattern=".html")[3]))
 
 ```
 
@@ -479,7 +484,7 @@ dim(res6); dim(res6d)
 
 #Save
 saveRDS(res6d,
-        file="./02_Short_Out/Merged_upGraph.Rdata",
+        file="./03_Short_Out/Merged_upGraph.Rdata",
         compress = TRUE)
 
 #run the network creation
@@ -491,11 +496,11 @@ agVisNetwork(Graph=res6d,
              Output=TRUE,
              FilePath=FileName)
 filesstrings::file.move(files=FileName,
-                        destinations="./Short_Out_vis",
+                        destinations="./03_Short_Out_vis",
                         overwrite = TRUE)
 
 #View the results
-#browseURL(paste0("./Short_Out_vis/", FileName))
+#browseURL(paste0("./03_Short_Out_vis/", FileName))
 
 ```
 
@@ -559,9 +564,10 @@ table(Count_upEntity_DF2$Freq)
 
 #save
 saveRDS(Count_upEntity_DF2,
-        file = "./02_Short_Out/Count_upEntity_DF2.Rdata", compress = TRUE)
+        file = "./03_Short_Out/Count_upEntity_DF2.Rdata", compress = TRUE)
 readr::write_excel_csv(Count_upEntity_DF2,
-                       file=paste("./02_Short_Out/Count_upEntity_DF2.csv", sep=""))
+                       file=paste("./03_Short_Out/Count_upEntity_DF2.csv", sep=""))
+#Count_upEntity_DF2 <- readRDS(file = "./03_Short_Out/Count_upEntity_DF2.Rdata")
 
 #Calculation of inclusion rate
 QID <- QIDdf$QID
@@ -581,13 +587,65 @@ b; length(b)
 FileName <- paste0("./FrequencyGraph_", format(Sys.time(), "%y%m%d_%H%M"),".html")
 
 pc_plot(input=Count_upEntity_DF2, 
-        SaveFolder="Short_Out_vis", 
+        SaveFolder="03_Short_Out_vis", 
         FileName=FileName, 
         IDnum=3)
 
 #View the results
-#browseURL(paste0("./Short_Out_vis/", dir("Short_Out_vis", pattern="FrequencyGraph_")[2]))
-#browseURL(paste0("./Short_Out_vis/", dir("Short_Out_vis", pattern="FrequencyGraph_")[1]))
+#browseURL(paste0("./03_Short_Out_vis/", dir("03_Short_Out_vis", pattern="FrequencyGraph_")[2]))
+#browseURL(paste0("./03_Short_Out_vis/", dir("03_Short_Out_vis", pattern="FrequencyGraph_")[1]))
+
+```
+
+## Extraction of class hierarchies based on common entities
+
+### Set-up parameters
+
+```{r}
+#Individual graphes
+eachGraph <- readRDS("./03_Short_Out/Individual_upGraph.Rdata")
+head(eachGraph[[1]])
+sapply(eachGraph, dim)
+
+#Search entities
+list1a <- readRDS("./01_Short_Out/SearchEntities.Rdata")
+head(QID_rdfsLabel)
+readr::write_excel_csv(QID_rdfsLabel, file = "./04_Out/R04_QID_rdfsLabel.csv")
+
+dim(QID_rdfsLabel)
+list1a <- unique(QID_rdfsLabel$QID)
+head(list1a)
+any(list1a == "wd:Q35120")
+
+#共通エンティティ
+list2a <- readRDS("./03_Out/R03_pc_table2.Rdata")
+
+head(list2a)
+dim(list2a)
+unique(list2a$Freq)
+list2b <- unique(list2a$parentClass)
+head(list2b)
+any(list2b == "wd:Q35120")
+
+#Q35120を共通リストから除外
+list2b <- list2b[list2b != "wd:Q35120"]
+
+##包含
+table(list1a %in% list2b)
+table(list2b %in% list1a)
+
+
+```
+
+### Calculation
+
+```{r}
+system.time(SearchNum <- Graph_Analysis_v3(graphList=eachGraph, list1=list1a, list2=list2b, LowerSearch=T))
+head(SearchNum)
+table(SearchNum$Levels)
+sum(table(SearchNum$Levels))
+table(SearchNum$Levels)
+table(!is.na(SearchNum[,2]))
 
 ```
 
@@ -597,14 +655,6 @@ pc_plot(input=Count_upEntity_DF2,
 
 ```{r}
 ```
-
-## XXX
-
-### YYY
-
-```{r}
-```
-
 
 # Session information {.unnumbered}
 ```{r sessionInfo, echo=FALSE}

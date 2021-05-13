@@ -41,6 +41,8 @@ library( "agGraphSearch" )
 
 - [A short-tutorial for agGraphSearch](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-short-tutorial.html)
 
+- [agGraphSearch 日本語ショートチュートリアル](http://translate.google.com/translate?hl=&sl=en&tl=ja&u=https%3A%2F%2Fkumes.github.io%2FagGraphSearch%2Fvignettes%2FagGraphSearch-short-tutorial.html)
+
 ## Some examples of function execution in the package
 
 - CkeckQuery_agCount_Label_Num_Wikidata_P279_P31
