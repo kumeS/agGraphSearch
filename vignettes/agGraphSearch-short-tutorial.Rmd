@@ -12,7 +12,7 @@ output:
 vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
-  %\VignetteIndexEntry{Short tutorial: leukemia}
+  %\VignetteIndexEntry{Workflow to use agGraphSearch for leukemia terms}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
@@ -90,6 +90,9 @@ if(!require("agGraphSearch")){
 #load
 library("agGraphSearch")
 
+#GitHub URL
+#browseURL("https://github.com/kumeS/agGraphSearch")
+
 ```
 
 # Workflow for searching the graph for leukemia.
@@ -114,7 +117,7 @@ terms
 
 #create a new folder
 if(!dir.exists("01_Short_Out")){dir.create("01_Short_Out")}
-saveRDS(terms, file="./01_Short_Out/SearchEntities.Rdata")
+saveRDS(terms, file="./01_Short_Out/SearchTerm.Rdata")
 ```
 
 ## SPARQL query (1) counting labels and class relations
@@ -151,7 +154,8 @@ agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 #run SPARQL
 #library(SPARQL)
-res <- agCount_Label_Num_Wikidata_P279_P31(Entity_Name = ter00)
+res <- agCount_Label_Num_Wikidata_P279_P31(Entity_Name = ter00, 
+                                           Dir="02_Short_Out")
 res
 
 #View table
@@ -238,10 +242,10 @@ for(n in 1:length(Lab01)){
 QID_res[[n]] <- agCount_ID_Num_Wikidata_QID_P279_P31(QID[n])
 }
 
-#convert list to data.frame
+#convert list to data frame
 QID_res2 <- ListDF2DF(QID_res)
 
-#check it
+#check results
 head(QID_res2)
 dim(QID_res2)
 colnames(QID_res2)
@@ -297,7 +301,8 @@ for(m in seq_len(NumQ)){
 
 res <- c()
 for(n in seq_len(length(QID))){
-res[[n]] <- agCount_ID_Prop_Obj_Wikidata_vP(Entity_ID=QID[n], Object=paste0("wd:", ExcluQ[m]))
+res[[n]] <- agCount_ID_Prop_Obj_Wikidata_vP(Entity_ID=QID[n], 
+                                            Object=paste0("wd:", ExcluQ[m]))
 }
 res1 <- ListDF2DF(res)
 eval(parse(text=paste0("QIDdf$", ExcluQ[m], " <- c(as.numeric(unlist(res1)) > 0)")))
@@ -326,7 +331,8 @@ print(ExcluP[m])
 
 res <- c()
 for(n in seq_len(length(QID))){
-res[[n]] <- agCount_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property=paste0("wdt:", ExcluP[m]))
+res[[n]] <- agCount_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], 
+                                            Property=paste0("wdt:", ExcluP[m]))
 }
 res1 <- ListDF2DF(res)
 eval(parse(text=paste0("QIDdf$", ExcluP[m], " <- c(as.numeric(unlist(res1)) > 0)")))
@@ -338,6 +344,8 @@ agTableKB(QIDdf)
 ```
 
 ## SPARQL query (3) Examining the upper-level class relations
+
+### instanceOf 
 
 ```{r echo=TRUE, eval=TRUE}
 # instanceOf (wdt:P31)
@@ -353,6 +361,8 @@ for(n in seq_len(length(QID))){
 res3[[n]] <- agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P31")
 }
 ```
+
+### subClassOf 
 
 ```{r echo=TRUE, eval=TRUE}
 # subClassOf (wdt:P279)
@@ -374,7 +384,7 @@ res4b <- ListDF2DF(res4)
 res <- rbind(res3b, res4b)
 
 #remove rows with NA on "o" col
-res.na <- res[!is.na(res$o),]
+(res.na <- res[!is.na(res$o),])
 
 #View the result
 #agTableDT(res.na, Width = "100px", Transpose = FALSE, AutoWidth=FALSE)
@@ -395,7 +405,8 @@ res5 <- c()
 #run SPARQL; search the upper-level classes
 for(n in 1:length(QID)){
   message(n)
-  res5[[n]] <- PropertyPath_GraphUp_Wikidata(Entity_ID = QID[n], Depth = 30)  
+  res5[[n]] <- PropertyPath_GraphUp_Wikidata(Entity_ID = QID[n], 
+                                             Depth = 30)  
 }
 
 #check results
@@ -418,7 +429,9 @@ An alternative way,
 
 ```{r echo=TRUE, eval=FALSE}
 #run SPARQL with purrr::map function
-res5m <- purrr::map(QID, PropertyPath_GraphUp_Wikidata, Depth = 30)
+res5m <- purrr::map(QID, 
+                    PropertyPath_GraphUp_Wikidata, 
+                    Depth = 30)
 
 #check results
 #Count rows
@@ -456,9 +469,11 @@ filesstrings::file.move(files=FileName,
                         destinations="./03_Short_Out_vis",
                         overwrite = TRUE)
 
-if(dir.exists(paste0("./agVisNetwork_", formatC(n, flag="0", width=4), "_", Lab00, "_files"))){
-  system(paste0('rm -rf "./agVisNetwork_', formatC(n, flag="0", width=4), '_', Lab00, '_files"'))
-}}
+Name <- paste0("./agVisNetwork_", 
+               formatC(n, flag="0", width=4), 
+               "_", Lab00, "_files")
+if(dir.exists(Name)){file.remove(Name)}
+}
 
 #View the results
 #browseURL(paste0("./03_Short_Out_vis/", dir("03_Short_Out_vis", pattern=".html")[1]))
@@ -470,7 +485,7 @@ if(dir.exists(paste0("./agVisNetwork_", formatC(n, flag="0", width=4), "_", Lab0
 ### Merged network diagrams
 
 ```{r echo=TRUE, eval=FALSE}
-#Merge them to one dataset
+#Merge their graphs to one graph
 res6 <- ListDF2DF(res5)
 
 #check NAs
@@ -488,9 +503,9 @@ saveRDS(res6d,
         compress = TRUE)
 
 #run the network creation
+if(TRUE){
 FileName <- paste0("agVisNetwork_Merged", "_", 
                    format(Sys.time(), "%y%m%d"),".html")
-
 agVisNetwork(Graph=res6d,
              Browse=FALSE,
              Output=TRUE,
@@ -498,6 +513,7 @@ agVisNetwork(Graph=res6d,
 filesstrings::file.move(files=FileName,
                         destinations="./03_Short_Out_vis",
                         overwrite = TRUE)
+}
 
 #View the results
 #browseURL(paste0("./03_Short_Out_vis/", FileName))
@@ -527,12 +543,8 @@ The common upper-level concept is defined based on the edge list of triples obta
 #Gathering the parent concepts
 upEntity <- unlist(purrr::map(res5, function(x){unique(x$parentClass)}))
 
-#convert it to data frame
-Count_upEntity <- table(upEntity)
-Count_upEntity_DF <- data.frame(parentClass=names(Count_upEntity),
-                                Freq=as.numeric(Count_upEntity), 
-                                row.names = 1:length(Count_upEntity),
-                                stringsAsFactors = F)
+#calculate the frequency of common entities
+Count_upEntity_DF <- countCommonEntities(upEntity)
 
 #Count and view table
 agTableDT(Count_upEntity_DF, Transpose = F, AutoWidth = FALSE)
@@ -549,14 +561,16 @@ head(Dat)
 #Delete the deplicates
 Dat0 <- Exclude_duplicates(Dat, 1)
 head(Dat0)
+dim(Dat); dim(Dat0)
 
 #define the common upper-level entities
 dim(Count_upEntity_DF); dim(Dat0)
+head(Count_upEntity_DF); head(Dat0)
 Count_upEntity_DF2 <- Cutoff_FreqNum(input1=Count_upEntity_DF, 
                                      input2=Dat0, 
                                      By="parentClass", 
                                      Sort="Freq", 
-                                     FreqNum=1)
+                                     FreqNum=2)
 
 #check the results
 head(Count_upEntity_DF2, n=10)
@@ -566,7 +580,7 @@ table(Count_upEntity_DF2$Freq)
 saveRDS(Count_upEntity_DF2,
         file = "./03_Short_Out/Count_upEntity_DF2.Rdata", compress = TRUE)
 readr::write_excel_csv(Count_upEntity_DF2,
-                       file=paste("./03_Short_Out/Count_upEntity_DF2.csv", sep=""))
+                       file="./03_Short_Out/Count_upEntity_DF2.csv")
 #Count_upEntity_DF2 <- readRDS(file = "./03_Short_Out/Count_upEntity_DF2.Rdata")
 
 #Calculation of inclusion rate
@@ -586,7 +600,7 @@ b; length(b)
 ```{r echo=TRUE, eval=FALSE}
 FileName <- paste0("./FrequencyGraph_", format(Sys.time(), "%y%m%d_%H%M"),".html")
 
-pc_plot(input=Count_upEntity_DF2, 
+pc_plot(Count_upEntity_DF2, 
         SaveFolder="03_Short_Out_vis", 
         FileName=FileName, 
         IDnum=3)
@@ -601,46 +615,47 @@ pc_plot(input=Count_upEntity_DF2,
 
 ### Set-up parameters
 
-```{r}
+```{r echo=TRUE, eval=FALSE}
 #Individual graphes
 eachGraph <- readRDS("./03_Short_Out/Individual_upGraph.Rdata")
 head(eachGraph[[1]])
 sapply(eachGraph, dim)
 
 #Search entities
-list1a <- readRDS("./01_Short_Out/SearchEntities.Rdata")
-head(QID_rdfsLabel)
-readr::write_excel_csv(QID_rdfsLabel, file = "./04_Out/R04_QID_rdfsLabel.csv")
+(list1a <- readRDS("./02_Short_Out/SearchEntities.Rdata"))
 
-dim(QID_rdfsLabel)
-list1a <- unique(QID_rdfsLabel$QID)
 head(list1a)
 any(list1a == "wd:Q35120")
 
-#共通エンティティ
-list2a <- readRDS("./03_Out/R03_pc_table2.Rdata")
+#Common entities
+list2a <- readRDS("./03_Short_Out/Count_upEntity_DF2.Rdata")
 
 head(list2a)
 dim(list2a)
-unique(list2a$Freq)
+
 list2b <- unique(list2a$parentClass)
 head(list2b)
 any(list2b == "wd:Q35120")
 
-#Q35120を共通リストから除外
+#Remove Q35120 from the common list.
 list2b <- list2b[list2b != "wd:Q35120"]
 
-##包含
+#Inclusion of list1a and list2b
 table(list1a %in% list2b)
 table(list2b %in% list1a)
-
 
 ```
 
 ### Calculation
 
-```{r}
-system.time(SearchNum <- Graph_Analysis_v3(graphList=eachGraph, list1=list1a, list2=list2b, LowerSearch=T))
+```{r echo=TRUE, eval=FALSE}
+system.time(
+  SearchNum <- agGraphAnalysis(eachGraph, 
+                               list1a, 
+                               list2b, 
+                               LowerSearch=TRUE)
+  )
+
 head(SearchNum)
 table(SearchNum$Levels)
 sum(table(SearchNum$Levels))

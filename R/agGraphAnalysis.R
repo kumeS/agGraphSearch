@@ -1,7 +1,6 @@
 ##' @title Graph analysis
 ##'
-##' @param Entity_ID
-##'
+##' @param graphList
 ##'
 ##' @description this function is a general function for
 ##'
@@ -13,28 +12,36 @@
 ##'
 ##' }
 
-if(!require("igraph")){install.packages("igraph")}; library(igraph)
-
-#graphList=eachGraph; list1=list1a; list2=list2b; UpdateList=F; breakRepeat=99; Entity_only=T; View=TRUE; RemoveGraph=F; PlusLabel=T; GraphView=T
-#graphList=eachGraph; list1=list1a; list2=list2b; UpdateList=F; breakRepeat=99; View=TRUE; RemoveGraph=F; PlusLabel=T; GraphView=T; LvView=T; OutputResults=T; WindowSize01=10; WindowSize02=10; WindowSize03=10; WindowSize04=10; WindowSize05=10; FileName=T;FileName00="04_Results_01"; GraphView01=F;GraphView02=F;GraphView03=T; GraphView04=F
-
-#PlusLabel=T; FileName=T; FileName00="04_Results_01"; LowerSearch=F
-
 #list1: 検索エンティティ
 #list2, list2.c, list2.wd: 共通上位エンティティ
 #list3: 共通上位エンティティ + 展開段数
 #graphList=eachGraph; list1=list1a; list2=list2b; LowerSearch=T;  UpdateList=F; breakRepeat=20;View=T; RemoveGraph=F; PlusLabel=T; FileName=T; FileName00="04_Results_01";OutputResults=T; ResultsEach=F; Entity_only=T; list2.WD="wd:Q35120"; GraphView01=F; GraphView02=F; GraphView03=T; GraphView04=T; LvView=T;WindowSize01=10; WindowSize02=10;WindowSize03=10; WindowSize04=7.5;WindowSize05=7.5
 
-agGraphAnalysis <- function(graphList=eachGraph, list1=list1a, list2=list2b,
-                              UpdateList=F, breakRepeat=20,
-                              View=T, RemoveGraph=F,
-                              PlusLabel=T, FileName=T, FileName00="04_Results_01",
-                              OutputResults=T, ResultsEach=F, LowerSearch=F,
-                              Entity_only=T, list2.WD="wd:Q35120",
-                              GraphView01=F, GraphView02=F, GraphView03=T, GraphView04=T, LvView=T,
-                              WindowSize01=10, WindowSize02=10,
-                              WindowSize03=10, WindowSize04=7.5,
-                              WindowSize05=7.5){
+agGraphAnalysis <- function(graphList,
+                            list1,
+                            list2,
+                            UpdateList=F,
+                            breakRepeat=20,
+                            View=T,
+                            RemoveGraph=F,
+                            PlusLabel=T,
+                            FileName=T,
+                            FileName00,
+                            OutputResults=T,
+                            ResultsEach=F,
+                            LowerSearch=F,
+                            Entity_only=T,
+                            list2.WD="wd:Q35120",
+                            GraphView01=F,
+                            GraphView02=F,
+                            GraphView03=T,
+                            GraphView04=T,
+                            LvView=T,
+                            WindowSize01=10,
+                            WindowSize02=10,
+                            WindowSize03=10,
+                            WindowSize04=7.5,
+                            WindowSize05=7.5){
 #graphListの型確認
 if(is.list(graphList)){}else{return(message("graphList is not the list type"))}
 

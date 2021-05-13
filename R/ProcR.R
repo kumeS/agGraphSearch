@@ -167,7 +167,7 @@ return(a)
 
 }
 
-Cutoff_FreqNum <- function(input1, input2, By="parentClass", Sort="Freq", FreqNum=1){
+Cutoff_FreqNum <- function(input1, input2, By="parentClass", Sort="Freq", FreqNum=2){
 if(!is.data.frame(input1)){ return(message("Warning: Not proper value of input1")) }
 if(!is.data.frame(input2)){ return(message("Warning: Not proper value of input2")) }
 
@@ -175,7 +175,7 @@ a <- merge(input1, input2, by=By, all = T, sort = F)
 if(!all(is.numeric(unlist(a[Sort], use.names=FALSE)))){return(message("Warning: Not proper value of Sort"))}
 
 b <- a[order(a[Sort]),]
-d <- b[b[Sort] > FreqNum,]
+d <- b[b[Sort] >= FreqNum,]
 rownames(d) <- 1:nrow(d)
 
 return(d)
@@ -198,6 +198,7 @@ return(a)
 
 ##' @title Check list data
 ##' @author Satoshi Kume
+##'
 ##' @export checkNrow_af
 ##' @export checkColumn_af
 ##' @export checkLoop_af
@@ -206,6 +207,8 @@ return(a)
 ##' @export Exclude_Subject_duplicates
 ##' @export Exclude_duplicates
 ##' @export Cutoff_FreqNum
+##' @export countCommonEntities
+##'
 
 
 #Check nrow
@@ -233,7 +236,12 @@ input0[[n]] <- input0[[n]][input0[[n]][,col1] != input0[[n]][,col2],]
 return(input0)
 }
 
-
-
-
+countCommonEntities <- function(upEntity){
+Count_upEntity <- table(upEntity)
+Count_upEntity_DF <- data.frame(parentClass=names(Count_upEntity),
+                                Freq=as.numeric(Count_upEntity),
+                                row.names = 1:length(Count_upEntity),
+                                stringsAsFactors = F)
+return(Count_upEntity_DF)
+}
 

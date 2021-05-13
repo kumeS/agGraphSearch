@@ -12,7 +12,7 @@ output:
 vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
-  %\VignetteIndexEntry{WF-002: match labels to the wikidata via SPARQL}
+  %\VignetteIndexEntry{Workflow to use agGraphSearch: WF-003}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console

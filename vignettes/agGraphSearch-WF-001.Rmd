@@ -12,7 +12,7 @@ output:
 vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
-  %\VignetteIndexEntry{WF-001: load the search seeds}
+  %\VignetteIndexEntry{Workflow to use agGraphSearch: WF-001}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
