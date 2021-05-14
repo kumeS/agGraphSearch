@@ -36,7 +36,7 @@ agCount_ID_Prop_Obj_Wikidata_vO <- function(Entity_ID,
                                             Property,
                                             Val=TRUE){
 
-if(!is.logical(Val)){return(message("Warning: Not proper value of Val"))}
+if(!is.logical(Val)){ return(message("Warning: Not proper value of Val")) }
 
 #Parameters
 Prefix <- agGraphSearch::PREFIX

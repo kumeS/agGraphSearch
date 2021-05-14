@@ -8,23 +8,23 @@ agGraphAnalysis(
   graphList,
   list1,
   list2,
-  UpdateList = F,
-  breakRepeat = 20,
-  View = T,
-  RemoveGraph = F,
-  PlusLabel = T,
-  FileName = T,
-  FileName00,
-  OutputResults = T,
-  ResultsEach = F,
-  LowerSearch = F,
-  Entity_only = T,
+  ParticularEntity_only = TRUE,
   list2.WD = "wd:Q35120",
-  GraphView01 = F,
-  GraphView02 = F,
-  GraphView03 = T,
-  GraphView04 = T,
-  LvView = T,
+  UpdateList = FALSE,
+  breakRepeat = 20,
+  View = TRUE,
+  RemoveGraph = FALSE,
+  PlusLabel = TRUE,
+  FileName = TRUE,
+  FileName00,
+  OutputResults = TRUE,
+  ResultsEach = FALSE,
+  LowerSearch = FALSE,
+  GraphView01 = FALSE,
+  GraphView02 = FALSE,
+  GraphView03 = TRUE,
+  GraphView04 = TRUE,
+  LvView = TRUE,
   WindowSize01 = 10,
   WindowSize02 = 10,
   WindowSize03 = 10,
@@ -36,6 +36,8 @@ agGraphAnalysis(
 \item{list1}{a character vector of search entities.}
 
 \item{list2}{a character vector of common upper-level entities}
+
+\item{PlusLabel}{logical; add the labels or not when createing the network.}
 }
 \value{
 data.frame

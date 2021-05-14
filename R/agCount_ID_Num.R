@@ -41,8 +41,9 @@ agCount_ID_Num <- function(Entity_ID,
                            Property,
                            Message=TRUE,
                            DirSave=FALSE,
-                           Dir="01_Results"){
+                           Dir){
 ID <- Entity_ID
+if(!is.character(Dir)){ return(message("Warning: Not proper value of Dir")) }
 
 Prefix <- agGraphSearch::PREFIX
 
