@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2021-05-11" />
+<meta name="date" content="2021-05-14" />
 
 <title>Introduction to agGraphSearch</title>
 
@@ -174,7 +174,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">Introduction to agGraphSearch</h1>
 <p class="author-name">Satoshi Kume</p>
-<h4 class="date">2021-05-11</h4>
+<h4 class="date">2021-05-14</h4>
 <h4 class="package">Package</h4>
 <p>agGraphSearch, knitr, SPARQL</p>
 
@@ -202,8 +202,8 @@ document.addEventListener("DOMContentLoaded", function() {
       links[i].target = '_blank';
 });
 </script>
-<p><strong>Last modified:</strong> 2021-05-11 12:17:46<br />
-<strong>Compiled</strong>: Tue May 11 12:18:00 2021</p>
+<p><strong>Last modified:</strong> NA<br />
+<strong>Compiled</strong>: Fri May 14 11:29:13 2021</p>
 <div id="getting-started" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Getting started</h1>
 <p><em>agGraphSearch</em> is an R package distributed in kumeS’s GitHub site.
@@ -213,19 +213,80 @@ devtools::install_github( &quot;kumeS/agGraphSearch&quot; )
 library( &quot;agGraphSearch&quot; )</code></pre>
 <p>Once <em>agGraphSearch</em> is installed, it can be loaded by the following command.</p>
 <pre class="r"><code>library(&quot;agGraphSearch&quot;)</code></pre>
+<p>Optionally, use the following R command if you want to use the docker environment.</p>
+<pre class="r"><code>system(&quot;docker run \\
+        -d \\
+        --name RStudio \\
+        -v $(pwd)/XXX:/home/rstudio/XXX \\
+        -e ROOT=TRUE \\
+        -e PASSWORD=PassWord \\
+        -p 8787:8787 \\
+       rocker/rstudio:4.0.5&quot;)</code></pre>
+<p>See DockerHub if you want to know details to the docker image.</p>
+<p><a href="https://hub.docker.com/r/rocker/rstudio" class="uri">https://hub.docker.com/r/rocker/rstudio</a></p>
 </div>
 <div id="basic-functions" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Basic functions</h1>
 <ul>
-<li><p>agCount_ID_Num</p></li>
-<li><p>agCount_ID_Prop_Obj</p></li>
-<li><p>agCount_Label_Num</p></li>
-<li><p>agIDtoLabel</p></li>
+<li><p>Generation functions for SPARQL Query</p>
+<ul>
+<li><p>agCount_ID_Num</p>
+<ul>
+<li>agCount_ID_Num_Wikidata_QID_P279_P31.R</li>
+</ul></li>
+<li><p>agCount_ID_Prop_Obj</p>
+<ul>
+<li><p>agCount_ID_Prop_Obj_Wikidata_vO</p></li>
+<li><p>agCount_ID_Prop_Obj_Wikidata_vP</p></li>
+</ul></li>
+<li><p>agWD_Alt_Wikidata</p>
+<ul>
+<li>agWD_ID_Prop_Obj_Wikidata_vO</li>
+</ul></li>
+<li><p>agCount_Label_Num</p>
+<ul>
+<li>agCount_Label_Num_Wikidata_P279_P31</li>
+</ul></li>
+<li><p>agIDtoLabel</p>
+<ul>
+<li>agIDtoLabel_Wikidata</li>
+</ul></li>
 <li><p>agWD_Alt</p></li>
-<li><p>agWD_ID_Prop_Obj</p></li>
-<li><p>PropertyPath</p></li>
+<li><p>agWD_ID_Prop_Obj</p>
+<ul>
+<li>agWD_Alt_Wikidata</li>
+</ul></li>
+<li><p>PropertyPath</p>
+<ul>
+<li>PropertyPath_GraphUp_Wikidata</li>
+</ul></li>
+</ul></li>
+<li><p>Analytical functions for SPARQL results</p>
+<ul>
+<li>pc_plot</li>
+</ul></li>
+<li><p>Analytical functions for Graph Data</p>
+<ul>
+<li>agGraphAnalysis</li>
+</ul></li>
+<li><p>Generation functions for Table-type Visualization</p>
+<ul>
 <li><p>agTableDT</p></li>
+<li><p>agTableFM</p></li>
+<li><p>agTableKB</p></li>
+</ul></li>
+<li><p>Generation functions for Network Graph Visualization</p>
+<ul>
 <li><p>agVisNetwork</p></li>
+<li><p>agNetwork3d</p></li>
+</ul></li>
+<li><p>Generation functions for Data processing</p>
+<ul>
+<li><p>PurseNT</p>
+<ul>
+<li>…</li>
+</ul></li>
+</ul></li>
 </ul>
 </div>
 <div id="session-information" class="section level1 unnumbered">

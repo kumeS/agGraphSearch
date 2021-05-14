@@ -41,25 +41,88 @@ Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the followi
 library("agGraphSearch")
 ```
 
+Optionally, use the following R command if you want to use the docker environment.
+
+```{r}
+system("docker run \\
+        -d \\
+        --name RStudio \\
+        -v $(pwd)/XXX:/home/rstudio/XXX \\
+        -e ROOT=TRUE \\
+        -e PASSWORD=PassWord \\
+        -p 8787:8787 \\
+       rocker/rstudio:4.0.5")
+
+```
+
+See DockerHub if you want to know details to the docker image.
+
+https://hub.docker.com/r/rocker/rstudio
+
 # Basic functions
 
-- agCount_ID_Num
+- Generation functions for SPARQL Query 
 
-- agCount_ID_Prop_Obj
+  - agCount_ID_Num
 
-- agCount_Label_Num
+    - agCount_ID_Num_Wikidata_QID_P279_P31.R
+    
+  - agCount_ID_Prop_Obj
 
-- agIDtoLabel
+    - agCount_ID_Prop_Obj_Wikidata_vO
+    
+    - agCount_ID_Prop_Obj_Wikidata_vP
+  
+  - agWD_Alt_Wikidata
+  
+    - agWD_ID_Prop_Obj_Wikidata_vO
 
-- agWD_Alt
+  - agCount_Label_Num
 
-- agWD_ID_Prop_Obj
+    - agCount_Label_Num_Wikidata_P279_P31
+    
+  - agIDtoLabel
+  
+    - agIDtoLabel_Wikidata
 
-- PropertyPath
+  - agWD_Alt
 
-- agTableDT
+  - agWD_ID_Prop_Obj
 
-- agVisNetwork
+    - agWD_Alt_Wikidata
+    
+  - PropertyPath
+  
+    - PropertyPath_GraphUp_Wikidata
+
+- Analytical functions for SPARQL results
+
+  - pc_plot
+
+- Analytical functions for Graph Data 
+
+    - agGraphAnalysis
+
+- Generation functions for Table-type Visualization
+
+  - agTableDT
+
+  - agTableFM
+  
+  - agTableKB
+  
+- Generation functions for Network Graph Visualization
+
+  - agVisNetwork
+
+  - agNetwork3d
+  
+- Generation functions for Data processing
+
+  - PurseNT
+  
+    - ...
+
 
 # Session information {.unnumbered}
 ```{r sessionInfo, echo=FALSE}

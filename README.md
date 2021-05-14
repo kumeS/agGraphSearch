@@ -14,7 +14,7 @@ as a function of R, without having to create any SPARQL queries on R scripts.
 
 2. Run the following commands in the R console.
 
-```{R}
+```{r}
 install.packages( "devtools" )
 devtools::install_github( "kumeS/agGraphSearch" )
 library( "agGraphSearch" )
@@ -29,7 +29,7 @@ system("brew install git")
 
 Then,
 
-```{R}
+```{r}
 system( "git clone https://github.com/kumeS/agGraphSearch.git" )
 system( "R CMD INSTALL agGraphSearch" )
 library( "agGraphSearch" )
