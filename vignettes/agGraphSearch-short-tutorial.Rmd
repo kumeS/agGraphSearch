@@ -648,7 +648,7 @@ table(list2b %in% list1a)
 
 ```
 
-### Calculation
+### Calculation for expanded common upper-level entities and number of expanded steps
 
 ```{r echo=TRUE, eval=FALSE}
 system.time(

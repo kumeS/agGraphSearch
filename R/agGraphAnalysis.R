@@ -14,7 +14,7 @@
 ##'
 ##' }
 
-#graphList=eachGraph; list1=list1a; list2=list2b; LowerSearch=T;  UpdateList=F; breakRepeat=20;View=T; RemoveGraph=F; PlusLabel=T; FileName=T; FileName00="04_Results_01";OutputResults=T; ResultsEach=F; ParticularEntity_only=T; list2.WD="wd:Q35120"; GraphView01=F; GraphView02=F; GraphView03=T; GraphView04=T; LvView=T;WindowSize01=10; WindowSize02=10;WindowSize03=10; WindowSize04=7.5;WindowSize05=7.5
+#graphList=eachGraph; list1=list1a; list2=list2b; LowerSearch=T;  UpdateList=F; breakRepeat=20;View=T; RemoveGraph=F; PlusLabel=T; FileName=T; OutputResults=T; ResultsEach=F; ParticularEntity_only=T; list2.WD="wd:Q35120"; GraphView01=F; GraphView02=F; GraphView03=T; GraphView04=T; LvView=T;WindowSize01=10; WindowSize02=10;WindowSize03=10; WindowSize04=7.5;WindowSize05=7.5
 
 agGraphAnalysis <- function(graphList,
                             list1,
@@ -26,8 +26,7 @@ agGraphAnalysis <- function(graphList,
                             View=TRUE,
                             RemoveGraph=FALSE,
                             PlusLabel=TRUE,
-                            FileName=TRUE,
-                            FileName00,
+                            FileName=paste0("Results_", format(Sys.time(), "%y%m%d_%H%M")),
                             OutputResults=TRUE,
                             ResultsEach=FALSE,
                             LowerSearch=FALSE,
@@ -80,7 +79,9 @@ graphList00[[nn]] <- data.frame(from=graphList[[nn]]$subject,
 #出力先の作成
 if(!exists(FileName)){ return(message("Not proper value of FileName")) }
 if(FileName){
-  Folder <- FileName00}else{Folder <- paste0("Results_", format(Sys.time(), "%y%m%d_%H%M"))}
+  Folder <- paste0("Results_", format(Sys.time(), "%y%m%d_%H%M"))
+}
+
 if(!exists(Folder)){dir.create(Folder)}
 FolderData <- paste(Folder, "/SaveData", sep="")
 if(!exists(FolderData)){dir.create(FolderData)}
