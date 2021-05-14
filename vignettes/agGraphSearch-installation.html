@@ -202,8 +202,8 @@ document.addEventListener("DOMContentLoaded", function() {
       links[i].target = '_blank';
 });
 </script>
-<p><strong>Last modified:</strong> NA<br />
-<strong>Compiled</strong>: Fri May 14 13:06:04 2021</p>
+<p><strong>Last modified:</strong> 2021-05-14 13:10:08<br />
+<strong>Compiled</strong>: Fri May 14 13:10:11 2021</p>
 <div id="getting-started" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Getting started</h1>
 <p><em>agGraphSearch</em> is an R package distributed in kumeS’s GitHub site.
@@ -251,9 +251,11 @@ system( &quot;R CMD INSTALL agGraphSearch&quot; )
 library( &quot;agGraphSearch&quot; )
 </code></pre>
 <ul>
-<li>memo: Remove All packages</li>
+<li><p>memo: Remove All packages</p>
+<ul>
+<li>remove.packages( installed.packages( priority = “NA” )[,1] )</li>
+</ul></li>
 </ul>
-<p>remove.packages( installed.packages( priority = “NA” )[,1] )</p>
 </div>
 <div id="basic-functions" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Basic functions</h1>

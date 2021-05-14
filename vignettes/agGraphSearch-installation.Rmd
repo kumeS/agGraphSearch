@@ -21,7 +21,7 @@ editor_options:
 BiocStyle::markdown()
 ```
 
-**Last modified:** `r file.info("agGraphSearch-introduction.Rmd")$mtime`<br />
+**Last modified:** `r file.info("agGraphSearch-installation.Rmd")$mtime`<br />
 **Compiled**: `r date()`
 
 # Getting started
@@ -93,7 +93,7 @@ library( "agGraphSearch" )
 
 - memo: Remove All packages
 
-remove.packages( installed.packages( priority = "NA" )[,1] )
+  - remove.packages( installed.packages( priority = "NA" )[,1] )
 
 # Basic functions
 
