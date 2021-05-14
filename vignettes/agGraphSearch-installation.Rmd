@@ -21,7 +21,7 @@ editor_options:
 BiocStyle::markdown()
 ```
 
-**Last modified:** `r file.info("agGraphSearch-installation.Rmd")$mtime`<br />
+**Last modified:** `r file.info("agGraphSearch-installation.Rmd")$mtime`<br/>
 **Compiled**: `r date()`
 
 # Getting started
@@ -42,7 +42,7 @@ Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the followi
 library("agGraphSearch")
 ```
 
-Optionally, use the following docker command if you want to use the docker environment.
+Optionally, you use the following command if you want to use the docker environment.
 
 ```sh
 # On Terminal
@@ -121,10 +121,12 @@ library( "agGraphSearch" )
   
     - agIDtoLabel_Wikidata
 
-  - agWD_Alt
-
   - agWD_ID_Prop_Obj
 
+    - agWD_ID_Prop_Obj_Wikidata_vO
+    
+  - agWD_Alt
+  
     - agWD_Alt_Wikidata
     
   - PropertyPath
@@ -137,7 +139,7 @@ library( "agGraphSearch" )
 
 - Analytical functions for Graph Data 
 
-    - agGraphAnalysis
+  - agGraphAnalysis
 
 - Generation functions for Table-type Visualization
 
