@@ -2,7 +2,7 @@
 % Please edit documentation in R/agGraphAnalysis.R
 \name{agGraphAnalysis}
 \alias{agGraphAnalysis}
-\title{Graph analysis}
+\title{Graph analysis function for the upper-level concepts.}
 \usage{
 agGraphAnalysis(
   graphList,
@@ -33,7 +33,9 @@ agGraphAnalysis(
 )
 }
 \arguments{
-\item{graphList}{}
+\item{list1}{a character vector of search entities.}
+
+\item{list2}{a character vector of common upper-level entities}
 }
 \value{
 data.frame

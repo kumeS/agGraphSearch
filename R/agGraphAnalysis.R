@@ -1,7 +1,9 @@
-##' @title Graph analysis
+##' @title Graph analysis function for the upper-level concepts.
 ##'
 ##' @param graphList
-##'
+##' @param list1 a character vector of search entities.
+##' @param list2 a character vector of common upper-level entities
+##' @param PlusLabel logical; add the labels or not when createing the network.
 ##' @description this function is a general function for
 ##'
 ##' @return data.frame
@@ -12,55 +14,55 @@
 ##'
 ##' }
 
-#list1: 検索エンティティ
-#list2, list2.c, list2.wd: 共通上位エンティティ
-#list3: 共通上位エンティティ + 展開段数
-#graphList=eachGraph; list1=list1a; list2=list2b; LowerSearch=T;  UpdateList=F; breakRepeat=20;View=T; RemoveGraph=F; PlusLabel=T; FileName=T; FileName00="04_Results_01";OutputResults=T; ResultsEach=F; Entity_only=T; list2.WD="wd:Q35120"; GraphView01=F; GraphView02=F; GraphView03=T; GraphView04=T; LvView=T;WindowSize01=10; WindowSize02=10;WindowSize03=10; WindowSize04=7.5;WindowSize05=7.5
+#graphList=eachGraph; list1=list1a; list2=list2b; LowerSearch=T;  UpdateList=F; breakRepeat=20;View=T; RemoveGraph=F; PlusLabel=T; FileName=T; FileName00="04_Results_01";OutputResults=T; ResultsEach=F; ParticularEntity_only=T; list2.WD="wd:Q35120"; GraphView01=F; GraphView02=F; GraphView03=T; GraphView04=T; LvView=T;WindowSize01=10; WindowSize02=10;WindowSize03=10; WindowSize04=7.5;WindowSize05=7.5
 
 agGraphAnalysis <- function(graphList,
                             list1,
                             list2,
-                            UpdateList=F,
-                            breakRepeat=20,
-                            View=T,
-                            RemoveGraph=F,
-                            PlusLabel=T,
-                            FileName=T,
-                            FileName00,
-                            OutputResults=T,
-                            ResultsEach=F,
-                            LowerSearch=F,
-                            Entity_only=T,
+                            ParticularEntity_only=TRUE,
                             list2.WD="wd:Q35120",
-                            GraphView01=F,
-                            GraphView02=F,
-                            GraphView03=T,
-                            GraphView04=T,
-                            LvView=T,
+                            UpdateList=FALSE,
+                            breakRepeat=20,
+                            View=TRUE,
+                            RemoveGraph=FALSE,
+                            PlusLabel=TRUE,
+                            FileName=TRUE,
+                            FileName00,
+                            OutputResults=TRUE,
+                            ResultsEach=FALSE,
+                            LowerSearch=FALSE,
+                            GraphView01=FALSE,
+                            GraphView02=FALSE,
+                            GraphView03=TRUE,
+                            GraphView04=TRUE,
+                            LvView=TRUE,
                             WindowSize01=10,
                             WindowSize02=10,
                             WindowSize03=10,
                             WindowSize04=7.5,
                             WindowSize05=7.5){
-#graphListの型確認
-if(is.list(graphList)){}else{return(message("graphList is not the list type"))}
 
-#共通エンティティ
-if(Entity_only){
+#Checking the type of graphList
+if(!is.list(graphList)){ return(message("Warning: graphList is not the list type")) }
+if(!is.character(list2.WD)){ return(message("Not proper value of list2.WD")) }
+
+#common upper-level entities
+if(ParticularEntity_only){
     list2.c <- list2
     list3 <- data.frame(V1=list2.c, V2=NA)
     list2.wd <- list2.WD
 }else{
-    list2.c <- list2[!(list2 %in% "wd:Q35120")]
+    list2.c <- list2[!(list2 %in% list2.WD)]
     list3 <- data.frame(V1=list2.c, V2=NA)
     list2.wd <- list2.c
 }
 
-#検索エンティティから共通エンティティを除外
+#Exclude common entities from the list of search entities
 list1.c <- list1[!(list1 %in% list2.c)]
 
 #length(graphList)
 graphList00 <- c()
+
 for(nn in seq_len(length(graphList))){
 #nn <-1
 if(PlusLabel){
@@ -76,7 +78,9 @@ graphList00[[nn]] <- data.frame(from=graphList[[nn]]$subject,
 }}
 
 #出力先の作成
-if(FileName){Folder <- FileName00}else{Folder <- paste("Results_", format(Sys.time(), "%y%m%d_%H%M"), sep="")}
+if(!exists(FileName)){ return(message("Not proper value of FileName")) }
+if(FileName){
+  Folder <- FileName00}else{Folder <- paste0("Results_", format(Sys.time(), "%y%m%d_%H%M"))}
 if(!exists(Folder)){dir.create(Folder)}
 FolderData <- paste(Folder, "/SaveData", sep="")
 if(!exists(FolderData)){dir.create(FolderData)}

@@ -624,7 +624,7 @@ head(eachGraph[[1]])
 sapply(eachGraph, dim)
 
 #Search entities
-(list1a <- readRDS("./02_Short_Out/SearchEntities.Rdata"))
+list1a <- readRDS("./02_Short_Out/SearchEntities.Rdata")
 
 head(list1a)
 any(list1a == "wd:Q35120")
