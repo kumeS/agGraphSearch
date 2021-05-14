@@ -30,6 +30,7 @@ BiocStyle::markdown()
 To install the package, start R and enter:
 
 ```{r installation, echo=TRUE, eval=FALSE}
+#Still can not be installation (14 May 2021)
 install.packages( "devtools" )
 devtools::install_github( "kumeS/agGraphSearch" )
 library( "agGraphSearch" )
@@ -70,6 +71,29 @@ system("docker run \\
 See DockerHub if you want to know details to the docker image.
 
 https://hub.docker.com/r/rocker/rstudio
+
+Then, browse `http://localhost:8787`.
+
+```r
+## run first on the terminal windows
+#sudo apt-get update
+#sudo apt-get install libxml2-dev libglpk-dev
+
+install.packages("BiocManager")
+BiocManager::install("BiocStyle")
+
+devtools::install_github( "kumeS/agGraphSearch" )
+#will get something error, then
+
+system( "git clone https://github.com/kumeS/agGraphSearch.git" )
+system( "R CMD INSTALL agGraphSearch" )
+library( "agGraphSearch" )
+
+```
+
+- memo: Remove All packages
+
+remove.packages( installed.packages( priority = "NA" )[,1] )
 
 # Basic functions
 

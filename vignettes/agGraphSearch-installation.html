@@ -203,18 +203,29 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 <p><strong>Last modified:</strong> NA<br />
-<strong>Compiled</strong>: Fri May 14 11:29:13 2021</p>
+<strong>Compiled</strong>: Fri May 14 13:02:19 2021</p>
 <div id="getting-started" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Getting started</h1>
 <p><em>agGraphSearch</em> is an R package distributed in kumeS’s GitHub site.
 To install the package, start R and enter:</p>
-<pre class="r"><code>install.packages( &quot;devtools&quot; )
+<pre class="r"><code>#Still can not be installation (14 May 2021)
+install.packages( &quot;devtools&quot; )
 devtools::install_github( &quot;kumeS/agGraphSearch&quot; )
 library( &quot;agGraphSearch&quot; )</code></pre>
 <p>Once <em>agGraphSearch</em> is installed, it can be loaded by the following command.</p>
 <pre class="r"><code>library(&quot;agGraphSearch&quot;)</code></pre>
-<p>Optionally, use the following R command if you want to use the docker environment.</p>
-<pre class="r"><code>system(&quot;docker run \\
+<p>Optionally, use the following docker command if you want to use the docker environment.</p>
+<pre class="sh"><code># On Terminal
+docker run \
+       -d \
+       --name RStudio \
+       -v $(pwd)/XXX:/home/rstudio/XXX \
+       -e ROOT=TRUE \
+       -e PASSWORD=PassWord \
+       -p 8787:8787 \
+       rocker/rstudio:4.0.5</code></pre>
+<pre class="r"><code># On R
+system(&quot;docker run \\
         -d \\
         --name RStudio \\
         -v $(pwd)/XXX:/home/rstudio/XXX \\
@@ -224,6 +235,25 @@ library( &quot;agGraphSearch&quot; )</code></pre>
        rocker/rstudio:4.0.5&quot;)</code></pre>
 <p>See DockerHub if you want to know details to the docker image.</p>
 <p><a href="https://hub.docker.com/r/rocker/rstudio" class="uri">https://hub.docker.com/r/rocker/rstudio</a></p>
+<p>Then, browse <code>http://localhost:8787</code>.</p>
+<pre class="r"><code>## run first on the terminal windows
+#sudo apt-get update
+#sudo apt-get install libxml2-dev libglpk-dev
+
+install.packages(&quot;BiocManager&quot;)
+BiocManager::install(&quot;BiocStyle&quot;)
+
+devtools::install_github( &quot;kumeS/agGraphSearch&quot; )
+#will get something error, then
+
+system( &quot;git clone https://github.com/kumeS/agGraphSearch.git&quot; )
+system( &quot;R CMD INSTALL agGraphSearch&quot; )
+library( &quot;agGraphSearch&quot; )
+</code></pre>
+<ul>
+<li>memo: Remove All packages</li>
+</ul>
+<p>remove.packages( installed.packages( priority = “NA” )[,1] )</p>
 </div>
 <div id="basic-functions" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Basic functions</h1>
