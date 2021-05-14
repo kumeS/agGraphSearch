@@ -41,9 +41,22 @@ Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the followi
 library("agGraphSearch")
 ```
 
-Optionally, use the following R command if you want to use the docker environment.
+Optionally, use the following docker command if you want to use the docker environment.
 
-```{r}
+```sh
+# On Terminal
+docker run \
+       -d \
+       --name RStudio \
+       -v $(pwd)/XXX:/home/rstudio/XXX \
+       -e ROOT=TRUE \
+       -e PASSWORD=PassWord \
+       -p 8787:8787 \
+       rocker/rstudio:4.0.5
+```
+
+```r
+# On R
 system("docker run \\
         -d \\
         --name RStudio \\
@@ -52,7 +65,6 @@ system("docker run \\
         -e PASSWORD=PassWord \\
         -p 8787:8787 \\
        rocker/rstudio:4.0.5")
-
 ```
 
 See DockerHub if you want to know details to the docker image.
