@@ -72,7 +72,7 @@ See DockerHub if you want to know details to the docker image.
 
 https://hub.docker.com/r/rocker/rstudio
 
-Then, browse `http://localhost:8787`.
+Then, browse the GitHub page (`http://localhost:8787`).
 
 ```r
 ## run first on the terminal windows
