@@ -141,7 +141,7 @@ library( "agGraphSearch" )
 
   - agGraphAnalysis
 
-- Generation functions for Table-type Visualization
+- Functions for Table-type Visualization
 
   - agTableDT
 
@@ -149,13 +149,13 @@ library( "agGraphSearch" )
   
   - agTableKB
   
-- Generation functions for Network Graph Visualization
+- Functions for Network Graph Visualization
 
   - agVisNetwork
 
   - agNetwork3d
   
-- Generation functions for Data processing
+- Functions for Data Processing
 
   - PurseNT
   
