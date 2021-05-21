@@ -48,7 +48,9 @@ Sys.setenv("ftp_proxy" = proxy_url)
 
 #Test 1
 curlGetHeaders("http://www.google.com/")
+# OK if the optput is 200
 install.packages("readr")
+# OK if it is installed successfully.
 
 #Test 2
 install.packages("BiocManager")

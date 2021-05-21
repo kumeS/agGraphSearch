@@ -210,7 +210,7 @@ CkeckQuery_agWD_Alt_Wikidata(Lab01[1])
 
 ```
 
-```{r echo=FALSE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE}
 #create an empty variable
 Lab01_res <- c()
 
@@ -674,6 +674,6 @@ table(!is.na(SearchNum[,2]))
 ```
 
 # Session information {.unnumbered}
-```{r sessionInfo, echo=FALSE}
+```{r sessionInfo, echo=TRUE}
 sessionInfo()
 ```
