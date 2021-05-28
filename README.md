@@ -1,6 +1,6 @@
 # agGraphSearch (under development)
 
-## Intoduction
+## Introduction
 
 agGraphSearch, a R package, supply a tool-set for searching graph data 
 structures of RDF (Resource Description Framework) via SPARQL query.
