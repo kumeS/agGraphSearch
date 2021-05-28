@@ -1,6 +1,6 @@
 ---
-title: "Workflow to use agGraphSearch: WF-002"
-shorttitle: "WF-002: match labels to the wikidata via SPARQL"
+title: "Workflow to use agGraphSearch and Mesh RDF: WF-002"
+shorttitle: "WF-002: match labels to the Mesh data via SPARQL"
 author:
   - name: Satoshi Kume
 date: "`r Sys.Date()`"
@@ -38,13 +38,13 @@ This workflow can be skipped. The next workflow should be started.
 # Read the csv files
 
 ```{r echo=TRUE, eval=FALSE}
-lab <- data.frame(readr::read_csv("./00_Input/words.lab.csv", col_names = F))
+lab <- data.frame(readr::read_csv("./00_Mesh_Input/words.c.csv", col_names = F))
 ```
 
 if the WF-001 is skipped, start with the command as follows.
 
 ```{r echo=TRUE, eval=FALSE}
-f <- system.file("extdata", "words.lab.csv", package="agGraphSearch")
+f <- system.file("extdata", "Mesh_words.c.csv", package="agGraphSearch")
 lab <- data.frame(readr::read_csv(f, col_names = F))
 ```
 
@@ -59,26 +59,27 @@ length(unique(lab$X1))
 
 #table
 agTableKB(lab)
+#agTableKB(lab, Head = F, Align = 3)
 ```
 
 # Check SPARQL query and run SPARQL
 ```{r echo=TRUE, eval=FALSE}
-lab00 <- lab$X1[1]
+lab00 <- "Polymers"
 
 #check Query
-CkeckQuery_agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab00)
+CkeckQuery_agCount_Label_Num_MeshRDF(Entity_Name = lab00)
 
 #Endpoint
-agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+agGraphSearch::EndPoint_MeshRDF$EndPoint
 #Graph id
-agGraphSearch::KzLabEndPoint_Wikidata$FROM
+agGraphSearch::EndPoint_MeshRDF$FROM
 
 #run SPARQL
 #library(SPARQL)
-res <- agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab00)
+res <- agCount_Label_Num_MeshRDF(Entity_Name = lab00, Dir="01_Mesh_Out")
 res
 
-agTableDT(res, Width = "100px")
+agTableDT(res, Width = "100px", Transpose = TRUE, AutoWidth=FALSE)
 
 ```
 
@@ -86,13 +87,14 @@ agTableDT(res, Width = "100px")
 
 This program executes SPARQL with a for-loop.
 
-Input words are 515.
+Input words are 463.
 
 ```{r echo=TRUE, eval=FALSE}
 m <- c()
 for(n in 1:nrow(lab)){
 message(n)
-m[[n]] <-agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab$X1[n])
+m[[n]] <-agCount_Label_Num_MeshRDF(Entity_Name = lab$X1[n], 
+                                   Dir="01_Mesh_Out")
 }
 
 #convert list to data.frame

@@ -8,11 +8,11 @@ agCount_Label_Num(
   Entity_Name,
   EndPoint,
   FROM = "",
-  Property,
   Message = FALSE,
   FilterRegex = FALSE,
   DirSave = FALSE,
-  Dir = "01_Out"
+  Dir = "01_Out",
+  Switch
 )
 }
 \arguments{
@@ -23,10 +23,6 @@ automatically judged to be Japanese (@ja) or English (@en)}
 
 \item{FROM}{a string of graph URI in the endpoint. The default is blank ("").}
 
-\item{Property}{a list of two character vectors.
-The first element of list contain the first property ID.
-The second element of list contain the second property ID.}
-
 \item{Message}{logical; perform an output of Entity_Name or not.}
 
 \item{FilterRegex}{do not use this option.}
@@ -34,6 +30,10 @@ The second element of list contain the second property ID.}
 \item{DirSave}{logical; save the results in the Dir path or not}
 
 \item{Dir}{a folder path for output files.}
+
+\item{Property}{a list of two character vectors.
+The first element of list contain the first property ID.
+The second element of list contain the second property ID.}
 }
 \value{
 data.frame

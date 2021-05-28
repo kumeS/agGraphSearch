@@ -183,21 +183,16 @@ m[[n]] <-agCount_Label_Num_Wikidata_P279_P31(Entity_Name = terms[n],
 }
 
 #convert list to data.frame
-(fm <- ListDF2DF(m))
+fm <- ListDF2DF(m)
 
-#View the data
-#agTableDT(fm, Width = "100px", Transpose = TRUE, AutoWidth=FALSE)
-
-```
-
-### Extract only results with label and upper-level class
-
-```{r echo=TRUE, eval=TRUE}
+# Extract only results with label and upper-level class
 fm1 <- fm[c(fm$Hit_Label > 0),]
 fm2 <- fm1[c(fm1$Hit_ALL > 0),]
 
-#dim(fm); dim(fm1); dim(fm2)
+#View the data
+agTableDT(fm2, Width = "100px", Transpose = TRUE, AutoWidth=FALSE)
 
+#dim(fm); dim(fm1); dim(fm2)
 ```
 
 ### Assigning Label information to QID

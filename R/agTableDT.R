@@ -28,6 +28,7 @@
 ##' agTableDT( Data = iris, PageLength = 10 )
 ##'
 ##' }
+##'
 
 agTableDT <- function(Data,
                       Output=TRUE,
@@ -41,10 +42,11 @@ agTableDT <- function(Data,
                       PageLength=25,
                       Transpose=FALSE){
 
-if(!is.data.frame(Data)){return(message("Warning: Not proper value of Data"))}
+if(!is.data.frame(Data)){ return( message("Warning: Not proper value of Data") ) }
 
 if(Transpose){
 Data <- data.frame(col=colnames(Data), res=t(Data))
+colnames(Data)[-1] <- as.character(Data[1,])[-1]
 }
 
 targets <- c(0:(ncol(Data)-1))
@@ -76,5 +78,8 @@ if(Output){
 }
 
 }
+
+
+
 
 

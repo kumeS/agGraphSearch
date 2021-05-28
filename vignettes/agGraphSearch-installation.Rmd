@@ -84,6 +84,7 @@ BiocManager::install("BiocStyle")
 
 install.packages( "devtools" )
 devtools::install_github( "kumeS/agGraphSearch" )
+
 #will get something error, then
 
 system( "git clone https://github.com/kumeS/agGraphSearch.git" )

@@ -43,60 +43,94 @@
 agCount_Label_Num <- function(Entity_Name,
                               EndPoint,
                               FROM = "",
-                              Property,
                               Message=FALSE,
                               FilterRegex=FALSE,
                               DirSave=FALSE,
-                              Dir="01_Out"){
+                              Dir="01_Out",
+                              Switch){
 
-if(!grepl("^http", EndPoint)){return(message("No EndPoint URL"))}
+if(!grepl("^http", EndPoint)){ return(message("No EndPoint URL")) }
+if(!any(Switch == c("wikidata", "Mesh"))){return(message("Warning: No proper value of Switch"))}
 if(DirSave){if(!dir.exists(Dir)){dir.create(Dir)}}
 
-LABEL <- Entity_Name
-if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){rdfs.l <- "ja" } else { rdfs.l <- "en" }
+#Switch section
+switch (Switch,
+  "wikidata" = Prefix <- agGraphSearch::PREFIX,
+  "Mesh" = Prefix <- agGraphSearch::PREFIX_Mesh,
+)
+Prefix <- gsub("\n", " ", Prefix)
 
-Prefix <- agGraphSearch::PREFIX
+switch (Switch,
+  "wikidata" = LabelProperty <- LabelProperty01,
+  "Mesh" = LabelProperty <- LabelProperty02,
+)
+
+switch (Switch,
+  "wikidata" = FrancFunc <- TRUE,
+  "Mesh" = FrancFunc <- FALSE,
+)
+
+switch (Switch,
+  "wikidata" = Property <- agGraphSearch::wikidataClassProperty,
+  "Mesh" = Property <- agGraphSearch::meshClassProperty,
+)
+
+switch (Switch,
+  "wikidata" = Distinct <- "distinct",
+  "Mesh" = Distinct <- "",
+)
+
+LABEL <- Entity_Name
+
+if(FrancFunc){
+  if(franc::franc(LABEL, min_length = 1) == "jpn" | franc::franc(LABEL, min_length = 1) == "cmn"){rdfs.l <- "ja" } else { rdfs.l <- "en" }
+}else{
+  rdfs.l <- "en"
+}
 
 if(FilterRegex){
-LAB00 <- paste('?subject rdfs:label ?text FILTER regex (?text, \"', LABEL, '\", \"i\"). ', sep="")
-LAB01 <- paste('?subject skos:altLabel ?text FILTER regex (?text, \"', LABEL, '\", \"i\"). ', sep="")
+LAB00 <- paste0('?subject ', LabelProperty[[1]], ' ?text . FILTER ( LCASE(str(?text)) = LCASE(str(\"', LABEL, '\")))')
+LAB01 <- paste0('?subject ', LabelProperty[[2]], ' ?text . FILTER ( LCASE(str(?text)) = LCASE(str(\"', LABEL, '\")))')
 }else{
-LAB00 <- paste('?subject rdfs:label \"', LABEL, '\"@', rdfs.l, '. ', sep="")
-LAB01 <- paste('?subject skos:altLabel \"', LABEL, '\"@', rdfs.l, '. ', sep="")
+LAB00 <- paste0('?subject ', LabelProperty[[1]], ' \"', LABEL, '\"@', rdfs.l, '. ')
+LAB01 <- paste0('?subject ', LabelProperty[[2]], ' \"', LABEL, '\"@', rdfs.l, '. ')
 }
 
 Query01 <-paste('
-SELECT (count(distinct ?subject) as ?Count_As_Label)', ' ',
+SELECT (count(', Distinct, ' ?subject) as ?Count_As_Label)', ' ',
 FROM, ' ',
-'WHERE {',LAB00,'}', sep="")
+'WHERE { ',LAB00,' }', sep="")
+#Query01 <- gsub("\n", " ", Query01)
 
 if(Message){message(paste("Query: ", LABEL, sep=""))}
 A <- try(SPA01 <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query01))$results, silent = T)
 if(class(A) == "try-error"){SPA01 <- 0}
 
 Query02 <-paste('
-SELECT (count(distinct ?subject) as ?Count_As_AltLabel)', ' ',
+SELECT (count(', Distinct, ' ?subject) as ?Count_As_AltLabel)', ' ',
 FROM, ' ',
 'WHERE {',LAB01, '}', sep="")
+#Query02 <- gsub("\n", " ", Query02)
+
 A <- try(SPA02 <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query02))$results, silent = T)
 if(class(A) == "try-error"){SPA02 <- 0}
 
 Query03A <-paste('
-SELECT  (count(distinct ?parentClass ) as ?Count_Of_ParentClass_Label)', ' ',
+SELECT  (count(', Distinct, ' ?parentClass ) as ?Count_Of_ParentClass_Label)', ' ',
 FROM, ' ',
 'WHERE {',LAB00, ' ?subject ', Property[[1]], ' ?parentClass. }', sep="")
 A <- try(SPA03A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query03A))$results, silent = T)
 if(class(A) == "try-error"){SPA03A <- 0}
 
 Query03B <-paste('
-SELECT  (count(distinct ?parentClass ) as ?Count_Of_ParentClass_altLabel)', ' ',
+SELECT  (count(', Distinct, ' ?parentClass ) as ?Count_Of_ParentClass_altLabel)', ' ',
 FROM, ' ',
 'WHERE {',LAB01,' ?subject ', Property[[1]], ' ?parentClass. }', sep="")
 A <- try(SPA03B <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query03B))$results, silent = T)
 if(class(A) == "try-error"){SPA03B <- 0}
 
 Query04A <-paste('
-SELECT  (count(distinct ?childClass ) as ?Count_Of_ChildClass_Label)', ' ',
+SELECT  (count(', Distinct, ' ?childClass ) as ?Count_Of_ChildClass_Label)', ' ',
 FROM, ' ',
 'WHERE {',LAB00,'
 ?childClass ', Property[[1]], ' ?subject.}', sep="")
@@ -104,7 +138,7 @@ A <- try(SPA04A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query04A))$r
 if(class(A) == "try-error"){SPA04A <- 0}
 
 Query04B <-paste('
-SELECT  (count(distinct ?childClass ) as ?Count_Of_ChildClass_altLabel)', ' ',
+SELECT  (count(', Distinct, ' ?childClass ) as ?Count_Of_ChildClass_altLabel)', ' ',
 FROM, ' ',
 'WHERE {',LAB01,'
 ?childClass ', Property[[1]], ' ?subject. }', sep="")
@@ -112,7 +146,7 @@ A <- try(SPA04B <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query04B))$r
 if(class(A) == "try-error"){SPA04B <- 0}
 
 Query05A <-paste('
-SELECT  (count(distinct ?instance ) as ?Count_Has_Instance_Label)', ' ',
+SELECT  (count(', Distinct, ' ?instance ) as ?Count_Has_Instance_Label)', ' ',
 FROM, ' ',
 'WHERE {',LAB00,'
 ?instance ', Property[[2]], ' ?subject. }', sep="")
@@ -120,7 +154,7 @@ A <- try(SPA05A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query05A))$r
 if(class(A) == "try-error"){SPA05A <- 0}
 
 Query05B <-paste('
-SELECT  (count(distinct ?instance ) as ?Count_Has_Instance_altLabel)', ' ',
+SELECT  (count(', Distinct, ' ?instance ) as ?Count_Has_Instance_altLabel)', ' ',
 FROM, ' ',
 'WHERE {',LAB01,'
 ?instance ', Property[[2]], ' ?subject. }', sep="")
@@ -128,7 +162,7 @@ A <- try(SPA05B <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query05B))$r
 if(class(A) == "try-error"){SPA05B <- 0}
 
 Query06A <-paste('
-SELECT  (count(distinct ?instance ) as ?Count_InstanceOf_Label)', ' ',
+SELECT  (count(', Distinct, ' ?instance ) as ?Count_InstanceOf_Label)', ' ',
 FROM, ' ',
 'WHERE {',LAB00,'
 ?subject ', Property[[2]], ' ?instance. }', sep="")
@@ -136,7 +170,7 @@ A <- try(SPA06A <- SPARQL::SPARQL(url=EndPoint, query=paste(Prefix, Query06A))$r
 if(class(A) == "try-error"){SPA06A <- 0}
 
 Query06B <-paste('
-SELECT  (count(distinct ?instance ) as ?Count_InstanceOf_altLabel)', ' ',
+SELECT  (count(', Distinct, ' ?instance ) as ?Count_InstanceOf_altLabel)', ' ',
 FROM, ' ',
 'WHERE {',LAB01,'
 ?subject ', Property[[2]], ' ?instance. }', sep="")

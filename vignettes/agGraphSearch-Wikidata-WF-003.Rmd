@@ -1,0 +1,304 @@
+---
+title: "Workflow to use agGraphSearch and Wikidata RDF: WF-003"
+shorttitle: "WF-003: match labels to the wikidata via SPARQL"
+author:
+  - name: Satoshi Kume
+date: "`r Sys.Date()`"
+graphics: no
+package: agGraphSearch, knitr, SPARQL
+output:
+  BiocStyle::html_document:
+  toc_float: true
+vignette: >
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{agGraphSearch}
+  %\VignetteIndexEntry{Workflow to use agGraphSearch: WF-003}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r style, echo = FALSE, results = 'asis', message=FALSE}
+BiocStyle::markdown()
+```
+
+**Last modified:** `r file.info("agGraphSearch-WF-002.Rmd")$mtime`<br />
+**Compiled**: `r date()`
+
+# Getting started
+
+Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
+
+```{r library, message=FALSE}
+library("agGraphSearch")
+```
+
+This workflow can be skipped. The next workflow should be started. 
+
+# Read the csv files
+
+```{r echo=TRUE, eval=FALSE}
+lab <- data.frame(readr::read_csv("./00_Input/words.lab.csv", col_names = F))
+```
+
+if the WF-001 is skipped, start with the command as follows.
+
+```{r echo=TRUE, eval=FALSE}
+f <- system.file("extdata", "words.lab.csv", package="agGraphSearch")
+lab <- data.frame(readr::read_csv(f, col_names = F))
+```
+
+# check the data
+
+```{r echo=TRUE, eval=FALSE}
+head(lab)
+dim(lab)
+
+#unique number
+length(unique(lab$X1))
+
+#table
+agTableKB(lab)
+```
+
+# Check SPARQL query
+```{r echo=TRUE, eval=FALSE}
+lab00 <- lab$X1[1]
+
+#Query
+CkeckQuery_agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab00)
+
+#Endpoint
+agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
+#Graph id
+agGraphSearch::KzLabEndPoint_Wikidata$FROM
+
+#SPARQL
+#library(SPARQL)
+res <- agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab00)
+res
+
+agTableDT(res, Width = "100px")
+
+```
+
+# Executing SPARQL 
+
+This program executes SPARQL with a for-loop.
+
+Input words are 515.
+
+```{r echo=TRUE, eval=FALSE}
+m <- c()
+for(n in 1:nrow(lab)){
+message(n)
+m[[n]] <-agCount_Label_Num_Wikidata_P279_P31(Entity_Name = lab$X1[n])
+}
+
+#convert list to data.frame
+fm <- ListDF2DF(m)
+
+#view the data
+agTableDT(fm)
+```
+
+In an alternative way, this executes SPARQL with a multisession of furrr::future_map function.
+
+```{r echo=TRUE, eval=FALSE}
+furrr::plan(multisession(workers = 4))
+furrr::plan()
+
+#Do SPARQL
+mm <- furrr::future_map(as.character(unlist(lab)), 
+                        agGraphSearch:::agCount_Label_Num_Wikidata_P279_P31, 
+                        .progress=T)
+
+#convert list to data.frame
+fmm <- ListDF2DF(mm)
+
+#view the data
+agTableDT(fmm)
+
+#pre-check
+#table(fmm$Hit_Label > 0)
+#FALSE  TRUE 
+#  306   209 
+
+#need to change it to fm
+#fm <- fmm
+```
+# Aggregating search results 
+
+```{r echo=TRUE, eval=FALSE}
+fm1 <- fm
+
+#colnames
+colnames(fm1)
+
+#Hit_Label
+table(fm1$Hit_Label > 0)
+
+#Hit_ALL
+table(fm1$Hit_ALL > 0)
+table(fm1$Hit_upClass_All > 0)
+table(fm1$Hit_downClass_All > 0)
+
+#New column: Relation
+fm1$Relation <- fm1$Hit_upClass_All + fm1$Hit_downClass_All
+table(fm1$Hit_ALL == fm1$Relation)
+
+```
+
+# Extract only results with label hits
+
+```{r echo=TRUE, eval=FALSE}
+fm2 <- fm1[c(fm1$Hit_Label > 0),]
+dim(fm2)
+```
+
+# Extract only results with upper classes
+
+```{r echo=TRUE, eval=FALSE}
+fm3 <- fm2[c(fm2$Hit_ALL > 0),]
+dim(fm3)
+
+agTableDT(fm3)
+```
+
+# Convert them to rdfs:label.
+
+The input words are 193 words.
+
+This imply the deletion of wd:P entity.
+
+```{r echo=TRUE, eval=FALSE}
+Lab01 <- fm3$LABEL
+agTableKB(data.frame(Lab01))
+
+#Check Query
+CkeckQuery_agWD_Alt_Wikidata(unlist(Lab01)[1])
+#CkeckQuery_agWD_Alt_Wikidata(unlist(Lab01)[136])
+
+#run SPARQL
+furrr::plan(multisession(workers = 2))
+Lab01_res <- furrr::future_map(unlist(Lab01), agWD_Alt_Wikidata, .progress = TRUE)
+
+#check them
+Lab01_res[[1]]
+Lab01_res[[136]]
+Lab01_res[[79]]
+Lab01_res[[119]]
+
+#check NA
+agGraphSearch:::checkNA_af_agWD_Alt(Lab01_res)
+
+#check nrow
+agGraphSearch:::checkNrow_af_agWD_Alt(Lab01_res)
+
+#gathering IDs
+Lab02 <- ListDF2DF(Lab01_res, NA.omit=TRUE)
+dim(Lab02)
+
+#delete deplicates
+QID <- unique(unlist(Lab02))
+length(QID)
+
+#save
+if(!dir.exists("01_Out")){dir.create("01_Out")}
+saveRDS(QID, file = "./01_Out/R01_QID.Rdata", compress = TRUE)
+
+```
+
+# Assigning Label information to QID
+
+```{r echo=TRUE, eval=FALSE}
+#view query
+CkeckQuery_agQIDtoLabel_Wikidata(QID[1])
+
+#do SPARQL
+furrr::plan(multisession(workers = 2))
+Label00 <- furrr::future_map(unlist(QID), agQIDtoLabel_Wikidata, .progress = TRUE)
+
+#check nrow
+checkNrow_af_agQIDtoLabel(Label00)
+#checkNrow_af_agWD_Alt(Label00)
+
+#convert list to data.frame
+Label01 <- ListDF2DF(Label00)
+
+#check it
+head(Label01)
+dim(Label01)
+table(is.na(Label01))
+table(is.na(Label01$entityNamej))
+table(is.na(Label01$entityNamee))
+
+#rows wit NA
+Label01[is.na(Label01$entityNamee),]
+
+#save
+#if(!dir.exists("01_Out")){dir.create("01_Out")}
+saveRDS(Label01, file = "./01_Out/R01_QID_rdfsLabel.Rdata", compress = TRUE)
+
+```
+
+# Retry SPARQL
+
+```{r echo=TRUE, eval=FALSE}
+#Data load 
+Labs <- readRDS("./01_Out/R01_QID_rdfsLabel.Rdata")
+head(Labs)
+dim(Labs)
+
+#View query
+CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31(Labs[1,1])
+
+#Try SPARQL
+furrr::plan(multisession(workers = 4))
+#furrr::plan()
+
+m_2 <- furrr::future_map(unlist(Labs$QID), agCount_ID_Num_Wikidata_QID_P279_P31, .progress = TRUE)
+
+#convert list to data.frame
+fm_2 <- ListDF2DF(m_2)
+
+#check it
+head(fm_2)
+dim(fm_2)
+colnames(fm_2)
+
+#All
+table(fm_2$Hit_All)
+table(fm_2$Hit_All > 0)
+table(fm_2$Hit_All_Parent > 0)
+table(fm_2$Hit_All_Child > 0)
+
+
+# check labels corresponding to ID
+head(Labs)
+dim(Labs)
+
+Labs_B1 <- furrr::future_map(unlist(Labs$entityNamej), 
+                             agCount_Label_Num_Wikidata_P279_P31, 
+                             .progress = TRUE)
+head(Labs_B1)
+
+#check nrow
+checkNrowVec_af_agQIDtoLabel(Labs_B1)
+checkNrow_af_agQIDtoLabel(Labs_B1)
+
+#check results
+checkHitLabel_af_agCount_Label_Num(Labs_B1)
+checkHitALL_af_agCount_Label_Num(Labs_B1)
+
+#View the results
+Labs_B2 <- ListDF2DF(Labs_B1)
+
+agTableDT(Labs_B2, Width = "100px")
+
+```
+
+# Session information {.unnumbered}
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```

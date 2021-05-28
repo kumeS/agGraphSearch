@@ -54,6 +54,7 @@ head(iris)
 agTableDT( Data = iris, PageLength = 10 )
 
 }
+
 }
 \author{
 Satoshi Kume

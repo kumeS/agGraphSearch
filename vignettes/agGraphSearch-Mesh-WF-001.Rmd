@@ -1,5 +1,5 @@
 ---
-title: "Workflow to use agGraphSearch: WF-001"
+title: "Workflow to use agGraphSearch and Mesh RDF: WF-001"
 shorttitle: "WF-001: load the search seeds"
 author:
   - name: Satoshi Kume
@@ -38,11 +38,8 @@ This workflow can be skipped. The next workflow should be started.
 # Read the csv files from extdata
 
 ```{r echo=TRUE, eval=FALSE}
-f <- system.file("extdata", "PoLyInfo_metadata_ALL_v02.csv", package="agGraphSearch")
-words <- data.frame(readr::read_csv(f, col_names = T))
-
-f <- system.file("extdata", "PoLyInfo_metadata_Jpn_v03.csv", package="agGraphSearch")
-wordsj <- data.frame(readr::read_csv(f, col_names = T))
+f <- system.file("extdata", "PoLyInfo_metadata_En_v01.csv", package="agGraphSearch")
+words <- data.frame(readr::read_csv(f, col_names = TRUE))
 
 ```
 
@@ -52,41 +49,36 @@ wordsj <- data.frame(readr::read_csv(f, col_names = T))
 head(words)
 dim(words)
 
-head(wordsj)
-dim(wordsj)
 ```
 
 # Delete blanks
 
 ```{r echo=TRUE, eval=FALSE}
 words.c <- unique(as.character(unlist(words)[unlist(words) != ""]))
-wordsj.c <- unique(as.character(unlist(wordsj)[unlist(wordsj) != ""]))
+
+#remove NA
+words.c <- words.c[!is.na(words.c)]
+
+#cehck NAs
+table(is.na(words.c))
+
 ```
 
 # combind the search seeds and delete the deplicates
 
 ```{r echo=TRUE, eval=FALSE}
-words.cc <- unique(c(wordsj.c, words.c))
+agTableFM(data.frame(words.c))
 
-agTableFM(data.frame(words.cc))
-```
-
-# Extract Japanese vocabulary
-
-```{r echo=TRUE, eval=FALSE}
-words.lab <- words.cc[1:515]
-
-agTableFM(as.data.frame(words.lab))
 ```
 
 # save file
 
 ```{r echo=TRUE, eval=FALSE}
 #create a new folder
-if(!dir.exists("00_Input")){dir.create("00_Input")}
+if(!dir.exists("00_Mesh_Input")){dir.create("00_Mesh_Input")}
 
 #save to csv
-readr::write_excel_csv(data.frame(words.lab), file="./00_Input/words.lab.csv", col_names = F)
+readr::write_excel_csv(data.frame(words.c), file="./00_Mesh_Input/words.c.csv", col_names = F)
 ```
 
 # Session information {.unnumbered}
