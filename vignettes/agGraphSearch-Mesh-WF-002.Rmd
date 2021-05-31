@@ -83,52 +83,111 @@ agTableDT(res, Width = "100px", Transpose = TRUE, AutoWidth=FALSE)
 
 ```
 
-# Executing SPARQL 
+# Downloads the Mesh files from the repository (Google Drive).
 
-This program executes SPARQL with a for-loop.
+```{r, echo=TRUE, eval=FALSE}
+#proxy <- 'export https_proxy="http://wwwproxy.osakac.ac.jp:8080"; export ftp_proxy="http://wwwproxy.osakac.ac.jp:8080"'
+scr <- system.file("script", "gdrive_download.sh", package="agGraphSearch")
+
+#mesh219_2020_2021_others2_df.Rds
+File_ID <- "1Pf28EA4mRc59JeFi4VREcBuS-AcTqxQm"
+File_Name <- "mesh219_2020_2021_others2_df.Rds"
+system(paste0(proxy, "; source ", scr, "; gdrive_download ", File_ID, " ./00_Input/", File_Name, " "))
+
+#mesh219_2020_2021_Label_en_df.Rds
+File_ID <- "1afoPL1xEJPxW7k72nD3ZWXEGMq94JMno"
+File_Name <- "mesh219_2020_2021_Label_en_df.Rds"
+system(paste0(proxy, "; source ", scr, "; gdrive_download '", File_ID, "' ./00_Input/", File_Name, " "))
+
+```
+
+# Import Mesh data (2019-2021)
+
+```{r, echo=TRUE, eval=TRUE}
+MeshLabels <- readRDS("./00_Input/mesh219_2020_2021_Label_en_df.Rds")
+head(MeshLabels)
+
+#check property
+table(MeshLabels$Property)
+
+```
+
+# remove other data
+
+```{r}
+#head(MeshLabels[!grepl("^A[0-9][0-9]|^B[0-9][0-9]", MeshLabels$Object),])
+MeshLabels00 <- MeshLabels
+MeshLabels00 <- MeshLabels00[!grepl("^[A-Z][0-9][0-9]|^[[]OBSOLETE",
+                                    MeshLabels00$Object),]
+#property
+MeshLabels00 <- MeshLabels00[!grepl("meshv:scopeNote|meshv:thesaurusID|meshv:lexicalTag|meshv:lastActiveYear", MeshLabels00$Property),]
+MeshLabels00 <- MeshLabels00[!grepl("meshv:historyNote|meshv:publicMeSHNote|meshv:previousIndexing|meshv:annotation|meshv:source|meshv:note|meshv:sortVersion|meshv:abbreviation|meshv:onlineNote|meshv:considerAlso|meshv:entryVersion", MeshLabels00$Property),]
+
+#Order
+MeshLabels00 <- MeshLabels00[order(MeshLabels00$Property),]
+
+#check property
+table(MeshLabels00$Property)
+
+#head(MeshLabels00)
+#readr::write_csv(MeshLabels00, file="./00_Input/MeshLabels00.csv", col_names = F, append=F)
+saveRDS(MeshLabels00, "./00_Input/MeshLabels00.Rds")
+
+```
+
+# Linking of input words to the Mesh words
 
 Input words are 463.
 
 ```{r echo=TRUE, eval=FALSE}
-m <- c()
-for(n in 1:nrow(lab)){
-message(n)
-m[[n]] <-agCount_Label_Num_MeshRDF(Entity_Name = lab$X1[n], 
-                                   Dir="01_Mesh_Out")
+head(MeshLabels00)
+MeshLabels01 <- unique(tolower(MeshLabels00$Object))
+head(MeshLabels01)
+
+head(words)
+words00 <- unique(unlist(words)); words00 <- words00[!is.na(words00)]
+words01 <- unique(tolower(words00))
+head(words01)
+
+#Counting table
+Dat <- data.frame(X1=words01, X2=NA, X3=NA)
+
+for(m in seq_len(length(words01))){
+  #m <- 1
+  print(m)
+  
+  #Perfect Match
+  cc <- grepl(pattern = paste0("^", words01[m], "$"), 
+              MeshLabels01)
+  if(any(cc)){
+    Dat01 <- MeshLabels01[cc]
+    Dat$X2[m] <- length(Dat01)
+  }else{
+    Dat$X2[m] <- 0
+  }
+  
+  #Partial Match
+  cc <- grepl(pattern = words01[m], 
+              MeshLabels01)
+  if(any(cc)){
+    Dat01 <- MeshLabels01[cc]
+    Dat$X3[m] <- length(Dat01)
+  }else{
+    Dat$X3[m] <- 0
+  }
+  
+  #adist
+  #drop(attr(adist("abc abc","abcde acc", count = TRUE), "counts"))
+  
 }
 
-#convert list to data.frame
-fm <- ListDF2DF(m)
+head(Dat)
+table(Dat$X2 > 0)
+table(Dat$X2)
 
-#view the data
-agTableDT(fm)
+
 ```
 
-In an alternative way, this executes SPARQL with a multisession of furrr::future_map function.
-
-```{r echo=TRUE, eval=FALSE}
-furrr::plan(multisession(workers = 4))
-furrr::plan()
-
-#Do SPARQL
-mm <- furrr::future_map(as.character(unlist(lab)), 
-                        agGraphSearch:::agCount_Label_Num_Wikidata_P279_P31, 
-                        .progress=T)
-
-#convert list to data.frame
-fmm <- ListDF2DF(mm)
-
-#view the data
-agTableDT(fmm)
-
-#pre-check
-#table(fmm$Hit_Label > 0)
-#FALSE  TRUE 
-#  306   209 
-
-#need to change it to fm
-#fm <- fmm
-```
 # Aggregating search results 
 
 ```{r echo=TRUE, eval=FALSE}
@@ -155,6 +214,7 @@ table(fm1$Hit_ALL == fm1$Relation)
 
 ```{r echo=TRUE, eval=FALSE}
 fm2 <- fm1[c(fm1$Hit_Label > 0),]
+
 dim(fm2)
 ```
 
