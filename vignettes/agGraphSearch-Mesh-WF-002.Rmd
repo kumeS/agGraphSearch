@@ -38,7 +38,7 @@ This workflow can be skipped. The next workflow should be started.
 # Read the csv files
 
 ```{r echo=TRUE, eval=FALSE}
-lab <- data.frame(readr::read_csv("./00_Mesh_Input/words.c.csv", col_names = F))
+lab <- data.frame(readr::read_csv("./00_Mesh_Input/words.cR.csv", col_names = F))
 ```
 
 if the WF-001 is skipped, start with the command as follows.
@@ -176,19 +176,44 @@ for(m in seq_len(length(words01))){
     Dat$X3[m] <- 0
   }
   
+  
+  MeshLabels01[m]
+  
   #adist
-  #drop(attr(adist("abc abc","abcde acc", count = TRUE), "counts"))
+  #drop(attr(adist(words01[m], MeshLabels01[m], count = TRUE), "counts"))
+  cc <- stringdist::stringdist("empty", MeshLabels01, method="lcs", nthread=4)
+    MeshLabels01[cc == min(cc)]
+  cc <- stringdist::stringdist("empty", MeshLabels01, method="cosine", nthread=4)
+    MeshLabels01[cc == min(cc)]
+
   
 }
 
 head(Dat)
 table(Dat$X2 > 0)
 table(Dat$X2)
+table(Dat$X3 > 0)
+table(Dat$X3)
+
+#save
+if(!dir.exists("01_Mesh_Out")){dir.create("01_Mesh_Out")}
+readr::write_csv(Dat, file="./01_Mesh_Out/Dat.csv", col_names = F, append=F)
+saveRDS(Dat, "./01_Mesh_Out/Dat.Rds")
 
 
 ```
 
+```{r}
+
+
+
+
+```
+
+
 # Aggregating search results 
+
+
 
 ```{r echo=TRUE, eval=FALSE}
 fm1 <- fm
