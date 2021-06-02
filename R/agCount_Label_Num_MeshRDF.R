@@ -122,7 +122,7 @@ CkeckQuery_agCount_Label_Num_MeshRDF <- function( Entity_Name ){
 
 #Parameters
 LABEL <- Entity_Name
-FilterRegex <- FALSE
+FilterRegex <- TRUE
 EndPoint <- agGraphSearch::EndPoint_MeshRDF$EndPoint
 FROM <- agGraphSearch::EndPoint_MeshRDF$FROM
 ######################################################################

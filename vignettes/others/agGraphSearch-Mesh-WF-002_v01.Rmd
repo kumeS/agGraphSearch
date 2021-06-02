@@ -31,6 +31,7 @@ Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the followi
 
 ```{r library, message=FALSE}
 library("agGraphSearch")
+
 ```
 
 This workflow can be skipped. The next workflow should be started. 
@@ -38,7 +39,9 @@ This workflow can be skipped. The next workflow should be started.
 # Read the csv files
 
 ```{r echo=TRUE, eval=FALSE}
-lab <- data.frame(readr::read_csv("./00_Mesh_Input/words.cR.csv", col_names = F))
+lab <- data.frame(readr::read_csv("./00_Mesh_Input/words.cR.csv", 
+                                  col_names = F))
+
 ```
 
 if the WF-001 is skipped, start with the command as follows.
@@ -46,6 +49,7 @@ if the WF-001 is skipped, start with the command as follows.
 ```{r echo=TRUE, eval=FALSE}
 f <- system.file("extdata", "Mesh_words.c.csv", package="agGraphSearch")
 lab <- data.frame(readr::read_csv(f, col_names = F))
+
 ```
 
 # check the data
@@ -63,6 +67,7 @@ agTableKB(lab)
 ```
 
 # Check SPARQL query and run SPARQL
+
 ```{r echo=TRUE, eval=FALSE}
 lab00 <- "Polymers"
 
