@@ -22,12 +22,13 @@ data.frame
 }
 \description{
 This function counts the particular relations between strings.
-Partial Match, partial Match, strings distance such as
-longest common substring distance (lcs) and
+Perfect Match, partial Match, strings similarity using
 cosine distance between q-gram profiles (cosine, N=2).
 }
 \examples{
 \dontrun{
+
+library(magrittr)
 
 InputTerms <- "polymer"
 RDFterms <- "Polymers"
@@ -36,8 +37,8 @@ ComputeDistance(
   InputTerms,
   RDFterms
   )
-
 }
+
 }
 \author{
 Satoshi Kume

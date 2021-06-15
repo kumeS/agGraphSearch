@@ -267,6 +267,8 @@ This imply the deletion of wd:P entity.
 Lab01 <- fm3$LABEL
 agTableKB(data.frame(Lab01))
 
+CkeckQuery_agCount_Label_Num_MeshRDF("Polymers")
+
 #Check Query
 CkeckQuery_agWD_Alt_Wikidata(unlist(Lab01)[1])
 #CkeckQuery_agWD_Alt_Wikidata(unlist(Lab01)[136])

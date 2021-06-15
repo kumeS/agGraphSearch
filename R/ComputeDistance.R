@@ -7,15 +7,17 @@
 ##' @param TopWords Number of words with top strings distances
 ##'
 ##' @description This function counts the particular relations between strings.
-##' Perfect Match, partial Match, strings similarity such as
-##' longest common substring distance (lcs) and
+##' Perfect Match, partial Match, strings similarity using
 ##' cosine distance between q-gram profiles (cosine, N=2).
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export ComputeDistance
 ##' @importFrom stringdist stringdist
+##' @importFrom magrittr %>%
 ##' @examples \dontrun{
+##'
+##' library(magrittr)
 ##'
 ##' InputTerms <- "polymer"
 ##' RDFterms <- "Polymers"
@@ -24,8 +26,9 @@
 ##'   InputTerms,
 ##'   RDFterms
 ##'   )
-##'
 ##' }
+##'
+
 
 ComputeDistance <- function(InputTerms,
                             RDFterms,
@@ -39,14 +42,12 @@ if(!is.vector(RDFterms)){ return(message("Warning: No proper value of RDFterms")
 InputTerms01 <- InputTerms
 RDFterms01 <- RDFterms
 
-#Counting table
-Dat <- data.frame(X1=InputTerms01,
-                  X2=NA, X3=NA,
-                  X4=NA, X5=NA, X6=NA,
-                  X7=NA, X8=NA, X9=NA)
-
+Dat0 <- c()
 for(m in seq_len(length(InputTerms01))){
-#m <- 1
+Dat <- data.frame(X1=rep(InputTerms01[m], TopWords),
+                  X2=NA, X3=NA,
+                  X4=NA, X5=NA, X6=NA)
+#head(Dat)
 message(paste0("No.: ", m))
 message(paste0("Term: ", InputTerms01[m]))
 
@@ -55,60 +56,50 @@ cc <- grepl(pattern = paste0("^", InputTerms01[m], "$"),
             RDFterms01)
 if(any(cc)){
   Dat01 <- RDFterms01[cc]
-  Dat$X2[m] <- length(Dat01)
+  Dat$X2[1] <- length(Dat01)
 }else{
-  Dat$X2[m] <- 0
+  Dat$X2[1] <- 0
 }
-message(paste0("PerfectMatch: ", Dat$X2[m]))
+message(paste0("PerfectMatch: ", Dat$X2[1]))
 
 #Partial Match
 cc <- grepl(pattern = InputTerms01[m],
             RDFterms01)
 if(any(cc)){
   Dat01 <- RDFterms01[cc]
-  Dat$X3[m] <- length(Dat01)
+  Dat$X3[1] <- length(Dat01)
 }else{
-  Dat$X3[m] <- 0
+  Dat$X3[1] <- 0
 }
-message(paste0("Partial Match: ", Dat$X3[m]))
+message(paste0("Partial Match: ", Dat$X3[1]))
 
 #Compute distance metrics between strings
-#lcs
-cc <- stringdist::stringdist(InputTerms01[m], RDFterms01, method="lcs", nthread=nthread)
-if(length(cc) < TopWords){
-  dd <- RDFterms01[order(cc)][1:length(cc)]
-}else{
-  dd <- RDFterms01[order(cc)][1:TopWords]
-}
-
-Dat$X4[m] <- length(dd)
-Dat$X5[m] <- paste(dd, collapse = "; ")
-Dat$X6[m] <- round(min(cc), 4)
-message(paste0("Hits by lcs: ", Dat$X4[m]))
-message(paste0("Words by lcs: ", Dat$X5[m]))
-message(paste0("min: ", Dat$X6[m]))
-
 #cosine
 cc <- stringdist::stringdist(InputTerms01[m], RDFterms01, method="cosine", nthread=nthread, q=q)
 if(length(cc) < TopWords){
   dd <- RDFterms01[order(cc)][1:length(cc)]
+  Dat$X6 <- round(cc[order(cc)][1:length(cc)], 4)
 }else{
   dd <- RDFterms01[order(cc)][1:TopWords]
+  Dat$X6 <- round(cc[order(cc)][1:TopWords], 4)
 }
-Dat$X7[m] <- length(dd)
-Dat$X8[m] <- paste(dd, collapse = "; ")
-Dat$X9[m] <- round(min(cc), 4)
-message(paste0("Hits by cosine: ", Dat$X7[m]))
-message(paste0("Words by cosine: ", Dat$X8[m]))
-message(paste0("min: ", Dat$X9[m]))
+
+Dat$X4 <- length(dd)
+Dat$X5 <- dd
+
+message(paste0("Hits by cosine: ", Dat$X4[1]))
+message(paste0("Words by cosine: ", paste(Dat$X5, collapse = "; ")))
+message(paste0("cosine distance: ", paste(Dat$X6, collapse = "; ")))
+
+Dat0 <- Dat0 %>% rbind(Dat)
 }
 
 #rename
-colnames(Dat) <- c("Terms", "PerfectMatch", "PartialMatch",
-                   "lcs1", "lcs2", "lcs3",
-                   "cosine1", "cosine2", "cosine3")
-#head(Dat)
-return(Dat)
+colnames(Dat0) <- c("Terms", "PerfectMatch", "PartialMatch",
+                    "cosine1", "cosine2", "cosine3")
+
+#head(Dat0)
+return(Dat0)
 
 }
 

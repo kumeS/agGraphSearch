@@ -16,6 +16,14 @@ message
 \description{
 View the SPARQL query of agCount_Label_Num_MeshRDF.
 }
+\examples{
+\dontrun{
+
+CkeckQuery_agCount_Label_Num_MeshRDF( "Polymers" )
+
+}
+
+}
 \seealso{
 agCount_Label_Num_MeshRDF
 }

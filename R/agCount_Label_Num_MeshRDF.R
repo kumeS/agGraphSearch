@@ -117,7 +117,13 @@ return(data.frame(SPA, stringsAsFactors = F))
 ##' @author Satoshi Kume
 ##' @export CkeckQuery_agCount_Label_Num_MeshRDF
 ##' @seealso agCount_Label_Num_MeshRDF
-
+##'
+##' @examples \dontrun{
+##'
+##' CkeckQuery_agCount_Label_Num_MeshRDF( "Polymers" )
+##'
+##' }
+##'
 CkeckQuery_agCount_Label_Num_MeshRDF <- function( Entity_Name ){
 
 #Parameters
@@ -164,8 +170,8 @@ if(FrancFunc){
 }
 
 if(FilterRegex){
-LAB00 <- paste0('?subject ', LabelProperty[[1]], ' ?text FILTER regex (?text, \"', LABEL, '\", \"i\"). ')
-LAB01 <- paste0('?subject ', LabelProperty[[2]], ' ?text FILTER regex (?text, \"', LABEL, '\", \"i\"). ')
+LAB00 <- paste0('?subject ', LabelProperty[[1]], ' ?text . FILTER ( LCASE(str(?text)) = LCASE(str(\"', LABEL, '\")))')
+LAB01 <- paste0('?subject ', LabelProperty[[2]], ' ?text . FILTER ( LCASE(str(?text)) = LCASE(str(\"', LABEL, '\")))')
 }else{
 LAB00 <- paste0('?subject ', LabelProperty[[1]], ' \"', LABEL, '\"@', rdfs.l, '. ')
 LAB01 <- paste0('?subject ', LabelProperty[[2]], ' \"', LABEL, '\"@', rdfs.l, '. ')
