@@ -36,6 +36,7 @@ library( magrittr )
 
 #Re-build
 rm( list=ls() )
+
 if(TRUE){
 system("rm -rf ./agGraphSearch/NAMESPACE")
 roxygen2::roxygenise("./agGraphSearch")
@@ -58,6 +59,124 @@ Sys.setenv("ftp_proxy" = proxy_url)
 }
 
 ```
+
+#パースのやり直し
+
+```{r}
+
+rm(list=ls())
+
+if(F){
+
+MeshLabel_2021df <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df.Rds")
+
+head(MeshLabel_2021df)
+dim(MeshLabel_2021df)
+length(unique(MeshLabel_2021df$Subject))
+length(unique(MeshLabel_2021df$Property))
+length(unique(MeshLabel_2021df$Object))
+length(unique(MeshLabel_2021df$OtherInfo))
+MeshLabel_2021df$SubInfo <- "BLANK"
+
+#Subject 01
+cc <- grepl("^mesh:[A-Z][0-9][0-9][0-9]", MeshLabel_2021df$Subject)
+table(MeshLabel_2021df$SubInfo[cc])
+MeshLabel_2021df$SubInfo[cc] <- paste0("IDs:", stringr::str_sub(MeshLabel_2021df$Subject[cc], start=1, end=6))
+
+#Subject 02
+cc <- !grepl("^mesh:[A-Z][0-9][0-9][0-9]", MeshLabel_2021df$Subject)
+table(MeshLabel_2021df$SubInfo[cc])
+MeshLabel_2021df$SubInfo[cc] <- paste0("Tree:", stringr::str_sub(MeshLabel_2021df$Subject[cc], start=1, end=6))
+table(MeshLabel_2021df$SubInfo)
+
+saveRDS(MeshLabel_2021df, "./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
+
+}
+
+#table(grepl("mesh[:]", MeshLabel_2021df$Object))
+
+if(F){
+
+rm(list=ls())
+
+MeshOthers_2021df <- readRDS("./00_Mesh_Input/mesh2021_others_df.Rds")
+head(MeshOthers_2021df)
+dim(MeshOthers_2021df)
+#table(grepl("mesh[:]", MeshOthers_2021df$Subject))
+MeshOthers_2021df$SubInfo <- "BLANK"
+MeshOthers_2021df$ObjInfo <- "BLANK"
+head(MeshOthers_2021df)
+
+#Subject 01
+cc <- grepl("^mesh:[A-Z][0-9][0-9][0-9]", MeshOthers_2021df$Subject)
+table(MeshOthers_2021df$SubInfo[cc])
+MeshOthers_2021df$SubInfo[cc] <- paste0("IDs:", stringr::str_sub(MeshOthers_2021df$Subject[cc], start=1, end=6))
+
+#Subject 02
+cc <- !grepl("^mesh:[A-Z][0-9][0-9][0-9]", MeshOthers_2021df$Subject)
+table(MeshOthers_2021df$SubInfo[cc])
+MeshOthers_2021df$SubInfo[cc] <- paste0("Tree:", stringr::str_sub(MeshOthers_2021df$Subject[cc], start=1, end=6))
+table(MeshOthers_2021df$SubInfo)
+
+#Tree
+cc <- grepl("tree|Tree", MeshOthers_2021df$Property)
+table(cc)
+table(MeshOthers_2021df$OtherInfo[cc])
+head(MeshOthers_2021df[cc,])
+MeshOthers_2021df$OtherInfo[cc] <- "Tree"
+MeshOthers_2021df$ObjInfo[cc] <- paste0("Tree:", stringr::str_sub(MeshOthers_2021df$Object[cc], start=1, end=6))
+head(MeshOthers_2021df[cc,])
+
+cc1 <- grepl("rdf:type", MeshOthers_2021df$Property)
+cc2 <- grepl("tree|Tree", MeshOthers_2021df$Object)
+cc3 <- apply(data.frame(cc1, cc2), 1, all)
+head(cc3)
+head(MeshOthers_2021df[cc3,])
+table(MeshOthers_2021df$OtherInfo[cc3])
+MeshOthers_2021df$OtherInfo[cc3] <- "Tree"
+MeshOthers_2021df$ObjInfo[cc3] <- "Tree"
+head(MeshOthers_2021df[cc3,])
+tail(MeshOthers_2021df[cc3,])
+
+#Descriptor
+cc <- grepl("^mesh:[A-Z][0-9][0-9][0-9]", MeshOthers_2021df$Object)
+table(MeshOthers_2021df$OtherInfo[cc])
+head(MeshOthers_2021df[cc,])
+
+MeshOthers_2021df$OtherInfo[cc] <- "IDs"
+MeshOthers_2021df$ObjInfo[cc] <- paste0("IDs:", stringr::str_sub(MeshOthers_2021df$Object[cc], start=1, end=6))
+head(MeshOthers_2021df[cc,])
+
+cc <- grepl("^[A-Z][0-9][0-9][0-9][0-9]", MeshOthers_2021df$Object)
+table(MeshOthers_2021df$OtherInfo[cc])
+head(MeshOthers_2021df[cc,])
+MeshOthers_2021df$OtherInfo[cc] <- "identifier"
+MeshOthers_2021df$ObjInfo[cc] <- paste0("identifier:", stringr::str_sub(MeshOthers_2021df$Object[cc], start=1, end=1))
+head(MeshOthers_2021df[cc,])
+
+length(unique(MeshOthers_2021df$Subject))
+length(unique(MeshOthers_2021df$Property))
+length(unique(MeshOthers_2021df$Object))
+length(unique(MeshOthers_2021df$OtherInfo))
+#table(MeshOthers_2021df$OtherInfo)
+
+head(MeshOthers_2021df)
+table(is.na(MeshOthers_2021df$ObjInfo))
+table(is.na(MeshOthers_2021df$OtherInfo))
+MeshOthers_2021df[is.na(MeshOthers_2021df$OtherInfo),]
+MeshOthers_2021df[is.na(MeshOthers_2021df$OtherInfo),"OtherInfo"] <- "BLANK"
+
+MeshOthers_2021df$ObjInfo[MeshOthers_2021df$ObjInfo == "BLANK"] <- MeshOthers_2021df$OtherInfo[MeshOthers_2021df$ObjInfo == "BLANK"]
+
+table(MeshOthers_2021df$SubInfo == "BLANK")
+table(MeshOthers_2021df$ObjInfo == "BLANK")
+
+saveRDS(MeshOthers_2021df, "./00_Mesh_Input/mesh2021_others_df_R.Rds")
+
+}
+
+```
+
 
 This workflow can be skipped. The next workflow should be started. 
 
@@ -114,16 +233,16 @@ system(paste0(proxy, "; source ", scr, "; gdrive_download '", File_ID, "' ./00_M
 
 ```
 
-# Import Mesh data (2019-2021)
+# Import Mesh data (2021)
 
 ```{r, echo=TRUE, eval=FALSE}
-MeshLabels <- readRDS("./00_Mesh_Input/mesh219_2020_2021_Label_en_df.Rds")
+MeshLabels <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
 head(MeshLabels)
 
 #check property
 table(MeshLabels$Property)
 
-MeshOthers <- readRDS("./00_Mesh_Input/mesh219_2020_2021_others_df.Rds")
+MeshOthers <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
 head(MeshOthers)
 
 #check property
@@ -152,15 +271,17 @@ head(MeshLabels00)
 
 #Extract D terms
 table(grepl("[:]D", MeshLabels00$Subject))
-head(MeshLabels00[grepl("[:]D", MeshLabels00$Subject),])
+head(MeshLabels00[grepl("[:]D", MeshLabels00$Subject),], n=20)
 MeshLabels_D00 <- MeshLabels00[grepl("[:]D", MeshLabels00$Subject),]
-#head(MeshLabels_D00)
+#head(MeshLabels_D00, n=20)
 
 #head(MeshLabels00)
-#readr::write_csv(MeshLabels00, file="./00_Mesh_Input/MeshLabels00.csv", col_names = F, append=F)
+if(F){
+readr::write_csv(MeshLabels00, file="./00_Mesh_Input/MeshLabels00.csv", col_names = F, append=F)
 saveRDS(MeshLabels00, "./00_Mesh_Input/MeshLabels00.Rds")
-#readr::write_csv(MeshLabels_D00, file="./00_Mesh_Input/MeshLabels_D00.csv", col_names = F, append=F)
+readr::write_csv(MeshLabels_D00, file="./00_Mesh_Input/MeshLabels_D00.csv", col_names = F, append=F)
 saveRDS(MeshLabels_D00, "./00_Mesh_Input/MeshLabels_D00.Rds")
+}
 
 ```
 
@@ -171,6 +292,7 @@ Input words in English are 428.
 ```{r echo=TRUE, eval=FALSE}
 ##restart
 rm( list=ls() )
+
 MeshLabels00 <- readRDS("./00_Mesh_Input/MeshLabels_D00.Rds")
 head( MeshLabels00, n=10 )
 dim(MeshLabels00)
@@ -181,6 +303,7 @@ words <- unlist(words, use.names = F)
 words <- words[!is.na(words)]
 words <- words[words != ""]
 words <- unique(words)
+
 head(words)
 length(unique(words))
 
@@ -207,8 +330,8 @@ table(Dat$PartialMatch > 0)
 table(Dat$cosine1 > 0)
 
 if(!dir.exists("01_Mesh_Out")){dir.create("01_Mesh_Out")}
-readr::write_csv(Dat, file="./01_Mesh_Out/DistanceDat_Out.csv", col_names = T, append=F)
-saveRDS(Dat, "./01_Mesh_Out/DistanceDat_Out.Rds")
+#readr::write_csv(Dat, file="./01_Mesh_Out/DistanceDat_Out.csv", col_names = T, append=F)
+#saveRDS(Dat, "./01_Mesh_Out/DistanceDat_Out.Rds")
 
 ```
 
@@ -216,6 +339,8 @@ saveRDS(Dat, "./01_Mesh_Out/DistanceDat_Out.Rds")
 #コサインが良いかも
 
 ```{r echo=TRUE, eval=FALSE}
+rm( list=ls() )
+
 #options(digits=5) 
 Thres <- data.frame(readr::read_csv("./01_Mesh_Out/Dat210610_v02.csv", col_names = T))
 
@@ -236,6 +361,7 @@ summary(Thres$cosine3[Thres$Check == 0])
 #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 # 0.0762  0.2417  0.3164  0.3138  0.3814  0.6087 
 #厳し目基準なら、Thres = 0.075
+
 head(Thres)
 words02 <- Thres[Thres$cosine3 < 0.075, ]
 head(words02)
@@ -249,6 +375,7 @@ saveRDS(words02, "./01_Mesh_Out/words02.Rds")
 
 ```{r echo=TRUE, eval=FALSE}
 rm(list=ls())
+
 words02 <- readRDS("./01_Mesh_Out/words02.Rds")
 head(words02)
 
@@ -262,6 +389,8 @@ words02$Lab01 <- NA
 head(words02)
 
 table(grepl("[,][ ]", words02$Lab00))
+table(grepl("[,][ ]and", words02$Lab00))
+
 for(n in 1:length(words02$Lab00)){
 #n <- 5
 if(grepl("[,][ ]", words02$Lab00[n])){
@@ -285,9 +414,29 @@ Result <- DeePL(Sentence=words02$Lab01[n], Auth_Key="43725ffd-d3d3-a301-c92d-8d7
 words02$Jpn[n] <- Result
 }
 
-head(words02)
-tail(words02)
+head(words02, n=10)
+tail(words02, n=10)
+words02[is.na(words02)] <- 0
 
+#PerfectMatch
+a <- words02$PerfectMatch > 0
+unique(words02$Terms[a])
+sum(a)
+#[1] 54
+
+#PartialMatch
+a <- words02$PartialMatch > 0
+unique(words02$Terms[a])
+sum(a)
+#[1] 57
+
+#cosine3
+a <- words02$cosine3 < 0.075
+unique(words02$Terms[a])
+sum(a)
+#[1] 101
+
+#######################################
 saveRDS(words02, "./01_Mesh_Out/words02_Jpn.Rds")
 readr::write_excel_csv(words02, file="./01_Mesh_Out/words02_Jpn.csv", col_names = T, append=F)
 
@@ -296,11 +445,13 @@ readr::write_excel_csv(words02, file="./01_Mesh_Out/words02_Jpn.csv", col_names 
 # Linking to the Mesh
 
 ```{r echo=TRUE, eval=FALSE}
+
 rm(list=ls())
 
 #Match List
 words02 <- readRDS("./01_Mesh_Out/words02_Jpn.Rds")
 head(words02)
+
 table(words02$cosine2 == words02$Lab00)
 table(words02$cosine2 == words02$Lab01)
 
@@ -322,9 +473,9 @@ library( magrittr )
 #MeshLabels_D00 <- D01 %>% rbind(D02) %>% rbind(D03) %>% rbind(D04)
 #head(MeshLabels_D00)
 
-##########################
+####################################################
 #Extract IDs
-##########################
+####################################################
 #一時的に小文字に変換してマッティング
 MeshLabels01 <- MeshLabels00[c(tolower(MeshLabels00$Object) %in% tolower(words02$Lab00)),]
 
@@ -342,15 +493,149 @@ saveRDS(LabList00, "./01_Mesh_Out/LabList00.Rds")
 
 ```
 
+# Check propertys
+
+```{r echo=TRUE, eval=FALSE}
+
+rm(list=ls())
+
+MeshLabel_2021df <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df.Rds")
+head(MeshLabel_2021df)
+dim(MeshLabel_2021df)
+MeshOthers_2021df <- readRDS("./00_Mesh_Input/mesh2021_others_df.Rds")
+head(MeshOthers_2021df)
+dim(MeshOthers_2021df)
+
+#bind
+Mesh2021df <- rbind(MeshLabel_2021df, MeshOthers_2021df)
+rm(list = c("MeshLabel_2021df", "MeshOthers_2021df"))
+
+Subj2021 <- stringr::str_sub(Mesh2021df$Subject, start=1, end=6)
+table(Subj2021)
+a <- names(table(Subj2021))
+a
+length(a)
+
+for(n in 1:length(a)){
+#n <- 4
+Mesh2021df00 <- Mesh2021df[grepl(a[n], Subj2021),]
+#head(Mesh2021df00)
+message(paste0("No.: ", n))
+message(a[n])
+#print(Mesh2021df00$Subject[1:10])
+print(table(Mesh2021df00$Property))
+
+#table(grepl(paste0(a[n], "[0-9][0-9][0-9]"), Mesh2021df00$Subject))
+a1 <- Mesh2021df00$Subject[grepl(paste0(a[n], "[0-9][0-9][0-9]"), Mesh2021df00$Subject)][1:10]
+if(!all(is.na(a1))){print(a1)}
+a2 <- Mesh2021df00$Subject[!grepl(paste0(a[n], "[0-9][0-9][0-9]"), Mesh2021df00$Subject)][1:10]
+if(!all(is.na(a2))){print(a2)}
+
+}
+
+
+```
+
+# Check structures of Polymers
+
+```{r}
+
+#修正版の読み込み
+rm(list=ls())
+
+MeshLabel_2021df <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
+head(MeshLabel_2021df)
+dim(MeshLabel_2021df)
+table(MeshLabel_2021df$OtherInfo == "BLANK")
+
+MeshOthers_2021df <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
+head(MeshOthers_2021df)
+dim(MeshOthers_2021df)
+table(MeshOthers_2021df$OtherInfo == "BLANK")
+
+##############################################
+# Trial 01
+##############################################
+txt <- "Polymers"
+a1 <- MeshLabel_2021df[MeshLabel_2021df$Object == txt,]
+
+a1
+#              Subject        Property   Object OtherInfo
+#1242522  mesh:D011108      rdfs:label Polymers       @en
+#1906322 mesh:M0017208      rdfs:label Polymers       @en
+#2995287  mesh:T032687 meshv:prefLabel Polymers       @en
+a2 <- a1$Subject
+a2
+
+for(n in seq_len(length(a2))){
+  #n <- 3
+  b1 <- MeshOthers_2021df[MeshOthers_2021df$Subject == a2[n],]
+  b1
+  table(b1$Subject)
+  table(b1$Property)
+  #b1$info <- stringr::str_sub(b1$Subject, start=1, end=6)
+  dim(b1)
+  table(b1$Property, b1$SubInfo)
+  table(b1$Property, b1$ObjInfo)
+  b1[grepl("Tree|tree", b1$Property),]
+  
+  b2 <- MeshOthers_2021df[MeshOthers_2021df$Object == a2[n],]
+  b2
+  table(b2$Object)
+  table(b2$Property)
+  #b2$info <- stringr::str_sub(b2$Subject, start=1, end=6)
+  dim(b2)
+  table(b2$Property, b2$SubInfo)
+  table(b2$Property, b2$ObjInfo)
+
+}
+
+b3 <- MeshOthers_2021df[MeshOthers_2021df$Subject == a2[1],]
+head(b3)
+b4 <- b3[grepl("Tree|tree", b3$Property), "Object"]
+b4
+
+for(m in seq_len(length(b4))){
+  #m <- 1
+  d1 <- MeshLabel_2021df[MeshLabel_2021df$Subject == b4[m],]
+  d1
+  
+  b1 <- MeshOthers_2021df[MeshOthers_2021df$Subject == b4[m],]
+  b1
+  table(b1$Subject)
+  table(b1$Property)
+  #b1$info <- stringr::str_sub(b1$Subject, start=1, end=6)
+  dim(b1)
+  table(b1$Property, b1$SubInfo)
+  table(b1$Property, b1$ObjInfo)
+  b1[grepl("Tree|tree", b1$Property),]
+  
+  b2 <- MeshOthers_2021df[MeshOthers_2021df$Object == b4[m],]
+  b2
+  table(b2$Object)
+  table(b2$Property)
+  #b2$info <- stringr::str_sub(b2$Subject, start=1, end=6)
+  
+  dim(b2)
+  table(b2$Property, b2$SubInfo)
+  table(b2$Property, b2$ObjInfo)  
+  
+}
+
+```
+
 # Extract the upper classes
 
 ```{r echo=TRUE, eval=FALSE}
 rm(list=ls())
+
 LabList00 <- readRDS("./01_Mesh_Out/LabList00.Rds")
 head(LabList00)
+length(LabList00)
 
-MeshOthers_df <- readRDS("./00_Mesh_Input/mesh2021_others_df.Rds")
+MeshOthers_df <- readRDS("./00_Mesh_Input/mesh219_2020_2021_others_df.Rds")
 head(MeshOthers_df)
+dim(MeshOthers_df)
 
 ##"meshv:broaderConcept", "meshv:broaderDescriptor", and "meshv:broaderQualifier" 
 table(MeshOthers_df$Property)
@@ -363,12 +648,15 @@ MeshOthers_broader <- MeshOthers_df[c(MeshOthers_df$Property %in% broader),]
 
 dim(MeshOthers_broader)
 head(MeshOthers_broader)
+table(MeshOthers_broader$Property)
 #(names(table(MeshOthers_broader$Subject)) -> a)[grepl("D", a)]
 
 #Perform All
+library(agGraphSearch)
 Dat <- extractUpperConcepts4Mesh(Lab_List=LabList00,
                                  Data=MeshOthers_broader,
                                  broaderProperty=broader)
+
 head(Dat); dim(Dat)
 length(unique(Dat$Subject))
 length(unique(Dat$Property))
@@ -403,6 +691,8 @@ head(Dat01)
 colnames(Dat01)[c((ncol(Dat01)-1):ncol(Dat01))] <- c("subjectLabel",
                                                      "parentClassLabel")
 head(Dat01)
+#saveRDS(Dat01, "./02_Mesh_Out/Dat01.Rds")
+
 FileName <- paste0("agVisNetwork_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
 
 #All
@@ -449,20 +739,24 @@ a19[!c(a19 %in% a21)]
 
 ```
 
-# Translate to Japanese
+# グラフ可視化: Translate the node names to the Japanese names
 
 ```{r echo=TRUE, eval=FALSE}
 #2021 + Jpn
+Dat01 <- readRDS("./02_Mesh_Out/Dat01.Rds")
 Dat03 <- Dat01[grepl("mesh[:]", Dat01$subject),]
 head(Dat03)
 
 words <- Dat03
 table(grepl("[,][ ]", words$subjectLabel))
 table(grepl("[,][ ]", words$parentClassLabel))
+words$subjectLabel[grepl("[,][ ]", words$subjectLabel)]
+words$parentClassLabel[grepl("[,][ ]", words$parentClassLabel)]
+
 for(n in 1:nrow(words)){
 #n <- 1
 #subjectLabel
-if(grepl("[,][ ]", words$subjectLabel[n])){
+if(grepl("[,][ ]", words$subjectLabel[n]) & !grepl("[,][ ]and", words$subjectLabel[n])){
  aa <- strsplit(words$subjectLabel[n], split = ", ")[[1]]
  words$subjectLabel[n] <- paste(aa[length(aa):1], collapse = " ")
 }else{
@@ -470,7 +764,7 @@ if(grepl("[,][ ]", words$subjectLabel[n])){
  words$subjectLabel[n] <- aa
 }
 #parentClassLabel
-if(grepl("[,][ ]", words$parentClassLabel[n])){
+if(grepl("[,][ ]", words$parentClassLabel[n]) & !grepl("[,][ ]and", words$parentClassLabel[n])){
  aa <- strsplit(words$parentClassLabel[n], split = ", ")[[1]]
  words$parentClassLabel[n] <- paste(aa[length(aa):1], collapse = " ")
 }else{
@@ -481,6 +775,7 @@ if(grepl("[,][ ]", words$parentClassLabel[n])){
 
 Dat04 <- words
 head(Dat04)
+library(agGraphSearch)
 
 for(n in 1:nrow(Dat04)){
 #n <- 1
@@ -492,11 +787,117 @@ Dat04$parentClassLabel[n] <- DeePL(Dat04$parentClassLabel[n], Auth_Key="43725ffd
 head(Dat04)
 
 if(!dir.exists("02_Mesh_Out")){dir.create("02_Mesh_Out")}
-saveRDS(Dat04, "./02_Mesh_Out/Dat04_UpperClass.Rds")
-readr::write_excel_csv(Dat04, file="./02_Mesh_Out/Dat04_UpperClass.csv", col_names = T, append=F)
+#saveRDS(Dat04, "./02_Mesh_Out/Dat04_UpperClass.Rds")
+#readr::write_excel_csv(Dat04, file="./02_Mesh_Out/Dat04_UpperClass.csv", col_names = T, append=F)
+
+Dat04 <- readRDS("./02_Mesh_Out/Dat04_UpperClass.Rds")
+head(Dat04)
+
+#node
+length(unique(c(Dat04$subject, Dat04$parentClass)))
+
+#edge
+length(unique(paste0(Dat04$subject, ".", Dat04$parentClass)))
+
+#2021
+agVisNetwork(Graph=Dat04,
+             Selected=NULL, 
+             Browse=FALSE, 
+             Output=TRUE,
+             FilePath=paste1("Mesh2021JPN"))
 
 ```
 
+#個別に実行
+
+```{r}
+
+rm(list=ls())
+
+LabList00 <- readRDS("./01_Mesh_Out/LabList00.Rds")
+head(LabList00)
+length(LabList00)
+
+
+MeshOthers_df <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
+head(MeshOthers_df)
+dim(MeshOthers_df)
+
+##"meshv:broaderConcept", "meshv:broaderDescriptor", and "meshv:broaderQualifier" 
+table(MeshOthers_df$Property)
+(names(table(MeshOthers_df$Property)) -> a)[grepl("broader", a)]
+(names(table(MeshOthers_df$Property)) -> a)[grepl("narrower", a)]
+
+#The upper graph
+broader <- c("meshv:broaderConcept", "meshv:broaderDescriptor", "meshv:broaderQualifier")
+MeshOthers_broader <- MeshOthers_df[c(MeshOthers_df$Property %in% broader),]
+
+dim(MeshOthers_broader)
+head(MeshOthers_broader)
+table(MeshOthers_broader$Property)
+#(names(table(MeshOthers_broader$Subject)) -> a)[grepl("D", a)]
+
+#Perform All
+library(agGraphSearch)
+Dat <- extractUpperConcepts4Mesh(Lab_List=LabList00,
+                                 Data=MeshOthers_broader,
+                                 broaderProperty=broader)
+
+head(Dat); dim(Dat)
+length(unique(Dat$Subject))
+length(unique(Dat$Property))
+unique(Dat$Property)
+length(unique(Dat$Object))
+Dat$triple <- paste0(Dat$Subject, ".", Dat$Object)
+rownames(Dat) <- 1:nrow(Dat)
+
+head(Dat)
+Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
+head(Dat)
+Dat <- Dat[,-ncol(Dat)]
+
+colnames(Dat) <- c("subject",
+                   "property",
+                   "parentClass",
+                   "OtherInfo")
+colnames(Dat)
+
+head(Dat)
+Dat <- Dat[order(Dat$subject, decreasing = T),]
+
+MeshLabels00 <- readRDS("./00_Mesh_Input/MeshLabels_D00.Rds")
+head(MeshLabels00)
+MeshLabels01 <- MeshLabels00[,c(1,3)]
+head(MeshLabels01)
+
+Dat00 <-  merge(Dat, MeshLabels01, by.x = "subject", by.y = "Subject", all = F, sort = F)
+head(Dat00)
+Dat01 <-  merge(Dat00, MeshLabels01, by.x = "parentClass", by.y = "Subject", all = F, sort = F)
+head(Dat01)
+colnames(Dat01)[c((ncol(Dat01)-1):ncol(Dat01))] <- c("subjectLabel",
+                                                     "parentClassLabel")
+head(Dat01)
+#saveRDS(Dat01, "./02_Mesh_Out/Dat01.Rds")
+
+
+```
+
+#Descriptor-Qualifier Pairs 
+
+mesh:D000001Q000008 rdfs:label  Calcimycin/administration & dosage
+↓↓↓↓↓
+Calcimycin (administration & dosage)
+に変更する
+
+
+#下位探索のアルゴリズムの修正
+
+段数ごとに、一気に下位概念を取得する。
+だいぶ早くなる。
+
+
+
+#高分子辞典索引
 
 
 

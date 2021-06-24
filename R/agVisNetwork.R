@@ -86,7 +86,7 @@ if(!any(colnames(Graph) == "propertyLabel")){
       nodes <- data.frame(id = LABEL$id, label = LABEL$id, group=LABEL$group, color.background="lightblue", color.border="darkblue", color.highlight="orangered", size=SmallSize, font.size =FontSize, shape="dot", stringsAsFactors = F)
       edges <- data.frame(from = Graph1$childClassLabel, to = Graph1$subjectLabel, dashes=FALSE)
 
-      Graph2 <- Graph[Graph$property != "hwdt:P279",]
+      Graph2 <- Graph[Graph$property != "wdt:P279",]
       LABEL2 <- c(Graph2$childClassLabel)
       LABEL2 <- data.frame(id = unique(LABEL2), stringsAsFactors = F)
       Group2 <- data.frame(id = c(Graph2$childClassLabel), group = c(Graph2$group), stringsAsFactors = F)
@@ -153,15 +153,14 @@ if(Count > 1){
       visNetwork::visOptions(highlightNearest = TRUE, nodesIdSelection = list(enabled=T, selected=Selected), selectedBy = "group", autoResize=T)
   }
   if(outputNodesEdges){
-
     readr::write_excel_csv(nodes, file = paste("nodes_", format(Sys.time(), "%y%m%d_%H%M"),".csv", sep="") )
     readr::write_excel_csv(edges, file = paste("edges_", format(Sys.time(), "%y%m%d_%H%M"),".csv", sep="") )
   }else{}
   if(Output){
     VIS %>% networkD3::saveNetwork(file = FilePath)
-    if(Browse){browseURL(FilePath)}else{return(NULL)}
-  } else {}
-  return(VIS)
+    if(Browse){browseURL(FilePath)}else{return()}
+  } else { return(VIS) }
+
 }
 
 
