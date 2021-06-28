@@ -45,10 +45,13 @@ remove.packages("agGraphSearch", lib=.libPaths())
 .rs.restartR()
 }
 
+#install.packages(c("SPARQL", "franc", "formattable"))
+
 if(TRUE){
 system("R CMD INSTALL agGraphSearch")
 Sys.sleep(1)
 library(agGraphSearch)
+
 }
 
 if(T){
@@ -627,13 +630,15 @@ for(m in seq_len(length(b4))){
 # Extract the upper classes
 
 ```{r echo=TRUE, eval=FALSE}
+
 rm(list=ls())
 
 LabList00 <- readRDS("./01_Mesh_Out/LabList00.Rds")
 head(LabList00)
 length(LabList00)
+LabList00
 
-MeshOthers_df <- readRDS("./00_Mesh_Input/mesh219_2020_2021_others_df.Rds")
+MeshOthers_df <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
 head(MeshOthers_df)
 dim(MeshOthers_df)
 
@@ -643,16 +648,19 @@ table(MeshOthers_df$Property)
 (names(table(MeshOthers_df$Property)) -> a)[grepl("narrower", a)]
 
 #The upper graph
-broader <- c("meshv:broaderConcept", "meshv:broaderDescriptor", "meshv:broaderQualifier")
+#broader <- c("meshv:broaderConcept", "meshv:broaderDescriptor", "meshv:broaderQualifier")
+broader <- c("meshv:broaderDescriptor")
 MeshOthers_broader <- MeshOthers_df[c(MeshOthers_df$Property %in% broader),]
 
 dim(MeshOthers_broader)
 head(MeshOthers_broader)
 table(MeshOthers_broader$Property)
+unique(MeshOthers_broader$SubInfo)
+unique(MeshOthers_broader$ObjInfo)
 #(names(table(MeshOthers_broader$Subject)) -> a)[grepl("D", a)]
 
 #Perform All
-library(agGraphSearch)
+library( agGraphSearch )
 Dat <- extractUpperConcepts4Mesh(Lab_List=LabList00,
                                  Data=MeshOthers_broader,
                                  broaderProperty=broader)
@@ -691,37 +699,51 @@ head(Dat01)
 colnames(Dat01)[c((ncol(Dat01)-1):ncol(Dat01))] <- c("subjectLabel",
                                                      "parentClassLabel")
 head(Dat01)
-#saveRDS(Dat01, "./02_Mesh_Out/Dat01.Rds")
+Dat02 <- Dat01[,c("subject", "property", 
+                  "parentClass", "OtherInfo",
+                  "subjectLabel", "parentClassLabel")]
+head(Dat02)
+#saveRDS(Dat02, "./02_Mesh_Out/Dat02.Rds")
 
+```
+
+# Visualize the relation network
+
+```{r}
+Dat02 <- readRDS("./02_Mesh_Out/Dat02.Rds")
+
+###
 FileName <- paste0("agVisNetwork_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
 
 #All
-agVisNetwork(Graph=Dat01,
+agVisNetwork(Graph=Dat02,
              Selected=NULL, 
              Browse=FALSE, 
              Output=TRUE,
              FilePath=paste1("Mesh_All"))
 
+if(F){
 #2019
-agVisNetwork(Graph=Dat01[grepl("mesh2019[:]", Dat01$subject),],
+agVisNetwork(Graph=Dat02[grepl("mesh2019[:]", Dat01$subject),],
              Selected=NULL, 
              Browse=FALSE, 
              Output=TRUE,
              FilePath=paste1("Mesh2019"))
 
 #2020
-agVisNetwork(Graph=Dat01[grepl("mesh2020[:]", Dat01$subject),],
+agVisNetwork(Graph=Dat02[grepl("mesh2020[:]", Dat01$subject),],
              Selected=NULL, 
              Browse=FALSE, 
              Output=TRUE,
              FilePath=paste1("Mesh2020"))
 
 #2021
-agVisNetwork(Graph=Dat01[grepl("mesh[:]", Dat01$subject),],
+agVisNetwork(Graph=Dat02[grepl("mesh[:]", Dat01$subject),],
              Selected=NULL, 
              Browse=FALSE, 
              Output=TRUE,
              FilePath=paste1("Mesh2021"))
+}
 
 #Check
 table(grepl("mesh2019[:]", Dat01$subject))
@@ -743,8 +765,8 @@ a19[!c(a19 %in% a21)]
 
 ```{r echo=TRUE, eval=FALSE}
 #2021 + Jpn
-Dat01 <- readRDS("./02_Mesh_Out/Dat01.Rds")
-Dat03 <- Dat01[grepl("mesh[:]", Dat01$subject),]
+Dat <- readRDS("./02_Mesh_Out/Dat02.Rds")
+Dat03 <- Dat[grepl("mesh[:]", Dat$subject),]
 head(Dat03)
 
 words <- Dat03
@@ -787,8 +809,8 @@ Dat04$parentClassLabel[n] <- DeePL(Dat04$parentClassLabel[n], Auth_Key="43725ffd
 head(Dat04)
 
 if(!dir.exists("02_Mesh_Out")){dir.create("02_Mesh_Out")}
-#saveRDS(Dat04, "./02_Mesh_Out/Dat04_UpperClass.Rds")
-#readr::write_excel_csv(Dat04, file="./02_Mesh_Out/Dat04_UpperClass.csv", col_names = T, append=F)
+saveRDS(Dat04, "./02_Mesh_Out/Dat04_UpperClass.Rds")
+readr::write_excel_csv(Dat04, file="./02_Mesh_Out/Dat04_UpperClass.csv", col_names = T, append=F)
 
 Dat04 <- readRDS("./02_Mesh_Out/Dat04_UpperClass.Rds")
 head(Dat04)
@@ -817,7 +839,7 @@ rm(list=ls())
 LabList00 <- readRDS("./01_Mesh_Out/LabList00.Rds")
 head(LabList00)
 length(LabList00)
-
+LabList00
 
 MeshOthers_df <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
 head(MeshOthers_df)
@@ -829,43 +851,56 @@ table(MeshOthers_df$Property)
 (names(table(MeshOthers_df$Property)) -> a)[grepl("narrower", a)]
 
 #The upper graph
-broader <- c("meshv:broaderConcept", "meshv:broaderDescriptor", "meshv:broaderQualifier")
+#broader <- c("meshv:broaderConcept", "meshv:broaderDescriptor", "meshv:broaderQualifier")
+broader <- c("meshv:broaderDescriptor")
 MeshOthers_broader <- MeshOthers_df[c(MeshOthers_df$Property %in% broader),]
 
 dim(MeshOthers_broader)
 head(MeshOthers_broader)
 table(MeshOthers_broader$Property)
+unique(MeshOthers_broader$SubInfo)
+unique(MeshOthers_broader$ObjInfo)
 #(names(table(MeshOthers_broader$Subject)) -> a)[grepl("D", a)]
 
-#Perform All
-library(agGraphSearch)
-Dat <- extractUpperConcepts4Mesh(Lab_List=LabList00,
+#Perform each
+library( agGraphSearch )
+Dat <- c()
+for(n in 1:length(LabList00)){
+#n <- 2
+print(LabList00[n])
+Dat[[n]] <- extractUpperConcepts4Mesh(Lab_List=LabList00[n],
                                  Data=MeshOthers_broader,
                                  broaderProperty=broader)
+names(Dat)[n] <- LabList00[n]
+rownames(Dat[[n]]) <- 1:nrow(Dat[[n]])
+colnames(Dat[[n]]) <- c("subject", "property", "parentClass", "OtherInfo")
 
-head(Dat); dim(Dat)
-length(unique(Dat$Subject))
-length(unique(Dat$Property))
-unique(Dat$Property)
-length(unique(Dat$Object))
-Dat$triple <- paste0(Dat$Subject, ".", Dat$Object)
-rownames(Dat) <- 1:nrow(Dat)
+}
 
 head(Dat)
-Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
-head(Dat)
-Dat <- Dat[,-ncol(Dat)]
+length(Dat)
 
-colnames(Dat) <- c("subject",
-                   "property",
-                   "parentClass",
-                   "OtherInfo")
-colnames(Dat)
+#集計
+##Graph data without the uplicates
+#Number of entities
+(E01 <- length(unique(c(res6d$subject, res6d$parentClass))))
+#Number of labels
+(E02 <- length(unique(c(res6d$subjectLabel, res6d$parentClassLabel))))
+#Number of Triples
+(E03 <- length(unique(res6d$triples)))
 
-head(Dat)
-Dat <- Dat[order(Dat$subject, decreasing = T),]
+#Gathering the parent concepts
+upEntity <- unlist(purrr::map(res5, function(x){unique(x$parentClass)}))
 
-MeshLabels00 <- readRDS("./00_Mesh_Input/MeshLabels_D00.Rds")
+#calculate the frequency of common entities
+Count_upEntity_DF <- countCommonEntities(upEntity)
+
+#Count and view table
+agTableDT(Count_upEntity_DF, Transpose = F, AutoWidth = FALSE)
+
+
+
+
 head(MeshLabels00)
 MeshLabels01 <- MeshLabels00[,c(1,3)]
 head(MeshLabels01)
@@ -877,10 +912,20 @@ head(Dat01)
 colnames(Dat01)[c((ncol(Dat01)-1):ncol(Dat01))] <- c("subjectLabel",
                                                      "parentClassLabel")
 head(Dat01)
-#saveRDS(Dat01, "./02_Mesh_Out/Dat01.Rds")
-
+Dat02 <- Dat01[,c("subject", "property", 
+                  "parentClass", "OtherInfo",
+                  "subjectLabel", "parentClassLabel")]
+head(Dat02)
+#saveRDS(Dat02, "./02_Mesh_Out/Dat02.Rds")
 
 ```
+
+#下位探索のアルゴリズムの修正
+
+段数ごとに、一気に下位概念を取得する。
+だいぶ早くなる。
+
+
 
 #Descriptor-Qualifier Pairs 
 
@@ -890,10 +935,7 @@ Calcimycin (administration & dosage)
 に変更する
 
 
-#下位探索のアルゴリズムの修正
 
-段数ごとに、一気に下位概念を取得する。
-だいぶ早くなる。
 
 
 

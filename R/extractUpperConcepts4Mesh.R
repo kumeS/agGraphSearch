@@ -21,9 +21,15 @@ extractUpperConcepts4Mesh <- function(Lab_List,
 Dat <- c()
 List <- Lab_List
 MeshOthers_broader <- Data
+
 x <- 1
 if(!is.vector(Lab_List)){ return(message("Warning: Not proper value of Lab_List")) }
 if(!is.vector(broaderProperty)){ return(message("Warning: Not proper value of broaderProperty")) }
+
+if(!all(colnames(MeshOthers_broader) %in% c("Subject","Property","Object","OtherInfo"))){
+   MeshOthers_broader <- MeshOthers_broader[,colnames(MeshOthers_broader) %in% c("Subject","Property","Object","OtherInfo")]
+}
+
 if(!all(colnames(MeshOthers_broader) == c("Subject","Property","Object","OtherInfo"))){
    return(message("Warning: Not proper value of Data"))
 }

@@ -128,6 +128,7 @@ CkeckQuery_agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name){
 LABEL <- Entity_Name
 EndPoint <- agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
 FROM <- agGraphSearch::KzLabEndPoint_Wikidata$FROM
+FilterRegex=FALSE
 ######################################################################
 ######################################################################
 #Switch

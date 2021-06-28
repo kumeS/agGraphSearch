@@ -22,7 +22,7 @@ Description: This package provides a tool set for searching RDF graph data
 Depends: R (>= 4.0.0), SPARQL
 Imports: RCurl,
   XML,
-  franc, 
+  franc,
   magrittr, 
   purrr, 
   readr, 

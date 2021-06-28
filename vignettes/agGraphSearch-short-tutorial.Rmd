@@ -155,6 +155,7 @@ agGraphSearch::KzLabEndPoint_Wikidata$EndPoint
 agGraphSearch::KzLabEndPoint_Wikidata$FROM
 
 #run SPARQL
+#library(agGraphSearch)
 #library(SPARQL)
 res <- agCount_Label_Num_Wikidata_P279_P31(Entity_Name = ter00, 
                                            Dir="02_Short_Out")
@@ -529,7 +530,7 @@ EBImage::display(EBImage::readImage(files = img))
 The common upper-level concept is defined based on the edge list of triples obtained above.
 
 ```{r echo=TRUE, eval=FALSE}
-##Graph data without the uplicates
+##Graph data without the duplicates
 #Number of entities
 (E01 <- length(unique(c(res6d$subject, res6d$parentClass))))
 #Number of labels
