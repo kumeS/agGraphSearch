@@ -830,7 +830,7 @@ agVisNetwork(Graph=Dat04,
 
 ```
 
-#個別に実行
+#Run individually
 
 ```{r}
 
@@ -845,7 +845,7 @@ MeshOthers_df <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
 head(MeshOthers_df)
 dim(MeshOthers_df)
 
-##"meshv:broaderConcept", "meshv:broaderDescriptor", and "meshv:broaderQualifier" 
+#"meshv:broaderConcept", "meshv:broaderDescriptor", and "meshv:broaderQualifier" 
 table(MeshOthers_df$Property)
 (names(table(MeshOthers_df$Property)) -> a)[grepl("broader", a)]
 (names(table(MeshOthers_df$Property)) -> a)[grepl("narrower", a)]
@@ -855,7 +855,7 @@ table(MeshOthers_df$Property)
 broader <- c("meshv:broaderDescriptor")
 MeshOthers_broader <- MeshOthers_df[c(MeshOthers_df$Property %in% broader),]
 
-  dim(MeshOthers_broader)
+dim(MeshOthers_broader)
 head(MeshOthers_broader)
 table(MeshOthers_broader$Property)
 unique(MeshOthers_broader$SubInfo)
@@ -885,6 +885,7 @@ length(Dat)
 #Number of entities
 DatDF <- ListDF2DF(Dat)
 head(DatDF)
+
 (E01 <- length(unique(c(DatDF$subject, DatDF$parentClass))))
 #Number of labels
 (E02 <- length(unique(c(DatDF$subjectLabel, DatDF$parentClassLabel))))
@@ -897,6 +898,7 @@ head(upEntity)
 
 #calculate the frequency of common entities
 Count_upEntity_DF <- countCommonEntities(upEntity)
+head(Count_upEntity_DF)
 
 #Count and view table
 agTableDT(Count_upEntity_DF, Transpose = F, AutoWidth = FALSE)
@@ -917,10 +919,10 @@ head(Dat02P0)
 dim(Dat); dim(Dat02P0)
 
 #define the common upper-level entities
-dim(Count_upEntity_DF); dim(Dat0)
-head(Count_upEntity_DF); head(Dat0)
+dim(Count_upEntity_DF); dim(Dat02P0)
+head(Count_upEntity_DF); head(Dat02P0)
 Count_upEntity_DF2 <- Cutoff_FreqNum(input1=Count_upEntity_DF, 
-                                     input2=Dat0, 
+                                     input2=Dat02P0, 
                                      By="parentClass", 
                                      Sort="Freq", 
                                      FreqNum=2)
@@ -929,12 +931,34 @@ Count_upEntity_DF2 <- Cutoff_FreqNum(input1=Count_upEntity_DF,
 head(Count_upEntity_DF2, n=10)
 table(Count_upEntity_DF2$Freq)
 
+#Translate to Japanese
+Count_upEntity_DF2$parentClassLabelJpn <- Count_upEntity_DF2$parentClassLabel
+words <- Count_upEntity_DF2
+head(words)
+
+for(n in 1:nrow(words)){
+#n <- 1
+#parentClassLabelJpn
+print(n)
+if(grepl("[,][ ]", words$parentClassLabelJpn[n]) & !grepl("[,][ ]and", words$parentClassLabelJpn[n])){
+ aa <- strsplit(words$parentClassLabelJpn[n], split = ", ")[[1]]
+ aa1 <- paste(aa[length(aa):1], collapse = " ")
+ words$parentClassLabelJpn[n] <- DeePL(aa1, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
+}else{
+ aa <-  words$parentClassLabelJpn[n]
+ words$parentClassLabelJpn[n] <- DeePL(aa, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
+} 
+}
+
+Count_upEntity_DF3 <- words
+head(Count_upEntity_DF3)
+
 #save
-saveRDS(Count_upEntity_DF2,
-        file = "./03_Short_Out/Count_upEntity_DF2.Rdata", compress = TRUE)
-readr::write_excel_csv(Count_upEntity_DF2,
-                       file="./03_Short_Out/Count_upEntity_DF2.csv")
-#Count_upEntity_DF2 <- readRDS(file = "./03_Short_Out/Count_upEntity_DF2.Rdata")
+saveRDS(Count_upEntity_DF3,
+        file = "./03_Short_Out/Count_upEntity_DF3.Rds", compress = TRUE)
+readr::write_excel_csv(Count_upEntity_DF3,
+                       file="./03_Short_Out/Count_upEntity_DF3.csv")
+#Count_upEntity_DF3 <- readRDS(file = "./03_Short_Out/Count_upEntity_DF3.Rds")
 
 #Calculation of inclusion rate
 QID <- QIDdf$QID
