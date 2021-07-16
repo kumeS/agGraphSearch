@@ -4,46 +4,69 @@
 ##' @param list1 a character vector of search entities.
 ##' @param list2 a character vector of common upper-level entities
 ##' @param PlusLabel logical; add the labels or not when createing the network.
+##' @param ParticularEntity_only logical
+##' @param list2.WD a character vector
+##' @param UpdateList logical
+##' @param breakRepeat a numeric
+##' @param View logical
+##' @param RemoveGraph logical
+##' @param FileName a string
+##' @param OutputResults logical
+##' @param ResultsEach logical
+##' @param LowerSearch logical
+##' @param GraphView logical
+##' @param LvView logical
+##' @param WindowSize a numeric
 ##' @description this function is a general function for
+##' determining the exploration Segment
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export agGraphAnalysis
 ##' @examples \dontrun{
 ##'
+##' library(magrittr)
+##' agGraphAnalysis(graphList=eachGraph,
+##'                 list1=list1a,
+##'                 list2=list2b)
 ##'
 ##' }
 
-#graphList=eachGraph; list1=list1a; list2=list2b; LowerSearch=T;  UpdateList=F; breakRepeat=20;View=T; RemoveGraph=F; PlusLabel=T; FileName=T; OutputResults=T; ResultsEach=F; ParticularEntity_only=T; list2.WD="wd:Q35120"; GraphView01=F; GraphView02=F; GraphView03=T; GraphView04=T; LvView=T;WindowSize01=10; WindowSize02=10;WindowSize03=10; WindowSize04=7.5;WindowSize05=7.5
+#graphList=eachGraph; list1=list1a; list2=list2b; LowerSearch=T; UpdateList=F; breakRepeat=20;View=T; RemoveGraph=F; PlusLabel=T; FileName=TRUE; OutputResults=T; ResultsEach=F; ParticularEntity_only=FALSE; list2.WD="wd:Q35120"; GraphView=c(FALSE, FALSE, TRUE, TRUE); LvView=T;WindowSize=c(10,10,10,7.5,7.5)
 
 agGraphAnalysis <- function(graphList,
                             list1,
                             list2,
+                            PlusLabel=TRUE,
                             ParticularEntity_only=TRUE,
                             list2.WD="wd:Q35120",
                             UpdateList=FALSE,
                             breakRepeat=20,
                             View=TRUE,
                             RemoveGraph=FALSE,
-                            PlusLabel=TRUE,
-                            FileName=paste0("Results_", format(Sys.time(), "%y%m%d_%H%M")),
+                            FileName=TRUE,
                             OutputResults=TRUE,
                             ResultsEach=FALSE,
                             LowerSearch=FALSE,
-                            GraphView01=FALSE,
-                            GraphView02=FALSE,
-                            GraphView03=TRUE,
-                            GraphView04=TRUE,
+                            GraphView=c(FALSE, FALSE, TRUE, TRUE),
                             LvView=TRUE,
-                            WindowSize01=10,
-                            WindowSize02=10,
-                            WindowSize03=10,
-                            WindowSize04=7.5,
-                            WindowSize05=7.5){
+                            WindowSize=c(10, 10, 10, 7.5, 7.5)
+                            ){
 
 #Checking the type of graphList
 if(!is.list(graphList)){ return(message("Warning: graphList is not the list type")) }
 if(!is.character(list2.WD)){ return(message("Not proper value of list2.WD")) }
+
+#Parameters
+GraphView01=GraphView[1]
+GraphView02=GraphView[2]
+GraphView03=GraphView[3]
+GraphView04=GraphView[4]
+WindowSize01=WindowSize[1]
+WindowSize02=WindowSize[2]
+WindowSize03=WindowSize[3]
+WindowSize04=WindowSize[4]
+WindowSize05=WindowSize[5]
 
 #common upper-level entities
 if(ParticularEntity_only){
@@ -77,7 +100,7 @@ graphList00[[nn]] <- data.frame(from=graphList[[nn]]$subject,
 }}
 
 #出力先の作成
-if(!exists(FileName)){ return(message("Not proper value of FileName")) }
+if(!exists("FileName")){ return(message("Not proper value of FileName")) }
 if(FileName){
   Folder <- paste0("Results_", format(Sys.time(), "%y%m%d_%H%M"))
 }
@@ -89,7 +112,6 @@ if(!exists(FolderData)){dir.create(FolderData)}
 #共通エンティティごとに処理実施
 for(p in seq_len(length(list2.wd))){
 #p <- 1
-#p <- 416
 if(View){print(paste(p, "step 01"))}
 A <- c()
 lab <- as.character(list2.wd[p]); lab.c <- lab

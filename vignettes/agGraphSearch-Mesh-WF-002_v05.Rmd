@@ -65,7 +65,7 @@ Sys.setenv("ftp_proxy" = proxy_url)
 
 #パースのやり直し
 
-```{r}
+```{r echo=TRUE, eval=FALSE}
 
 rm(list=ls())
 
@@ -447,6 +447,11 @@ readr::write_excel_csv(words02, file="./01_Mesh_Out/words02_Jpn.csv", col_names 
 
 # Linking to the Mesh
 
+どれがクラス階層かを判断する - これらを使う？
+- meshv:broaderDescriptor
+- meshv:concept
+
+
 ```{r echo=TRUE, eval=FALSE}
 
 rm(list=ls())
@@ -541,7 +546,7 @@ if(!all(is.na(a2))){print(a2)}
 
 # Check structures of Polymers
 
-```{r}
+```{r echo=TRUE, eval=FALSE}
 
 #修正版の読み込み
 rm(list=ls())
@@ -709,7 +714,7 @@ head(Dat02)
 
 # Visualize the relation network
 
-```{r}
+```{r echo=TRUE, eval=FALSE}
 Dat02 <- readRDS("./02_Mesh_Out/Dat02.Rds")
 
 ###
@@ -830,9 +835,9 @@ agVisNetwork(Graph=Dat04,
 
 ```
 
-#Run individually
+# Run individually
 
-```{r}
+```{r echo=TRUE, eval=FALSE}
 
 rm(list=ls())
 
@@ -845,8 +850,15 @@ MeshOthers_df <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
 head(MeshOthers_df)
 dim(MeshOthers_df)
 
+MeshOthers_df[MeshOthers_df$Subject == "mesh:D002623",]
+MeshOthers_df[MeshOthers_df$Subject == "mesh:M0526832",]
+
 #"meshv:broaderConcept", "meshv:broaderDescriptor", and "meshv:broaderQualifier" 
 table(MeshOthers_df$Property)
+table(MeshOthers_df$Property, MeshOthers_df$SubInfo)
+head(MeshOthers_df)
+table(MeshOthers_df[as.numeric(rownames(unique(MeshOthers_df["Subject"]))),]$SubInfo)
+
 (names(table(MeshOthers_df$Property)) -> a)[grepl("broader", a)]
 (names(table(MeshOthers_df$Property)) -> a)[grepl("narrower", a)]
 
@@ -854,6 +866,10 @@ table(MeshOthers_df$Property)
 #broader <- c("meshv:broaderConcept", "meshv:broaderDescriptor", "meshv:broaderQualifier")
 broader <- c("meshv:broaderDescriptor")
 MeshOthers_broader <- MeshOthers_df[c(MeshOthers_df$Property %in% broader),]
+
+broader <- c("meshv:broaderConcept")
+MeshOthers_broader <- MeshOthers_df[c(MeshOthers_df$Property %in% broader),]
+head(MeshOthers_broader)
 
 dim(MeshOthers_broader)
 head(MeshOthers_broader)
@@ -880,6 +896,11 @@ colnames(Dat[[n]]) <- c("subject", "property", "parentClass", "OtherInfo")
 head(Dat)
 length(Dat)
 
+#save
+saveRDS(Dat,
+        file = "./02_Mesh_Out/Individual_upGraph.Rds", compress = TRUE)
+
+Dat <- readRDS("./02_Mesh_Out/Individual_upGraph.Rds")
 #集計
 ##Graph data without the uplicates
 #Number of entities
@@ -955,32 +976,90 @@ head(Count_upEntity_DF3)
 
 #save
 saveRDS(Count_upEntity_DF3,
-        file = "./03_Short_Out/Count_upEntity_DF3.Rds", compress = TRUE)
+        file = "./02_Mesh_Out/Count_upEntity_DF3.Rds", compress = TRUE)
 readr::write_excel_csv(Count_upEntity_DF3,
-                       file="./03_Short_Out/Count_upEntity_DF3.csv")
-#Count_upEntity_DF3 <- readRDS(file = "./03_Short_Out/Count_upEntity_DF3.Rds")
+                       file="./02_Mesh_Out/Count_upEntity_DF3.csv")
+#Count_upEntity_DF3 <- readRDS(file = "./02_Mesh_Out/Count_upEntity_DF3.Rds")
 
-#Calculation of inclusion rate
-QID <- QIDdf$QID
-
-##QID
-qid <- unique(res6d$subject, res6d$parentClass)
-b <- setdiff(QID, qid)
-b; length(b)
-
-##rdfsLabel
-#RdfsLabel <- unique(res6d$subjectLabel, res6d$parentClassLabel)
+head(Count_upEntity_DF3)
 
 ```
 
-#下位探索のアルゴリズムの修正
+# Calculation of the number of expansion steps
+
+```{r echo=TRUE, eval=FALSE}
+if(!dir.exists("03_Mesh_Out")){dir.create("03_Mesh_Out")}
+
+rm(list=ls())
+
+#Individual graphs
+eachGraph <- readRDS("./02_Mesh_Out/Individual_upGraph.Rds")
+head(eachGraph[[1]])
+sapply(eachGraph, dim)
+
+#Label information
+Dat02 <- readRDS("./02_Mesh_Out/Dat02.Rds")
+head(Dat02)
+
+words <- Dat02
+for(n in 1:nrow(words)){
+#n <- 1
+#subjectLabel
+if(grepl("[,][ ]", words$subjectLabel[n]) & !grepl("[,][ ]and", words$subjectLabel[n])){
+ aa <- strsplit(words$subjectLabel[n], split = ", ")[[1]]
+ words$subjectLabel[n] <- paste(aa[length(aa):1], collapse = " ")
+}else{
+ aa <-  words$subjectLabel[n]
+ words$subjectLabel[n] <- aa
+}
+#parentClassLabel
+if(grepl("[,][ ]", words$parentClassLabel[n]) & !grepl("[,][ ]and", words$parentClassLabel[n])){
+ aa <- strsplit(words$parentClassLabel[n], split = ", ")[[1]]
+ words$parentClassLabel[n] <- paste(aa[length(aa):1], collapse = " ")
+}else{
+ aa <-  words$parentClassLabel[n]
+ words$parentClassLabel[n] <- aa
+} 
+}
+Dat02  <- words
+
+for(n in 1:length(eachGraph)){
+#n <- 1
+a <- Dat02[Dat02$subject %in% eachGraph[[n]]$subject,c(1,5)]
+a1 <- merge(eachGraph[[n]], a, by="subject", sort=F)
+a2 <- Dat02[Dat02$parentClass %in% eachGraph[[n]]$parentClass,c(3,6)]
+a3 <- merge(a1, a2, by="parentClass", sort=F)
+a4 <- a3[,c("subject", "property", "parentClass", "OtherInfo",
+            "subjectLabel", "parentClassLabel")]
+a4$triple <- paste0(a4$subject, ".", a4$parentClass)
+a5 <- a4[as.numeric(rownames(unique(a4["triple"]))),]
+rownames(a5) <- 1:nrow(a5)
+eachGraph[[n]] <- a5
+}
+
+#Search entities
+list1a <- readRDS("./01_Mesh_Out/LabList00.Rds")
+head(list1a)
+
+#Common entities
+list2a <- readRDS("./02_Mesh_Out/Count_upEntity_DF3.Rds")
+head(list2a)
+dim(list2a)
+list2b <- unique(list2a$parentClass)
+
+#Inclusion of list1a and list2b
+table(list1a %in% list2b)
+table(list2b %in% list1a)
+
+```
+
+# 下位探索のアルゴリズムの修正
 
 段数ごとに、一気に下位概念を取得する。
 だいぶ早くなる。
 
 
-
-#Descriptor-Qualifier Pairs 
+# Descriptor-Qualifier Pairs 
 
 mesh:D000001Q000008 rdfs:label  Calcimycin/administration & dosage
 ↓↓↓↓↓
@@ -992,7 +1071,7 @@ Calcimycin (administration & dosage)
 
 
 
-#高分子辞典索引
+# 高分子辞典索引
 
 
 

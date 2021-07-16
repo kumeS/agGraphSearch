@@ -205,7 +205,7 @@ length(QID)
 
 #save
 if(!dir.exists("01_Out")){dir.create("01_Out")}
-saveRDS(QID, file = "./01_Out/R01_QID.Rdata", compress = TRUE)
+saveRDS(QID, file = "./01_Out/R01_QID.Rds", compress = TRUE)
 
 ```
 
@@ -238,7 +238,7 @@ Label01[is.na(Label01$entityNamee),]
 
 #save
 #if(!dir.exists("01_Out")){dir.create("01_Out")}
-saveRDS(Label01, file = "./01_Out/R01_QID_rdfsLabel.Rdata", compress = TRUE)
+saveRDS(Label01, file = "./01_Out/R01_QID_rdfsLabel.Rds", compress = TRUE)
 
 ```
 
@@ -246,7 +246,7 @@ saveRDS(Label01, file = "./01_Out/R01_QID_rdfsLabel.Rdata", compress = TRUE)
 
 ```{r echo=TRUE, eval=FALSE}
 #Data load 
-Labs <- readRDS("./01_Out/R01_QID_rdfsLabel.Rdata")
+Labs <- readRDS("./01_Out/R01_QID_rdfsLabel.Rds")
 head(Labs)
 dim(Labs)
 

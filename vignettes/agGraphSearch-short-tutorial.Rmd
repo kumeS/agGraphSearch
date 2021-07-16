@@ -119,7 +119,7 @@ terms
 
 #create a new folder
 if(!dir.exists("01_Short_Out")){dir.create("01_Short_Out")}
-saveRDS(terms, file="./01_Short_Out/SearchTerm.Rdata")
+saveRDS(terms, file="./01_Short_Out/SearchTerm.Rds")
 ```
 
 ## SPARQL query (1) counting labels and class relations
@@ -220,7 +220,7 @@ QID <- as.character(unlist(Lab01_res))
 
 #create a new folder
 if(!dir.exists("02_Short_Out")){dir.create("02_Short_Out")}
-saveRDS(QID, file="./02_Short_Out/SearchEntities.Rdata")
+saveRDS(QID, file="./02_Short_Out/SearchEntities.Rds")
 ```
 
 ### Retry SPARQL by QID
@@ -419,7 +419,7 @@ checkLoop_af(res5)
 
 #Save
 saveRDS(res5,
-        file="./03_Short_Out/Individual_upGraph.Rdata",
+        file="./03_Short_Out/Individual_upGraph.Rds",
         compress = TRUE)
 ```
 
@@ -497,7 +497,7 @@ dim(res6); dim(res6d)
 
 #Save
 saveRDS(res6d,
-        file="./03_Short_Out/Merged_upGraph.Rdata",
+        file="./03_Short_Out/Merged_upGraph.Rds",
         compress = TRUE)
 
 #run the network creation
@@ -576,10 +576,10 @@ table(Count_upEntity_DF2$Freq)
 
 #save
 saveRDS(Count_upEntity_DF2,
-        file = "./03_Short_Out/Count_upEntity_DF2.Rdata", compress = TRUE)
+        file = "./03_Short_Out/Count_upEntity_DF2.Rds", compress = TRUE)
 readr::write_excel_csv(Count_upEntity_DF2,
                        file="./03_Short_Out/Count_upEntity_DF2.csv")
-#Count_upEntity_DF2 <- readRDS(file = "./03_Short_Out/Count_upEntity_DF2.Rdata")
+#Count_upEntity_DF2 <- readRDS(file = "./03_Short_Out/Count_upEntity_DF2.Rds")
 
 #Calculation of inclusion rate
 QID <- QIDdf$QID
@@ -615,18 +615,18 @@ pc_plot(Count_upEntity_DF2,
 
 ```{r echo=TRUE, eval=FALSE}
 #Individual graphes
-eachGraph <- readRDS("./03_Short_Out/Individual_upGraph.Rdata")
+eachGraph <- readRDS("./03_Short_Out/Individual_upGraph.Rds")
 head(eachGraph[[1]])
 sapply(eachGraph, dim)
 
 #Search entities
-list1a <- readRDS("./02_Short_Out/SearchEntities.Rdata")
+list1a <- readRDS("./02_Short_Out/SearchEntities.Rds")
 
 head(list1a)
 any(list1a == "wd:Q35120")
 
 #Common entities
-list2a <- readRDS("./03_Short_Out/Count_upEntity_DF2.Rdata")
+list2a <- readRDS("./03_Short_Out/Count_upEntity_DF2.Rds")
 
 head(list2a)
 dim(list2a)
