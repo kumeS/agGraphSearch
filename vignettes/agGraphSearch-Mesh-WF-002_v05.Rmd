@@ -54,7 +54,7 @@ library(agGraphSearch)
 
 }
 
-if(T){
+if(F){
 proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
 Sys.setenv("http_proxy" = proxy_url)
 Sys.setenv("https_proxy" = proxy_url)
@@ -630,6 +630,15 @@ agVisNetwork(Graph=Dat,
 
 ```{r echo=TRUE, eval=FALSE}
 rm(list=ls())
+
+if(F){
+proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
+Sys.setenv("http_proxy" = proxy_url)
+Sys.setenv("https_proxy" = proxy_url)
+Sys.setenv("ftp_proxy" = proxy_url)
+devtools::install_github( "kumeS/agGraphSearch" )
+library(agGraphSearch)
+}
 
 LabList00 <- readRDS("./01_Mesh_Out/LabList00.Rds")
 head(LabList00)
