@@ -60,6 +60,7 @@ Sys.setenv("http_proxy" = proxy_url)
 Sys.setenv("https_proxy" = proxy_url)
 Sys.setenv("ftp_proxy" = proxy_url)
 devtools::install_github( "kumeS/agGraphSearch" )
+library(agGraphSearch)
 }
 
 ```
@@ -610,26 +611,24 @@ x <- x + 1
 
 dim(Dat)
 head(Dat)
+rownames(Dat) <- 1:nrow(Dat)
+colnames(Dat) <- c("subject", "property", "parentClass", "OtherInfo", "subjectLabel", "parentClassLabel")
 
-Dat02 <- readRDS("./02_Mesh_Out/Dat02.Rds")
-head(Dat02)
-
-###
-FileName <- paste0("agVisNetwork_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
+#
+FileName <- paste0("agVisNetwork_polymers_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
 
 #All
-agVisNetwork(Graph=Dat02,
+agVisNetwork(Graph=Dat,
              Selected=NULL, 
              Browse=FALSE, 
              Output=TRUE,
-             FilePath=paste1("Mesh_All"))
+             FilePath=FileName)
 
 ```
 
 # Extract the upper classes
 
 ```{r echo=TRUE, eval=FALSE}
-
 rm(list=ls())
 
 LabList00 <- readRDS("./01_Mesh_Out/LabList00.Rds")
@@ -637,18 +636,18 @@ head(LabList00)
 length(LabList00)
 LabList00
 
-MeshOthers_df <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
+MeshOthers_df <- readRDS("./00_Mesh_Input/mesh2021_others_df_RR.Rds")
 head(MeshOthers_df)
 dim(MeshOthers_df)
 
-##"meshv:broaderConcept", "meshv:broaderDescriptor", and "meshv:broaderQualifier" 
+#"meshv:broaderDescriptor", and "meshv:reverseConcept"
 table(MeshOthers_df$Property)
-(names(table(MeshOthers_df$Property)) -> a)[grepl("broader", a)]
-(names(table(MeshOthers_df$Property)) -> a)[grepl("narrower", a)]
+(names(table(MeshOthers_df$Property)) -> a)[grepl("meshv:broaderDescriptor", a)]
+(names(table(MeshOthers_df$Property)) -> a)[grepl("meshv:reverseConcept", a)]
 
 #The upper graph
 #broader <- c("meshv:broaderConcept", "meshv:broaderDescriptor", "meshv:broaderQualifier")
-broader <- c("meshv:broaderDescriptor")
+broader <- c("meshv:broaderDescriptor", "meshv:reverseConcept")
 MeshOthers_broader <- MeshOthers_df[c(MeshOthers_df$Property %in% broader),]
 
 dim(MeshOthers_broader)
@@ -656,53 +655,21 @@ head(MeshOthers_broader)
 table(MeshOthers_broader$Property)
 unique(MeshOthers_broader$SubInfo)
 unique(MeshOthers_broader$ObjInfo)
-#(names(table(MeshOthers_broader$Subject)) -> a)[grepl("D", a)]
+
+MeshLabels00 <- readRDS("./00_Mesh_Input/MeshLabels_D00.Rds")
+MeshLabels01 <- MeshLabels00[,c(1,3)]
+head(MeshLabels01)
 
 #Perform All
 library( agGraphSearch )
 Dat <- extractUpperConcepts4Mesh(Lab_List=LabList00,
                                  Data=MeshOthers_broader,
+                                 Labels=MeshLabels01,
                                  broaderProperty=broader)
 
-head(Dat); dim(Dat)
-length(unique(Dat$Subject))
-length(unique(Dat$Property))
-unique(Dat$Property)
-length(unique(Dat$Object))
-Dat$triple <- paste0(Dat$Subject, ".", Dat$Object)
-rownames(Dat) <- 1:nrow(Dat)
 
-head(Dat)
-Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
-head(Dat)
-Dat <- Dat[,-ncol(Dat)]
 
-colnames(Dat) <- c("subject",
-                   "property",
-                   "parentClass",
-                   "OtherInfo")
-colnames(Dat)
 
-head(Dat)
-Dat <- Dat[order(Dat$subject, decreasing = T),]
-
-MeshLabels00 <- readRDS("./00_Mesh_Input/MeshLabels_D00.Rds")
-head(MeshLabels00)
-MeshLabels01 <- MeshLabels00[,c(1,3)]
-head(MeshLabels01)
-
-Dat00 <-  merge(Dat, MeshLabels01, by.x = "subject", by.y = "Subject", all = F, sort = F)
-head(Dat00)
-Dat01 <-  merge(Dat00, MeshLabels01, by.x = "parentClass", by.y = "Subject", all = F, sort = F)
-head(Dat01)
-colnames(Dat01)[c((ncol(Dat01)-1):ncol(Dat01))] <- c("subjectLabel",
-                                                     "parentClassLabel")
-head(Dat01)
-Dat02 <- Dat01[,c("subject", "property", 
-                  "parentClass", "OtherInfo",
-                  "subjectLabel", "parentClassLabel")]
-head(Dat02)
-#saveRDS(Dat02, "./02_Mesh_Out/Dat02.Rds")
 
 ```
 
