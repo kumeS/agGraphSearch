@@ -20,9 +20,6 @@ agVisNetwork <- function(Graph,
                          SmallSize=5,
                          StarSize=10,
                          FontSize=7,
-                         HeightSclale = "750px",
-                         WidthSclale = "110%",
-                         SEED=123,
                          Selected=NULL,
                          Browse=FALSE,
                          Output=FALSE,
@@ -32,12 +29,12 @@ agVisNetwork <- function(Graph,
 if(is.null(Graph)){return(message("Warning: Not proper value of Graph"))}
 if(!is.data.frame(Graph)){return(message("Warning: Not proper value of Graph"))}
 if(nrow(Graph) > 5000){return(message("Warning: should be less than 5000 rows"))}
+HeightSclale = "750px"; WidthSclale = "110%"; SEED=123
 
-colnames(Graph) <- tolower(colnames(Graph))
 set.seed(SEED)
 
-if(!any(colnames(Graph) == "propertylabel")){
-    if(any(colnames(Graph) == "parentclasslabel")){
+if(!any(colnames(Graph) == "propertyLabel")){
+    if(any(colnames(Graph) == "parentClassLabel")){
       Graph$subjectLabel <- paste0(Graph$subjectLabel, ".", Graph$subject)
       Graph$parentClassLabel <- paste0(Graph$parentClassLabel, ".", Graph$parentClass)
       LABEL <- unique(c(Graph$subjectLabel, Graph$parentClassLabel))
@@ -57,7 +54,7 @@ if(!any(colnames(Graph) == "propertylabel")){
       edges <- data.frame(from = Graph$childClassLabel, to = Graph$subjectLabel)
     }
   } else {
-    if(any(colnames(Graph) == "parentclasslabel")){
+    if(any(colnames(Graph) == "parentClassLabel")){
       Graph$subjectLabel <- paste0( Graph$subjectLabel, ".",Graph$subject)
       Graph$parentClassLabel <- paste0(Graph$parentClassLabel, ".", Graph$parentClass)
       LABEL <- unique(c(Graph$subjectLabel, Graph$parentClassLabel))
@@ -118,7 +115,7 @@ if(Count > 1){
      }}
   }
 
-  if(any(colnames(Graph) == "parentclasslabel")){
+  if(any(colnames(Graph) == "parentClassLabel")){
     if(Count > 1){
       for(n in seq_len(length(Count10))){
         if(Count10[n] > Count){
@@ -130,8 +127,8 @@ if(Count > 1){
     }else{}
   }
 
-  if(!any(colnames(Graph) == "propertylabel")){}else{
-    if(any(colnames(Graph) == "parentclasslabel")){}else{
+  if(!any(colnames(Graph) == "propertyLabel")){}else{
+    if(any(colnames(Graph) == "parentClassLabel")){}else{
       nodes %>% rbind(nodes2) -> nodes}}
   nodes <- nodes[as.numeric(as.character(rownames(unique(nodes['id'])))),]
   if(is.null(Selected)){

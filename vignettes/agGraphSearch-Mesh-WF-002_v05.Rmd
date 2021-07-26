@@ -632,22 +632,25 @@ agVisNetwork(Graph=Dat,
 rm(list=ls())
 
 if(F){
+.rs.restartR()
+
 proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
 Sys.setenv("http_proxy" = proxy_url)
 Sys.setenv("https_proxy" = proxy_url)
 Sys.setenv("ftp_proxy" = proxy_url)
-devtools::install_github( "kumeS/agGraphSearch" )
+
+#remove.packages("agGraphSearch")
+devtools::install_github( "kumeS/agGraphSearch", force = T)
 library(agGraphSearch)
 }
 
+#Read data
 LabList00 <- readRDS("./01_Mesh_Out/LabList00.Rds")
-head(LabList00)
-length(LabList00)
+head(LabList00); length(LabList00)
 LabList00
 
 MeshOthers_df <- readRDS("./00_Mesh_Input/mesh2021_others_df_RR.Rds")
-head(MeshOthers_df)
-dim(MeshOthers_df)
+head(MeshOthers_df); dim(MeshOthers_df)
 
 #"meshv:broaderDescriptor", and "meshv:reverseConcept"
 table(MeshOthers_df$Property)
@@ -659,8 +662,7 @@ table(MeshOthers_df$Property)
 broader <- c("meshv:broaderDescriptor", "meshv:reverseConcept")
 MeshOthers_broader <- MeshOthers_df[c(MeshOthers_df$Property %in% broader),]
 
-dim(MeshOthers_broader)
-head(MeshOthers_broader)
+head(MeshOthers_broader); dim(MeshOthers_broader)
 table(MeshOthers_broader$Property)
 unique(MeshOthers_broader$SubInfo)
 unique(MeshOthers_broader$ObjInfo)
@@ -676,9 +678,17 @@ Dat <- extractUpperConcepts4Mesh(Lab_List=LabList00,
                                  Labels=MeshLabels01,
                                  broaderProperty=broader)
 
+head(Dat)
+saveRDS(Dat, "./02_Mesh_Out/Dat.Rds")
 
-
-
+# Visualize the relation network
+FileName <- paste0("agVisNetwork_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
+#All
+agVisNetwork(Graph=Dat,
+             Selected=NULL, 
+             Browse=FALSE, 
+             Output=TRUE,
+             FilePath=paste1("Mesh_2021"))
 
 ```
 
