@@ -692,84 +692,34 @@ agVisNetwork(Graph=Dat,
 
 ```
 
-# Visualize the relation network
-
-```{r echo=TRUE, eval=FALSE}
-Dat02 <- readRDS("./02_Mesh_Out/Dat02.Rds")
-
-###
-FileName <- paste0("agVisNetwork_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
-
-#All
-agVisNetwork(Graph=Dat02,
-             Selected=NULL, 
-             Browse=FALSE, 
-             Output=TRUE,
-             FilePath=paste1("Mesh_All"))
-
-if(F){
-#2019
-agVisNetwork(Graph=Dat02[grepl("mesh2019[:]", Dat01$subject),],
-             Selected=NULL, 
-             Browse=FALSE, 
-             Output=TRUE,
-             FilePath=paste1("Mesh2019"))
-
-#2020
-agVisNetwork(Graph=Dat02[grepl("mesh2020[:]", Dat01$subject),],
-             Selected=NULL, 
-             Browse=FALSE, 
-             Output=TRUE,
-             FilePath=paste1("Mesh2020"))
-
-#2021
-agVisNetwork(Graph=Dat02[grepl("mesh[:]", Dat01$subject),],
-             Selected=NULL, 
-             Browse=FALSE, 
-             Output=TRUE,
-             FilePath=paste1("Mesh2021"))
-}
-
-#Check
-table(grepl("mesh2019[:]", Dat01$subject))
-table(grepl("mesh2020[:]", Dat01$subject))
-table(grepl("mesh[:]", Dat01$subject))
-
-head(Dat01)
-a19 <- unique(unlist(Dat01[grepl("mesh2019[:]", Dat01$subject), c((ncol(Dat01)-1):ncol(Dat01))], use.names = F))
-a20 <- unique(unlist(Dat01[grepl("mesh2020[:]", Dat01$subject), c((ncol(Dat01)-1):ncol(Dat01))], use.names = F))
-a21 <- unique(unlist(Dat01[grepl("mesh[:]", Dat01$subject), c((ncol(Dat01)-1):ncol(Dat01))], use.names = F))
-
-#Match
-a19[!c(a19 %in% a20)]
-a19[!c(a19 %in% a21)]
-
-```
-
-# グラフ可視化: Translate the node names to the Japanese names
+# Visualize the relation network: Translate the node names to the Japanese names
 
 ```{r echo=TRUE, eval=FALSE}
 #2021 + Jpn
-Dat <- readRDS("./02_Mesh_Out/Dat02.Rds")
-Dat03 <- Dat[grepl("mesh[:]", Dat$subject),]
-head(Dat03)
+Dat <- readRDS("./02_Mesh_Out/Dat.Rds")
+Dat01 <- Dat[grepl("mesh[:]", Dat$subject),]
+head(Dat01)
 
-words <- Dat03
-table(grepl("[,][ ]", words$subjectLabel))
-table(grepl("[,][ ]", words$parentClassLabel))
-words$subjectLabel[grepl("[,][ ]", words$subjectLabel)]
-words$parentClassLabel[grepl("[,][ ]", words$parentClassLabel)]
+words <- Dat01
+#table(grepl("[,][ ]", words$subjectLabel))
+#table(grepl("[,][ ]", words$parentClassLabel))
+#words$subjectLabel[grepl("[,][ ]", words$subjectLabel)]
+#words$parentClassLabel[grepl("[,][ ]", words$parentClassLabel)]
 
 for(n in 1:nrow(words)){
 #n <- 1
 #subjectLabel
+message(paste(n, "/", nrow(words)))
 if(grepl("[,][ ]", words$subjectLabel[n]) & !grepl("[,][ ]and", words$subjectLabel[n])){
- aa <- strsplit(words$subjectLabel[n], split = ", ")[[1]]
+aa <- strsplit(words$subjectLabel[n], split = ", ")[[1]]
  words$subjectLabel[n] <- paste(aa[length(aa):1], collapse = " ")
 }else{
  aa <-  words$subjectLabel[n]
  words$subjectLabel[n] <- aa
 }
+#Translate to Japanese 
+words$subjectLabel[n]  <- DeePL(words$subjectLabel[n], Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
+
 #parentClassLabel
 if(grepl("[,][ ]", words$parentClassLabel[n]) & !grepl("[,][ ]and", words$parentClassLabel[n])){
  aa <- strsplit(words$parentClassLabel[n], split = ", ")[[1]]
@@ -777,37 +727,32 @@ if(grepl("[,][ ]", words$parentClassLabel[n]) & !grepl("[,][ ]and", words$parent
 }else{
  aa <-  words$parentClassLabel[n]
  words$parentClassLabel[n] <- aa
-} 
+}
+#Translate to Japanese 
+words$parentClassLabel[n] <- DeePL(words$parentClassLabel[n], Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
 }
 
-Dat04 <- words
-head(Dat04)
-library(agGraphSearch)
+Dat02 <- words
+head(Dat02)
 
-for(n in 1:nrow(Dat04)){
-#n <- 1
-print(n)
-Dat04$subjectLabel[n] <- DeePL(Dat04$subjectLabel[n], Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
-Dat04$parentClassLabel[n] <- DeePL(Dat04$parentClassLabel[n], Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
-}
 
-head(Dat04)
+head(Dat02)
 
 if(!dir.exists("02_Mesh_Out")){dir.create("02_Mesh_Out")}
-saveRDS(Dat04, "./02_Mesh_Out/Dat04_UpperClass.Rds")
-readr::write_excel_csv(Dat04, file="./02_Mesh_Out/Dat04_UpperClass.csv", col_names = T, append=F)
+saveRDS(Dat02, "./02_Mesh_Out/Dat02_UpperClass.Rds")
+readr::write_excel_csv(Dat02, file="./02_Mesh_Out/Dat02_UpperClass.csv", col_names = T, append=F)
 
-Dat04 <- readRDS("./02_Mesh_Out/Dat04_UpperClass.Rds")
-head(Dat04)
+Dat02 <- readRDS("./02_Mesh_Out/Dat02_UpperClass.Rds")
+head(Dat02)
 
 #node
-length(unique(c(Dat04$subject, Dat04$parentClass)))
+length(unique(c(Dat02$subject, Dat02$parentClass)))
 
 #edge
-length(unique(paste0(Dat04$subject, ".", Dat04$parentClass)))
+length(unique(paste0(Dat02$subject, ".", Dat02$parentClass)))
 
 #2021
-agVisNetwork(Graph=Dat04,
+agVisNetwork(Graph=Dat02,
              Selected=NULL, 
              Browse=FALSE, 
              Output=TRUE,
