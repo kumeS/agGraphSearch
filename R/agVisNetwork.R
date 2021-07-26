@@ -33,10 +33,11 @@ if(is.null(Graph)){return(message("Warning: Not proper value of Graph"))}
 if(!is.data.frame(Graph)){return(message("Warning: Not proper value of Graph"))}
 if(nrow(Graph) > 5000){return(message("Warning: should be less than 5000 rows"))}
 
+colnames(Graph) <- tolower(colnames(Graph))
 set.seed(SEED)
 
-if(!any(colnames(Graph) == "propertyLabel")){
-    if(any(colnames(Graph) == "parentClassLabel")){
+if(!any(colnames(Graph) == "propertylabel")){
+    if(any(colnames(Graph) == "parentclasslabel")){
       Graph$subjectLabel <- paste0(Graph$subjectLabel, ".", Graph$subject)
       Graph$parentClassLabel <- paste0(Graph$parentClassLabel, ".", Graph$parentClass)
       LABEL <- unique(c(Graph$subjectLabel, Graph$parentClassLabel))
@@ -56,7 +57,7 @@ if(!any(colnames(Graph) == "propertyLabel")){
       edges <- data.frame(from = Graph$childClassLabel, to = Graph$subjectLabel)
     }
   } else {
-    if(any(colnames(Graph) == "parentClassLabel")){
+    if(any(colnames(Graph) == "parentclasslabel")){
       Graph$subjectLabel <- paste0( Graph$subjectLabel, ".",Graph$subject)
       Graph$parentClassLabel <- paste0(Graph$parentClassLabel, ".", Graph$parentClass)
       LABEL <- unique(c(Graph$subjectLabel, Graph$parentClassLabel))
@@ -117,7 +118,7 @@ if(Count > 1){
      }}
   }
 
-  if(any(colnames(Graph) == "parentClassLabel")){
+  if(any(colnames(Graph) == "parentclasslabel")){
     if(Count > 1){
       for(n in seq_len(length(Count10))){
         if(Count10[n] > Count){
@@ -129,8 +130,8 @@ if(Count > 1){
     }else{}
   }
 
-  if(!any(colnames(Graph) == "propertyLabel")){}else{
-    if(any(colnames(Graph) == "parentClassLabel")){}else{
+  if(!any(colnames(Graph) == "propertylabel")){}else{
+    if(any(colnames(Graph) == "parentclasslabel")){}else{
       nodes %>% rbind(nodes2) -> nodes}}
   nodes <- nodes[as.numeric(as.character(rownames(unique(nodes['id'])))),]
   if(is.null(Selected)){
