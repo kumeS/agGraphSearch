@@ -255,6 +255,7 @@ system(paste0(proxy, "; source ", scr, "; gdrive_download '", File_ID, "' ./00_M
 ```{r, echo=TRUE, eval=FALSE}
 MeshLabels <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
 head(MeshLabels)
+table(stringr::str_sub(MeshLabels$Subject, start=1, end=6))
 
 #check property
 table(MeshLabels$Property)
@@ -272,6 +273,7 @@ table(MeshOthers$Property)
 ```{r echo=TRUE, eval=FALSE}
 #head(MeshLabels[!grepl("^A[0-9][0-9]|^B[0-9][0-9]", MeshLabels$Object),])
 MeshLabels00 <- MeshLabels
+
 MeshLabels00 <- MeshLabels00[!grepl("^[A-Z][0-9][0-9]|^[[]OBSOLETE", MeshLabels00$Object),]
 
 #property
@@ -284,9 +286,11 @@ MeshLabels00 <- MeshLabels00[order(MeshLabels00$Property),]
 #check property
 table(MeshLabels00$Property)
 head(MeshLabels00)
+table(stringr::str_sub(MeshLabels00$Subject, start=1, end=6))
 
 #Extract D terms
 table(grepl("[:]D", MeshLabels00$Subject))
+table(grepl("[:]D|[:]M", MeshLabels00$Subject))
 head(MeshLabels00[grepl("[:]D", MeshLabels00$Subject),], n=20)
 MeshLabels_D00 <- MeshLabels00[grepl("[:]D", MeshLabels00$Subject),]
 #head(MeshLabels_D00, n=20)
@@ -566,14 +570,17 @@ if(!all(is.na(a2))){print(a2)}
 rm(list=ls())
 
 MeshLabel_2021df <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
+MeshLabel_2021df <- MeshLabel_2021df[MeshLabel_2021df$Property == "rdfs:label",]
 head(MeshLabel_2021df)
 dim(MeshLabel_2021df)
 table(MeshLabel_2021df$OtherInfo == "BLANK")
+table(MeshLabel_2021df$Property)
 
 MeshOthers_2021df <- readRDS("./00_Mesh_Input/mesh2021_others_df_RR.Rds")
 head(MeshOthers_2021df)
 dim(MeshOthers_2021df)
 table(MeshOthers_2021df$OtherInfo == "BLANK")
+table(MeshOthers_2021df$Property)
 
 ##############################################
 #Trial 01
@@ -614,11 +621,56 @@ head(Dat)
 rownames(Dat) <- 1:nrow(Dat)
 colnames(Dat) <- c("subject", "property", "parentClass", "OtherInfo", "subjectLabel", "parentClassLabel")
 
-#
 FileName <- paste0("agVisNetwork_polymers_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
 
 #All
 agVisNetwork(Graph=Dat,
+             Selected=NULL, 
+             Browse=FALSE, 
+             Output=TRUE,
+             FilePath=FileName)
+
+########################################################################
+#Jpn
+########################################################################
+MeshLabels00 <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
+MeshLabels00 <- MeshLabels00[MeshLabels00$Property == "rdfs:label",]
+
+head(MeshLabels00)
+MeshLabels01 <- MeshLabels00[,c(1,3)]
+head(MeshLabels01)
+tail(MeshLabels01)
+dim(MeshLabels01)
+
+head(Dat)
+DatJpn <- Dat
+
+dim(DatJpn)
+DatJpn$triple <- paste0(DatJpn$subject, ".", DatJpn$property, ".", DatJpn$parentClass)
+rownames(DatJpn) <- 1:nrow(DatJpn)
+DatJpn <- DatJpn[as.numeric(rownames(unique(DatJpn["triple"]))),]
+DatJpn <- DatJpn[,-ncol(DatJpn)]
+DatJpn <- DatJpn[,1:4]
+dim(DatJpn)
+table(DatJpn$property)
+
+if(ncol(DatJpn) == 4){colnames(DatJpn) <- c("subject", "property", "parentClass", "OtherInfo")}
+DatJpn <- DatJpn[order(DatJpn$subject, decreasing = T),]
+if(all(colnames(MeshLabels01) == c("Subject", "Object"))){
+DatJpn00 <-  merge(DatJpn, MeshLabels01, by.x = "subject", by.y = "Subject", all = F, sort = F)
+DatJpn01 <-  merge(DatJpn00, MeshLabels01, by.x = "parentClass", by.y = "Subject", all = F, sort = F)
+colnames(DatJpn01)[c((ncol(DatJpn01)-1):ncol(DatJpn01))] <- c("subjectLabel", "parentClassLabel")
+DatJpn02 <- DatJpn01[,c("subject", "property",
+                  "parentClass", "OtherInfo",
+                  "subjectLabel", "parentClassLabel")]
+}
+
+head(DatJpn02); dim(DatJpn02)
+DatJpn02 <- Label2Jpn(Data=DatJpn02, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
+FileName <- paste0("agVisNetwork_polymers_Jpn_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
+
+#All
+agVisNetwork(Graph=DatJpn02,
              Selected=NULL, 
              Browse=FALSE, 
              Output=TRUE,
@@ -706,44 +758,14 @@ words <- Dat01
 #words$subjectLabel[grepl("[,][ ]", words$subjectLabel)]
 #words$parentClassLabel[grepl("[,][ ]", words$parentClassLabel)]
 
-for(n in 1:nrow(words)){
-#n <- 1
-#subjectLabel
-message(paste(n, "/", nrow(words)))
-if(grepl("[,][ ]", words$subjectLabel[n]) & !grepl("[,][ ]and", words$subjectLabel[n])){
-aa <- strsplit(words$subjectLabel[n], split = ", ")[[1]]
- words$subjectLabel[n] <- paste(aa[length(aa):1], collapse = " ")
-}else{
- aa <-  words$subjectLabel[n]
- words$subjectLabel[n] <- aa
-}
-#Translate to Japanese 
-words$subjectLabel[n]  <- DeePL(words$subjectLabel[n], Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
-
-#parentClassLabel
-if(grepl("[,][ ]", words$parentClassLabel[n]) & !grepl("[,][ ]and", words$parentClassLabel[n])){
- aa <- strsplit(words$parentClassLabel[n], split = ", ")[[1]]
- words$parentClassLabel[n] <- paste(aa[length(aa):1], collapse = " ")
-}else{
- aa <-  words$parentClassLabel[n]
- words$parentClassLabel[n] <- aa
-}
-#Translate to Japanese 
-words$parentClassLabel[n] <- DeePL(words$parentClassLabel[n], Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
-}
+words <- Label2Jpn(words, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
 
 Dat02 <- words
-head(Dat02)
-
-
 head(Dat02)
 
 if(!dir.exists("02_Mesh_Out")){dir.create("02_Mesh_Out")}
 saveRDS(Dat02, "./02_Mesh_Out/Dat02_UpperClass.Rds")
 readr::write_excel_csv(Dat02, file="./02_Mesh_Out/Dat02_UpperClass.csv", col_names = T, append=F)
-
-Dat02 <- readRDS("./02_Mesh_Out/Dat02_UpperClass.Rds")
-head(Dat02)
 
 #node
 length(unique(c(Dat02$subject, Dat02$parentClass)))
