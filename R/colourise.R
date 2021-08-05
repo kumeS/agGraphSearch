@@ -11,6 +11,7 @@
 #' @param fg foreground colour, defaults to white
 #' @param bg background colour, defaults to transparent
 #' @export colourise
+#' @export rcmd_running
 #' print(colourise("Red", "red"))
 #' cat(colourise("Red", "red"), "\n")
 #' cat(colourise("White on red", "white", "red"), "\n")

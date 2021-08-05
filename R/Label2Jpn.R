@@ -12,8 +12,8 @@ Label2Jpn <- function(Data, Auth_Key="Your Authentication Key"){
 #head(words)
 words <- Data
 
-if(!any(colnames(words) == "subjectLabel")){return(NULL)}
-if(!any(colnames(words) == "parentClassLabel")){return(NULL)}
+if(!any(colnames(words) == "subjectLabel")){return(message("Warning: Not proper value of subjectLabel"))}
+if(!any(colnames(words) == "parentClassLabel")){return("Warning: Not proper value of parentClassLabel")}
 wordsList <- unique(c(words$subjectLabel, words$parentClassLabel))
 k <- length(wordsList)
 Mat <- words[,c("subjectLabel","parentClassLabel")]

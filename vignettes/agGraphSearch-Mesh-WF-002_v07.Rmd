@@ -94,12 +94,12 @@ saveRDS(MeshLabel_2021df, "./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
 }
 #table(grepl("mesh[:]", MeshLabel_2021df$Object))
 
-#mesh2021_others_df.Rds
 if(F){
 rm(list=ls())
+
+#mesh2021_others_df_R.Rds
 MeshOthers_2021df <- readRDS("./00_Mesh_Input/mesh2021_others_df.Rds")
-head(MeshOthers_2021df)
-dim(MeshOthers_2021df)
+head(MeshOthers_2021df); dim(MeshOthers_2021df)
 #table(grepl("mesh[:]", MeshOthers_2021df$Subject))
 MeshOthers_2021df$SubInfo <- "BLANK"
 MeshOthers_2021df$ObjInfo <- "BLANK"
@@ -173,21 +173,56 @@ saveRDS(MeshOthers_2021df, "./00_Mesh_Input/mesh2021_others_df_R.Rds")
 
 #Use the below propertys for researching the class hierarchy.
 #- meshv:broaderDescriptor
+# meshv:broaderConcept
 #- meshv:concept => meshv:reverseConcept
+# meshv:narrowerConcept => meshv:reverseNarrowerConcept
+# meshv:preferredConcept
 
+##mesh2021_others_df_RR.Rds
+rm( list=ls() )
+MeshOthers_2021df <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
+head(MeshOthers_2021df); dim(MeshOthers_2021df)
 table(MeshOthers_2021df$Property)
-MeshOthers_2021df.broaderDescriptor <- MeshOthers_2021df[MeshOthers_2021df$Property == "meshv:broaderDescriptor",]
-MeshOthers_2021df.concept <- MeshOthers_2021df[MeshOthers_2021df$Property == "meshv:concept",]
-head(MeshOthers_2021df.concept)
-MeshOthers_2021df.conceptR <- MeshOthers_2021df.concept
 
+#001
+List <- c("meshv:broaderDescriptor", "meshv:broaderConcept", "meshv:preferredConcept")
+MeshOthers_2021df.broaderDescriptor <- MeshOthers_2021df[MeshOthers_2021df$Property %in% List,]
+
+#002: meshv:concept
+MeshOthers_2021df.concept <- MeshOthers_2021df[MeshOthers_2021df$Property == "meshv:concept",]
+MeshOthers_2021df.conceptR <- MeshOthers_2021df.concept
 MeshOthers_2021df.concept$Subject <- MeshOthers_2021df.conceptR$Object
 MeshOthers_2021df.concept$Property <- "meshv:reverseConcept"
 MeshOthers_2021df.concept$Object <- MeshOthers_2021df.conceptR$Subject
 MeshOthers_2021df.concept$SubInfo <- MeshOthers_2021df.conceptR$ObjInfo
 MeshOthers_2021df.concept$ObjInfo <- MeshOthers_2021df.conceptR$SubInfo
 
-MeshOthers_2021dfR <- rbind(MeshOthers_2021df.broaderDescriptor, MeshOthers_2021df.concept)
+#003: meshv:narrowerConcept
+MeshOthers_2021df.nC <- MeshOthers_2021df[MeshOthers_2021df$Property == "meshv:narrowerConcept",]
+MeshOthers_2021df.nCR <- MeshOthers_2021df.nC
+MeshOthers_2021df.nC$Subject <- MeshOthers_2021df.nCR$Object
+MeshOthers_2021df.nC$Property <- "meshv:reverseNarrowerConcept"
+MeshOthers_2021df.nC$Object <- MeshOthers_2021df.nCR$Subject
+MeshOthers_2021df.nC$SubInfo <- MeshOthers_2021df.nCR$ObjInfo
+MeshOthers_2021df.nC$ObjInfo <- MeshOthers_2021df.nCR$SubInfo
+
+#004: meshv:preferredConcept
+MeshOthers_2021df.pC <- MeshOthers_2021df[MeshOthers_2021df$Property == "meshv:preferredConcept",]
+MeshOthers_2021df.pCR <- MeshOthers_2021df.pC
+MeshOthers_2021df.pC$Subject <- MeshOthers_2021df.pCR$Object
+MeshOthers_2021df.pC$Property <- "meshv:preferredConceptR"
+MeshOthers_2021df.pC$Object <- MeshOthers_2021df.pCR$Subject
+MeshOthers_2021df.pC$SubInfo <- MeshOthers_2021df.pCR$ObjInfo
+MeshOthers_2021df.pC$ObjInfo <- MeshOthers_2021df.pCR$SubInfo
+
+library(magrittr)
+MeshOthers_2021dfR <- MeshOthers_2021df.broaderDescriptor %>% 
+  rbind(MeshOthers_2021df.concept) %>% 
+  rbind(MeshOthers_2021df.nC) %>% 
+  rbind(MeshOthers_2021df.pC)
+
+dim(MeshOthers_2021dfR)
+table(MeshOthers_2021dfR$Property)
 saveRDS(MeshOthers_2021dfR, "./00_Mesh_Input/mesh2021_others_df_RR.Rds")
 
 }
@@ -273,9 +308,9 @@ table(MeshOthers$Property)
 # remove other data
 
 ```{r echo=TRUE, eval=FALSE}
+if(F){
 #head(MeshLabels[!grepl("^A[0-9][0-9]|^B[0-9][0-9]", MeshLabels$Object),])
 MeshLabels00 <- MeshLabels
-
 MeshLabels00 <- MeshLabels00[!grepl("^[A-Z][0-9][0-9]|^[[]OBSOLETE", MeshLabels00$Object),]
 
 #property
@@ -303,6 +338,7 @@ readr::write_csv(MeshLabels00, file="./00_Mesh_Input/MeshLabels00.csv", col_name
 saveRDS(MeshLabels00, "./00_Mesh_Input/MeshLabels00.Rds")
 readr::write_csv(MeshLabels_D00, file="./00_Mesh_Input/MeshLabels_D00.csv", col_names = F, append=F)
 saveRDS(MeshLabels_D00, "./00_Mesh_Input/MeshLabels_D00.Rds")
+}
 }
 ```
 
@@ -571,17 +607,19 @@ if(!all(is.na(a2))){print(a2)}
 #修正版の読み込み
 rm(list=ls())
 
+#mesh2021_Label_en_df_R.Rds
 MeshLabel_2021df <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
 MeshLabel_2021df <- MeshLabel_2021df[MeshLabel_2021df$Property == "rdfs:label",]
-head(MeshLabel_2021df)
-dim(MeshLabel_2021df)
+
+head(MeshLabel_2021df); dim(MeshLabel_2021df)
 table(MeshLabel_2021df$OtherInfo == "BLANK")
 table(MeshLabel_2021df$Property)
 table(MeshLabel_2021df$SubInfo)
 
-MeshOthers_2021df <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
-head(MeshOthers_2021df)
-dim(MeshOthers_2021df)
+#mesh2021_others_df_RR.Rds
+MeshOthers_2021df <- readRDS("./00_Mesh_Input/mesh2021_others_df_RR.Rds")
+
+head(MeshOthers_2021df); dim(MeshOthers_2021df)
 table(MeshOthers_2021df$OtherInfo == "BLANK")
 table(MeshOthers_2021df$Property)
 table(MeshOthers_2021df$SubInfo)
@@ -594,10 +632,9 @@ txt <- "Polymers"
 a1 <- MeshLabel_2021df[MeshLabel_2021df$Object == txt,]
 
 a1
-#              Subject        Property   Object OtherInfo
-#1242522  mesh:D011108      rdfs:label Polymers       @en
-#1906322 mesh:M0017208      rdfs:label Polymers       @en
-#2995287  mesh:T032687 meshv:prefLabel Polymers       @en
+#              Subject   Property   Object OtherInfo    SubInfo
+#1242522  mesh:D011108 rdfs:label Polymers       @en IDs:mesh:D
+#1906322 mesh:M0017208 rdfs:label Polymers       @en IDs:mesh:M
 a2 <- a1$Subject
 a2
 
@@ -609,6 +646,7 @@ if(dim(b1)[1] == 0){break}
 Dat <- rbind(Dat, b1)
 Query <- b1$Object
 x <- x + 1
+if(x == 100){break}
 }
 
 x <- 1; Query <- a2
@@ -619,6 +657,7 @@ if(dim(b2)[1] == 0){break}
 Dat <- rbind(Dat, b2)
 Query <- b2$Subject
 x <- x + 1
+if(x == 100){break}
 }
 
 head(Dat); dim(Dat)
@@ -630,58 +669,54 @@ Dat <- Dat[,-ncol(Dat)]
 head(Dat); dim(Dat)
 length(unique(c(Dat$subject, Dat$parentClass)))
 
-FileName <- paste0("agVisNetwork_polymers_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
+#Add labels
+Dat00 <- MergeMeshData(Data=Dat, Labels=MeshLabel_2021df)
+FileName <- paste0("agVisNetwork_polymersRR_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
+
+head(Dat00); dim(Dat00)
+table(Dat00$property)
+Dat00 <- Dat00[Dat00$property != "meshv:preferredConcept",]
+Dat00 <- Dat00[Dat00$property != "meshv:preferredConceptR",]
+head(Dat00); dim(Dat00)
+table(Dat00$property)
 
 #All
-agVisNetwork(Graph=Dat,
+agVisNetwork(Graph=Dat00,
              Selected=NULL, 
-             Browse=FALSE, 
+             Browse=TRUE, 
              Output=TRUE,
              FilePath=FileName)
 
 ########################################################################
 #Jpn
 ########################################################################
-MeshLabels00 <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
-MeshLabels00 <- MeshLabels00[MeshLabels00$Property == "rdfs:label",]
-
-head(MeshLabels00)
-MeshLabels01 <- MeshLabels00[,c(1,3)]
-head(MeshLabels01)
-tail(MeshLabels01)
-dim(MeshLabels01)
-
 head(Dat)
-DatJpn <- Dat
+DatJpn <- Dat00
 
 dim(DatJpn)
 DatJpn$triple <- paste0(DatJpn$subject, ".", DatJpn$property, ".", DatJpn$parentClass)
 rownames(DatJpn) <- 1:nrow(DatJpn)
 DatJpn <- DatJpn[as.numeric(rownames(unique(DatJpn["triple"]))),]
 DatJpn <- DatJpn[,-ncol(DatJpn)]
-DatJpn <- DatJpn[,1:4]
-dim(DatJpn)
+
+head(DatJpn); dim(DatJpn)
 table(DatJpn$property)
+length(unique(c(DatJpn$subject, DatJpn$parentClass)))
+length(unique(c(DatJpn$subjectLabel, DatJpn$parentClassLabel)))
 
-if(ncol(DatJpn) == 4){colnames(DatJpn) <- c("subject", "property", "parentClass", "OtherInfo")}
-DatJpn <- DatJpn[order(DatJpn$subject, decreasing = T),]
-if(all(colnames(MeshLabels01) == c("Subject", "Object"))){
-DatJpn00 <-  merge(DatJpn, MeshLabels01, by.x = "subject", by.y = "Subject", all = F, sort = F)
-DatJpn01 <-  merge(DatJpn00, MeshLabels01, by.x = "parentClass", by.y = "Subject", all = F, sort = F)
-colnames(DatJpn01)[c((ncol(DatJpn01)-1):ncol(DatJpn01))] <- c("subjectLabel", "parentClassLabel")
-DatJpn02 <- DatJpn01[,c("subject", "property",
-                  "parentClass", "OtherInfo",
-                  "subjectLabel", "parentClassLabel")]
-}
-
-head(DatJpn02); dim(DatJpn02)
-DatJpn02 <- Label2Jpn(Data=DatJpn02, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
+DatJpn02 <- Label2Jpn(Data=DatJpn, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
+saveRDS(DatJpn02, "./02_Mesh_Out/DatJpn02.Rds")
 FileName <- paste0("agVisNetwork_polymers_Jpn_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
 
+DatJpn03 <- DatJpn02
+DatJpn03 <- DatJpn03[DatJpn03$property != "meshv:preferredConcept",]
+#DatJpn03 <- DatJpn03[DatJpn03$property != "meshv:preferredConceptR",]
+head(DatJpn03); dim(DatJpn03)
+
 #All
-agVisNetwork(Graph=DatJpn02,
+agVisNetwork(Graph=DatJpn03,
              Selected=NULL, 
-             Browse=FALSE, 
+             Browse=TRUE, 
              Output=TRUE,
              FilePath=FileName)
 
