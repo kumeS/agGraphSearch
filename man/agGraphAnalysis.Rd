@@ -8,27 +8,20 @@ agGraphAnalysis(
   graphList,
   list1,
   list2,
+  PlusLabel = TRUE,
   ParticularEntity_only = TRUE,
   list2.WD = "wd:Q35120",
   UpdateList = FALSE,
   breakRepeat = 20,
   View = TRUE,
   RemoveGraph = FALSE,
-  PlusLabel = TRUE,
-  FileName = paste0("Results_", format(Sys.time(), "\%y\%m\%d_\%H\%M")),
+  FileName = TRUE,
   OutputResults = TRUE,
   ResultsEach = FALSE,
   LowerSearch = FALSE,
-  GraphView01 = FALSE,
-  GraphView02 = FALSE,
-  GraphView03 = TRUE,
-  GraphView04 = TRUE,
+  GraphView = c(FALSE, FALSE, TRUE, TRUE),
   LvView = TRUE,
-  WindowSize01 = 10,
-  WindowSize02 = 10,
-  WindowSize03 = 10,
-  WindowSize04 = 7.5,
-  WindowSize05 = 7.5
+  WindowSize = c(10, 10, 10, 7.5, 7.5)
 )
 }
 \arguments{
@@ -37,16 +30,47 @@ agGraphAnalysis(
 \item{list2}{a character vector of common upper-level entities}
 
 \item{PlusLabel}{logical; add the labels or not when createing the network.}
+
+\item{ParticularEntity_only}{logical}
+
+\item{list2.WD}{a character vector}
+
+\item{UpdateList}{logical}
+
+\item{breakRepeat}{a numeric}
+
+\item{View}{logical}
+
+\item{RemoveGraph}{logical}
+
+\item{FileName}{a string}
+
+\item{OutputResults}{logical}
+
+\item{ResultsEach}{logical}
+
+\item{LowerSearch}{logical}
+
+\item{GraphView}{logical}
+
+\item{LvView}{logical}
+
+\item{WindowSize}{a numeric}
 }
 \value{
 data.frame
 }
 \description{
 this function is a general function for
+determining the exploration Segment
 }
 \examples{
 \dontrun{
 
+library(magrittr)
+agGraphAnalysis(graphList=eachGraph,
+                list1=list1a,
+                list2=list2b)
 
 }
 }

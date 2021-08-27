@@ -47,8 +47,7 @@ remove.packages("agGraphSearch", lib=.libPaths())
 
 #install.packages(c("SPARQL", "franc", "formattable"))
 
-if(F){
-
+if(TRUE){
 system("R CMD INSTALL agGraphSearch")
 Sys.sleep(1)
 library(agGraphSearch)
@@ -64,22 +63,15 @@ devtools::install_github( "kumeS/agGraphSearch" )
 library(agGraphSearch)
 }
 
-if(F){
-devtools::install_github( "kumeS/agGraphSearch" )
-library(agGraphSearch)
-}
-
 ```
 
-# Parse Mesh RDF to data.frame
+#パースのやり直し
 
 ```{r echo=TRUE, eval=FALSE}
-
 rm(list=ls())
 
 if(F){
 MeshLabel_2021df <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df.Rds")
-
 head(MeshLabel_2021df)
 dim(MeshLabel_2021df)
 length(unique(MeshLabel_2021df$Subject))
@@ -98,25 +90,16 @@ cc <- !grepl("^mesh:[A-Z][0-9][0-9][0-9]", MeshLabel_2021df$Subject)
 table(MeshLabel_2021df$SubInfo[cc])
 MeshLabel_2021df$SubInfo[cc] <- paste0("Tree:", stringr::str_sub(MeshLabel_2021df$Subject[cc], start=1, end=6))
 table(MeshLabel_2021df$SubInfo)
-
 saveRDS(MeshLabel_2021df, "./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
-
-head(MeshLabel_2021df)
-MeshLabel_2021dfR <- MeshLabel_2021df[MeshLabel_2021df$Property == "rdfs:label",]
-table(MeshLabel_2021dfR$SubInfo)
-saveRDS(MeshLabel_2021dfR, "./00_Mesh_Input/mesh2021_Label_en_df_RR.Rds")
+}
 #table(grepl("mesh[:]", MeshLabel_2021df$Object))
 
-}
-
-#mesh2021_others_df.Rds
 if(F){
 rm(list=ls())
 
 #mesh2021_others_df_R.Rds
 MeshOthers_2021df <- readRDS("./00_Mesh_Input/mesh2021_others_df.Rds")
 head(MeshOthers_2021df); dim(MeshOthers_2021df)
-
 #table(grepl("mesh[:]", MeshOthers_2021df$Subject))
 MeshOthers_2021df$SubInfo <- "BLANK"
 MeshOthers_2021df$ObjInfo <- "BLANK"
@@ -145,7 +128,6 @@ head(MeshOthers_2021df[cc,])
 cc1 <- grepl("rdf:type", MeshOthers_2021df$Property)
 cc2 <- grepl("tree|Tree", MeshOthers_2021df$Object)
 cc3 <- apply(data.frame(cc1, cc2), 1, all)
-
 head(cc3)
 head(MeshOthers_2021df[cc3,])
 table(MeshOthers_2021df$OtherInfo[cc3])
@@ -182,110 +164,53 @@ table(is.na(MeshOthers_2021df$OtherInfo))
 MeshOthers_2021df[is.na(MeshOthers_2021df$OtherInfo),]
 MeshOthers_2021df[is.na(MeshOthers_2021df$OtherInfo),"OtherInfo"] <- "BLANK"
 
-table(MeshOthers_2021df$SubInfo)
-table(MeshOthers_2021df$ObjInfo)
+MeshOthers_2021df$ObjInfo[MeshOthers_2021df$ObjInfo == "BLANK"] <- MeshOthers_2021df$OtherInfo[MeshOthers_2021df$ObjInfo == "BLANK"]
 
 table(MeshOthers_2021df$SubInfo == "BLANK")
 table(MeshOthers_2021df$ObjInfo == "BLANK")
-#BLANK 6722756
 
 saveRDS(MeshOthers_2021df, "./00_Mesh_Input/mesh2021_others_df_R.Rds")
 
-}
-
 #Use the below propertys for researching the class hierarchy.
-# meshv:broaderDescriptor
+#- meshv:broaderDescriptor
 # meshv:broaderConcept
-# meshv:concept => reverseConcept
-# meshv:narrowerConcept => reverseNarrowerConcept
+#- meshv:concept => meshv:reverseConcept
+# meshv:narrowerConcept => meshv:reverseNarrowerConcept
 # meshv:preferredConcept
-# meshv:preferredConcept => reversePreferredConcept
 
-if(F){
 ##mesh2021_others_df_RR.Rds
-rm(list=ls())
+rm( list=ls() )
 MeshOthers_2021df <- readRDS("./00_Mesh_Input/mesh2021_others_df_R.Rds")
-
 head(MeshOthers_2021df); dim(MeshOthers_2021df)
 table(MeshOthers_2021df$Property)
 
 #001
 List <- c("meshv:broaderDescriptor", "meshv:broaderConcept", "meshv:preferredConcept")
 MeshOthers_2021df.broaderDescriptor <- MeshOthers_2021df[MeshOthers_2021df$Property %in% List,]
-head(MeshOthers_2021df.broaderDescriptor)
-table(MeshOthers_2021df.broaderDescriptor$Property)
-table(MeshOthers_2021df.broaderDescriptor$SubInfo, MeshOthers_2021df.broaderDescriptor$Property)
-table(MeshOthers_2021df.broaderDescriptor$Property, MeshOthers_2021df.broaderDescriptor$ObjInfo )
-
-MeshOthers_2021df.broaderDescriptorR <- MeshOthers_2021df.broaderDescriptor[MeshOthers_2021df.broaderDescriptor$Property == "meshv:broaderConcept",]
-table(MeshOthers_2021df.broaderDescriptorR$SubInfo, MeshOthers_2021df.broaderDescriptorR$Property)
-table(MeshOthers_2021df.broaderDescriptorR$Property, MeshOthers_2021df.broaderDescriptorR$ObjInfo )
-head(MeshOthers_2021df.broaderDescriptorR)
-dim(MeshOthers_2021df.broaderDescriptorR)
-a <- MeshOthers_2021df.broaderDescriptorR[MeshOthers_2021df.broaderDescriptorR$Subject %in% MeshOthers_2021df.broaderDescriptorR$Object,]
-dim(a)
-
-MeshOthers_2021df.broaderDescriptorRR <- MeshOthers_2021df.broaderDescriptor[MeshOthers_2021df.broaderDescriptor$Property == "meshv:broaderDescriptor",]
-table(MeshOthers_2021df.broaderDescriptorRR$SubInfo, MeshOthers_2021df.broaderDescriptorRR$Property)
-table(MeshOthers_2021df.broaderDescriptorRR$Property, MeshOthers_2021df.broaderDescriptorRR$ObjInfo )
-head(MeshOthers_2021df.broaderDescriptorRR)
-dim(MeshOthers_2021df.broaderDescriptorRR)
-a <- MeshOthers_2021df.broaderDescriptorRR[MeshOthers_2021df.broaderDescriptorRR$Subject %in% MeshOthers_2021df.broaderDescriptorRR$Object,]
-dim(a)
-b <- MeshOthers_2021df.broaderDescriptorRR[MeshOthers_2021df.broaderDescriptorRR$Subject %in% a$Object,]
-dim(b)
 
 #002: meshv:concept
 MeshOthers_2021df.concept <- MeshOthers_2021df[MeshOthers_2021df$Property == "meshv:concept",]
-table(MeshOthers_2021df.concept$SubInfo, MeshOthers_2021df.concept$Property)
-table(MeshOthers_2021df.concept$Property, MeshOthers_2021df.concept$ObjInfo )
-
 MeshOthers_2021df.conceptR <- MeshOthers_2021df.concept
 MeshOthers_2021df.concept$Subject <- MeshOthers_2021df.conceptR$Object
-MeshOthers_2021df.concept$Property <- "reverseConcept"
+MeshOthers_2021df.concept$Property <- "meshv:reverseConcept"
 MeshOthers_2021df.concept$Object <- MeshOthers_2021df.conceptR$Subject
 MeshOthers_2021df.concept$SubInfo <- MeshOthers_2021df.conceptR$ObjInfo
 MeshOthers_2021df.concept$ObjInfo <- MeshOthers_2021df.conceptR$SubInfo
-table(MeshOthers_2021df.concept$SubInfo, MeshOthers_2021df.concept$Property)
-table(MeshOthers_2021df.concept$Property, MeshOthers_2021df.concept$ObjInfo )
-
-MeshOthers_2021df.nCC <- MeshOthers_2021df[MeshOthers_2021df$Property == "meshv:narrowerConcept" | MeshOthers_2021df$Property == "meshv:broaderConcept",]
-table(MeshOthers_2021df.nCC$SubInfo, MeshOthers_2021df.nCC$Property)
-table(MeshOthers_2021df.nCC$Property, MeshOthers_2021df.nCC$ObjInfo )
-#head(MeshOthers_2021df.nCC, n=20)
-#head(MeshOthers_2021df.nCC[MeshOthers_2021df.nCC$Subject == "mesh:M0000037",])
-dim(MeshOthers_2021df.nCC)
-a <- MeshOthers_2021df.nCC[MeshOthers_2021df.nCC$Subject %in% MeshOthers_2021df.nCC$Object,]
-dim(a)
-b <- MeshOthers_2021df.nCC[MeshOthers_2021df.nCC$Subject %in% a$Object,]
-dim(b)
 
 #003: meshv:narrowerConcept
 MeshOthers_2021df.nC <- MeshOthers_2021df[MeshOthers_2021df$Property == "meshv:narrowerConcept",]
-table(MeshOthers_2021df.nC$SubInfo, MeshOthers_2021df.nC$Property)
-table(MeshOthers_2021df.nC$Property, MeshOthers_2021df.nC$ObjInfo )
-head(MeshOthers_2021df.nC)
-dim(MeshOthers_2021df.nC)
-a <- MeshOthers_2021df.nC[MeshOthers_2021df.nC$Subject %in% MeshOthers_2021df.nC$Object,]
-dim(a)
-b <- MeshOthers_2021df.nC[MeshOthers_2021df.nC$Subject %in% a$Object,]
-dim(b)
-
 MeshOthers_2021df.nCR <- MeshOthers_2021df.nC
 MeshOthers_2021df.nC$Subject <- MeshOthers_2021df.nCR$Object
-MeshOthers_2021df.nC$Property <- "reverseNarrowerConcept"
+MeshOthers_2021df.nC$Property <- "meshv:reverseNarrowerConcept"
 MeshOthers_2021df.nC$Object <- MeshOthers_2021df.nCR$Subject
 MeshOthers_2021df.nC$SubInfo <- MeshOthers_2021df.nCR$ObjInfo
 MeshOthers_2021df.nC$ObjInfo <- MeshOthers_2021df.nCR$SubInfo
 
 #004: meshv:preferredConcept
 MeshOthers_2021df.pC <- MeshOthers_2021df[MeshOthers_2021df$Property == "meshv:preferredConcept",]
-table(MeshOthers_2021df.pC$SubInfo, MeshOthers_2021df.pC$Property)
-table(MeshOthers_2021df.pC$Property, MeshOthers_2021df.pC$ObjInfo )
-
 MeshOthers_2021df.pCR <- MeshOthers_2021df.pC
 MeshOthers_2021df.pC$Subject <- MeshOthers_2021df.pCR$Object
-MeshOthers_2021df.pC$Property <- "reversePreferredConcept"
+MeshOthers_2021df.pC$Property <- "meshv:preferredConceptR"
 MeshOthers_2021df.pC$Object <- MeshOthers_2021df.pCR$Subject
 MeshOthers_2021df.pC$SubInfo <- MeshOthers_2021df.pCR$ObjInfo
 MeshOthers_2021df.pC$ObjInfo <- MeshOthers_2021df.pCR$SubInfo
@@ -296,16 +221,7 @@ MeshOthers_2021dfR <- MeshOthers_2021df.broaderDescriptor %>%
   rbind(MeshOthers_2021df.nC) %>% 
   rbind(MeshOthers_2021df.pC)
 
-table(MeshOthers_2021dfR$SubInfo, MeshOthers_2021dfR$Property)
-table(MeshOthers_2021dfR$Property, MeshOthers_2021dfR$ObjInfo)
-MeshOthers_2021dfR <- MeshOthers_2021dfR[MeshOthers_2021dfR$SubInfo != "IDs:mesh:Q",]
-MeshOthers_2021dfR <- MeshOthers_2021dfR[MeshOthers_2021dfR$SubInfo != "IDs:mesh:C",]
-MeshOthers_2021dfR <- MeshOthers_2021dfR[MeshOthers_2021dfR$ObjInfo != "IDs:mesh:Q",]
-MeshOthers_2021dfR <- MeshOthers_2021dfR[MeshOthers_2021dfR$ObjInfo != "IDs:mesh:C",]
 dim(MeshOthers_2021dfR)
-table(MeshOthers_2021dfR$SubInfo, MeshOthers_2021dfR$Property)
-table(MeshOthers_2021dfR$Property, MeshOthers_2021dfR$ObjInfo)
-
 table(MeshOthers_2021dfR$Property)
 saveRDS(MeshOthers_2021dfR, "./00_Mesh_Input/mesh2021_others_df_RR.Rds")
 
@@ -691,8 +607,9 @@ if(!all(is.na(a2))){print(a2)}
 #修正版の読み込み
 rm(list=ls())
 
-#mesh2021_Label_en_df_RR.Rds
-MeshLabel_2021df <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df_RR.Rds")
+#mesh2021_Label_en_df_R.Rds
+MeshLabel_2021df <- readRDS("./00_Mesh_Input/mesh2021_Label_en_df_R.Rds")
+MeshLabel_2021df <- MeshLabel_2021df[MeshLabel_2021df$Property == "rdfs:label",]
 
 head(MeshLabel_2021df); dim(MeshLabel_2021df)
 table(MeshLabel_2021df$OtherInfo == "BLANK")

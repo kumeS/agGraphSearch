@@ -7,7 +7,7 @@
 ##'
 ##' @return data.frame
 ##' @author Satoshi Kume
-##' @export extractUpperConcepts4Mesh
+##' @export MergeMeshData
 ##'
 ##'
 

@@ -36,7 +36,8 @@ Imports: RCurl,
   visNetwork,
   networkD3,
   plotly,
-  igraph
+  igraph,
+  WikidataQueryServiceR
 Suggests: furrr, 
   progress, 
   rlang,
