@@ -3,7 +3,7 @@
 ##' @param Lab_List a character vector of input.
 ##' @param Data a RDF data.
 ##' @param Labels a RDF data.
-##' @param broaderProperty a string vector of property.
+##' @param Property a string vector of property.
 ##'
 ##' @description This function is a function to obtain
 ##' the upper class (meshv:broaderDescriptor) of Mesh RDF.
@@ -17,33 +17,40 @@
 extractUpperConcepts4Mesh <- function(Lab_List,
                                       Data,
                                       Labels,
-                                      broaderProperty){
+                                      Property){
 
 #Parameters
-Dat <- c()
 List <- Lab_List
-MeshOthers_broader <- Data
+MeshOB <- Data
 MeshLabels01 <- Labels
+List <- List[List %in% MeshOB$Subject]
 
-x <- 1
 if(!is.vector(Lab_List)){ return(message("Warning: Not proper value of Lab_List")) }
-if(!is.vector(broaderProperty)){ return(message("Warning: Not proper value of broaderProperty")) }
+if(!is.vector(Property)){ return(message("Warning: Not proper value of Property")) }
 
-if(!all(colnames(MeshOthers_broader) %in% c("Subject","Property","Object","OtherInfo"))){
-   MeshOthers_broader <- MeshOthers_broader[,colnames(MeshOthers_broader) %in% c("Subject","Property","Object","OtherInfo")]
+if(!all(colnames(MeshOB) %in% c("Subject","Property","Object","OtherInfo"))){
+   MeshOB <- MeshOB[,colnames(MeshOB) %in% c("Subject","Property","Object","OtherInfo")]
 }
 
-if(!all(colnames(MeshOthers_broader) == c("Subject","Property","Object","OtherInfo"))){
+if(!all(colnames(MeshOB) == c("Subject","Property","Object","OtherInfo"))){
    return(message("Warning: Not proper value of Data"))
 }
 
-MeshOthers_broader00 <- MeshOthers_broader[c(MeshOthers_broader$Property %in% broaderProperty),]
+MeshOB00 <- MeshOB[c(MeshOB$Property %in% Property),]
+
+DatFinal <- c()
+for(n in seq_len(length(List))){
+#n <- 1
+print(n)
+x <- 1
+List00 <- List[n]
+Dat <- c()
 
 repeat{
-print(x)
-MeshOthers_broader01 <- MeshOthers_broader00[c(MeshOthers_broader00$Subject %in% List),]
-if(nrow(MeshOthers_broader01) != 0){
-  Dat <- Dat %>% rbind(MeshOthers_broader01)
+#print(x)
+MeshOB01 <- MeshOB00[c(MeshOB00$Subject %in% List00),]
+if(nrow(MeshOB01) != 0 && x < 50){
+  Dat <- Dat %>% rbind(MeshOB01)
 }else{
   Dat$triple <- paste0(Dat$Subject, ".", Dat$Object)
   rownames(Dat) <- 1:nrow(Dat)
@@ -51,19 +58,25 @@ if(nrow(MeshOthers_broader01) != 0){
   Dat <- Dat[,-ncol(Dat)]
   if(ncol(Dat) == 4){colnames(Dat) <- c("subject", "property", "parentClass", "OtherInfo")}
   Dat <- Dat[order(Dat$subject, decreasing = T),]
-  if(any(colnames(MeshLabels01) == c("Subject", "Object"))){
+  if(any(colnames(MeshLabels01[,c("Subject", "Object")]) == c("Subject", "Object"))){
     Dat00 <-  merge(Dat, MeshLabels01, by.x = "subject", by.y = "Subject", all = F, sort = F)
     Dat01 <-  merge(Dat00, MeshLabels01, by.x = "parentClass", by.y = "Subject", all = F, sort = F)
     colnames(Dat01)[c((ncol(Dat01)-1):ncol(Dat01))] <- c("subjectLabel", "parentClassLabel")
     Dat02 <- Dat01[,c("subject", "property",
-                  "parentClass", "OtherInfo",
-                  "subjectLabel", "parentClassLabel")]
+                  "parentClass", "subjectLabel", "parentClassLabel")]
   }
-  return(Dat02)
+  Top <- Dat02$parentClass[!(unique(Dat02$parentClass) %in% unique(Dat02$subject))]
+  DatFinal[[n]] <- list(Dat02, Top)
+  names(DatFinal)[n] <- List[n]
+  break
 }
-List <- unique(MeshOthers_broader01$Object)
+List00 <- unique(MeshOB01$Object)
 x <- x + 1
 }
+}
+
+return(DatFinal)
+
 }
 
 

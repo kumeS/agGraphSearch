@@ -28,7 +28,7 @@ agVisNetwork <- function(Graph,
 
 if(is.null(Graph)){return(message("Warning: Not proper value of Graph"))}
 if(!is.data.frame(Graph)){return(message("Warning: Not proper value of Graph"))}
-if(nrow(Graph) > 5000){return(message("Warning: should be less than 5000 rows"))}
+if(nrow(Graph) > 10000){return(message("Warning: should be less than 10000 rows"))}
 HeightSclale = "750px"; WidthSclale = "110%"; SEED=123
 
 set.seed(SEED)

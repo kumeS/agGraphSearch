@@ -9,7 +9,7 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export wikiQID2Label
-##' @importFrom WikidataQueryServiceR query_wikidata(paste
+##' @importFrom WikidataQueryServiceR query_wikidata
 ##'
 
 wikiQID2Label <- function(EntityQID, lang=1, Message=F){

@@ -59,7 +59,7 @@ rm(list=ls())
 #連鎖反応 (化学反応) (wd:Q1739960)
 
 #Process
-#上位リスト
+#上位
 QIDup <- c("wd:Q1150070", "wd:Q3249551", "wd:Q1914636", 
          "wd:Q17320256", "wd:Q900800", "wd:Q1293220", 
          "wd:Q213016", "wd:Q2695280", "wd:Q1408288",
@@ -67,7 +67,7 @@ QIDup <- c("wd:Q1150070", "wd:Q3249551", "wd:Q1914636",
          "wd:Q104637425", "wd:Q1363994", "wd:Q2281940",
          "wd:Q36534", "wd:Q3537517", "wd:Q181898", "wd:Q1739960")
 
-#下位リスト
+#下位
 #QIDdown <- c("wd:Q17320256")
 #QIDdown <- c("wd:Q10843872")
 #QIDdown <- c("wd:Q900800")
@@ -77,17 +77,15 @@ QIDup <- c("wd:Q1150070", "wd:Q3249551", "wd:Q1914636",
 
 #下位リスト
 QIDdown <- unique(c("wd:Q471702",  "wd:Q213016",  "wd:Q15211908", "wd:Q108000", "wd:Q3240978",
-             "wd:Q210028",  "wd:Q29652844", "wd:Q2035846", "wd:Q215328",
+             "wd:Q210028",  "wd:Q29652844", "wd:Q2035846", "wd:Q215328", "wd:Q1408288",
              "wd:Q1363994", "wd:Q1651044",  "wd:Q747713", "wd:Q1458918", 
              "wd:Q229367",   "wd:Q900800",  "wd:Q617224", "wd:Q131172", "wd:Q6438054",
              "wd:Q181898", "wd:Q185357", "wd:Q210028", "wd:Q552456", "wd:Q14946524",
              "wd:Q124131", "wd:Q3155522", "wd:Q133900"))
-
-#上位リスト + 下位リスト
 QIDup <- unique(c(QIDup, QIDdown))
 
 #除外リスト
-Ex <- c("wd:Q82264", "wd:Q61951", "wd:Q176996")
+Ex <- c("wd:Q82264", "wd:Q61951")
 ```
 
 ## search the upper-hieracry
@@ -100,7 +98,7 @@ head(df)
 ######################################################################
 ######################################################################
 #上位探索 subClassOf & instanceOf
-Data <- c(); x <- 1; Query <- QIDup; DepN <- 25
+Data <- c(); x <- 1; Query <- QIDup; DepN <- 20
 repeat{
 print(x)
 b1 <- df[df$Subject %in% Query,]
@@ -115,7 +113,6 @@ x <- x + 1
 #下位探索 subClassOf
 #カウント
 ######################################################################
-if(F){
 DatSubClassOfDownCount <- c()
 for(n in 1:length(QIDdown)){
 DatSubClassOfDown <- c(); x <- 1; DepN <- 20; Query <- QIDdown[n]
@@ -155,11 +152,8 @@ Query <- Query[!(Query %in% Ex)]
 
 #取得数
 data.frame(QIDdown, DatSubClassOfDownCount)
-}
-
 ######################################################################
 ######################################################################
-if(T){
 #下位探索 subClassOf
 #取得
 DatSubClassOfDown <- c(); x <- 1; Query <- QIDdown; DepN <- 20
@@ -190,7 +184,6 @@ Query <- b1$Subject
 if(x == DepN){break}
 x <- x + 1
 Query <- Query[!(Query %in% Ex)]
-}
 }
 ######################################################################
 #詳細
@@ -255,13 +248,6 @@ head(Dat01)
 d <- unique(c(Dat01[,c("subjectLabel")][grepl("wd:", Dat01[,c("subjectLabel")])], 
               Dat01[,c("parentClass")][grepl("wd:", Dat01[,c("parentClass")])]))
 length(d)
-
-if(T){
-proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
-Sys.setenv("http_proxy" = proxy_url)
-Sys.setenv("https_proxy" = proxy_url)
-Sys.setenv("ftp_proxy" = proxy_url)
-}
 
 for(n in 1:length(d)){
 #n <-1

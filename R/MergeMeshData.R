@@ -13,11 +13,13 @@
 
 MergeMeshData <- function(Data,
                           Labels){
+
 #Parameters
 Dat <- Data
 MeshLabels01 <- Labels[,c("Subject", "Object")]
 
 #head(Dat); dim(Dat)
+colnames(Dat) <- tolower(colnames(Dat))
 Dat$triple <- paste0(Dat$subject, ".", Dat$property, ".", Dat$parentClass)
 rownames(Dat) <- 1:nrow(Dat)
 Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
@@ -26,6 +28,7 @@ Dat <- Dat[,-ncol(Dat)]
 if(ncol(Dat) == 4){
   colnames(Dat) <- c("subject", "property", "parentClass", "OtherInfo")
   }else{
+  colnames(Dat)[1:4] <- c("subject", "property", "parentClass", "OtherInfo")
   Dat <- Dat[,c("subject", "property", "parentClass", "OtherInfo")]
 }
 
