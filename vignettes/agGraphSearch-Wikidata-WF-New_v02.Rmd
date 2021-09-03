@@ -37,7 +37,8 @@ This workflow can be skipped. The next workflow should be started.
 # prepare QIDs
 
 ```{r echo=TRUE, eval=FALSE}
-rm(list=ls())
+#rm(list=ls())
+
 #変化 (wd:Q1150070)
 #過程 (wd:Q3249551)
 #行為 (wd:Q1914636)
@@ -81,19 +82,20 @@ QIDdown <- unique(c("wd:Q471702",  "wd:Q213016",  "wd:Q15211908", "wd:Q108000", 
              "wd:Q1363994", "wd:Q1651044",  "wd:Q747713", "wd:Q1458918", 
              "wd:Q229367",   "wd:Q900800",  "wd:Q617224", "wd:Q131172", "wd:Q6438054",
              "wd:Q181898", "wd:Q185357", "wd:Q210028", "wd:Q552456", "wd:Q14946524",
-             "wd:Q124131", "wd:Q3155522", "wd:Q133900"))
+             "wd:Q124131", "wd:Q3155522", "wd:Q133900", "wd:Q1183091", "wd:Q14946524",
+             "wd:Q192005"))
 QIDup <- unique(c(QIDup, QIDdown))
 
 #除外リスト
-Ex <- c("wd:Q82264", "wd:Q61951")
+Ex <- c("wd:Q82264", "wd:Q61951", "wd:Q1433061", "wd:Q1408288", "wd:Q229367")
 ```
 
 ## search the upper-hieracry
 
 ```{r}
-df <- readRDS("./00_Input/Relation_P31_P279_df.Rds")
+#df <- readRDS("./00_Input/Relation_P31_P279_df.Rds")
 colnames(df) <- c("Subject", "Property", "Object")
-head(df)
+#head(df)
 
 ######################################################################
 ######################################################################
@@ -113,12 +115,14 @@ x <- x + 1
 #下位探索 subClassOf
 #カウント
 ######################################################################
+if(F){
 DatSubClassOfDownCount <- c()
 for(n in 1:length(QIDdown)){
 DatSubClassOfDown <- c(); x <- 1; DepN <- 20; Query <- QIDdown[n]
 message("Query: ", Query)
 repeat{
 print(x)
+Query <- Query[!(Query %in% Ex)]
 b1 <- df[df$Object %in% Query,]
 b1 <- b1[b1$Property == "wdt:P279",]
 if(dim(b1)[1] == 0){
@@ -152,6 +156,8 @@ Query <- Query[!(Query %in% Ex)]
 
 #取得数
 data.frame(QIDdown, DatSubClassOfDownCount)
+}
+
 ######################################################################
 ######################################################################
 #下位探索 subClassOf
@@ -159,6 +165,7 @@ data.frame(QIDdown, DatSubClassOfDownCount)
 DatSubClassOfDown <- c(); x <- 1; Query <- QIDdown; DepN <- 20
 repeat{
 print(x)
+Query <- Query[!(Query %in% Ex)]
 b1 <- df[df$Object %in% Query,]
 b1 <- b1[b1$Property == "wdt:P279",]
 if(dim(b1)[1] == 0){break}
@@ -169,6 +176,7 @@ if(x == DepN){break}
 x <- x + 1
 Query <- Query[!(Query %in% Ex)]
 }
+
 ######################################################################
 ######################################################################
 #下位探索 instanceOf
@@ -185,11 +193,13 @@ if(x == DepN){break}
 x <- x + 1
 Query <- Query[!(Query %in% Ex)]
 }
+
 ######################################################################
 #詳細
 ######################################################################
 table(DatSubClassOfDown$Depth)
 table(DatInstanceOfDown$Depth)
+
 ######################################################################
 ######################################################################
 #グラフの結合
@@ -200,7 +210,6 @@ Dat <- rbind(Dat, DatInstanceOfDown)
 table(Dat$Depth)
 #Dat <- Dat[!(Dat$Depth %in% c("down07", "down08", "down09", "down10", "down11", "down12", "down13")),]
 Dat <- Dat[,-4]
-  
 #Dat <- rbind(DatSubClassOfDown, DatInstanceOfDown)
 ######################################################################
 ######################################################################
@@ -224,10 +233,10 @@ length(unique(c(Dat$subject, Dat$parentClass)))
 ##Read Data
 #rm(list=ls())
 #Dat <- readRDS("./01_Wiki_Out/Wiki_Dat_up_down.Rds")
-if(!exists("Wikilabels")){
-Wikilabels <- data.frame(readRDS("./00_Input/WikiLab.Rds"))
-}
+
+#if(!exists("Wikilabels")){ Wikilabels <- data.frame(readRDS("./00_Input/WikiLab.Rds")) }
 Wikilabels00 <- Wikilabels[Wikilabels$Subject %in% unique(c(Dat$subject, Dat$parentClass)),]
+
 ######################################################################
 ######################################################################
 #Add labels
@@ -249,6 +258,14 @@ d <- unique(c(Dat01[,c("subjectLabel")][grepl("wd:", Dat01[,c("subjectLabel")])]
               Dat01[,c("parentClass")][grepl("wd:", Dat01[,c("parentClass")])]))
 length(d)
 
+
+if(T){
+proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
+Sys.setenv("http_proxy" = proxy_url)
+Sys.setenv("https_proxy" = proxy_url)
+Sys.setenv("ftp_proxy" = proxy_url)
+}
+
 for(n in 1:length(d)){
 #n <-1
 print(n)
@@ -257,9 +274,10 @@ if(!is.na(a$entityNamej[1])){
 Dat01$subjectLabel[Dat01$subject == d[n]] <- a$entityNamej[1]
 Dat01$parentClassLabel[Dat01$parentClass == d[n]] <- a$entityNamej[1] 
 }}
-  
+
 head(Dat01)
-#readr::write_excel_csv(Dat01, file = "./01_Wiki_Out/Wiki_Dat01.csv")
+readr::write_excel_csv(Dat01, file = paste0("./01_Wiki_Out/", sub(".html", ".csv", FileName)), col_names = T)
+#Dat01 <- data.frame(readr::read_csv(paste0("./01_Wiki_Out/", sub(".html", ".csv", FileName)), col_names = T))
 
 if(T){
 agVisNetwork(Graph=Dat01,
@@ -268,6 +286,36 @@ agVisNetwork(Graph=Dat01,
              Output=TRUE,
              FilePath=FileName)
 }
+
+head(Dat01)
+
+library(jsTree)
+
+Dat02 <- Dat01
+Dat02$X <- paste0(Dat02$subjectLabel, ".", Dat02$subject)
+Dat02$Y <- paste0(Dat02$parentClassLabel, ".", Dat02$parentClass)
+Dat03 <- Dat02[,c("X", "Y")]
+head(Dat03)
+
+DatDF <- c()
+TopClass <- "エンティティ.wd:Q35120"
+BottomClass <- unique(Dat03$X)[!(unique(Dat03$X) %in% unique(Dat03$Y))]
+
+graphList <- data.frame(from=Dat03$X, to=Dat03$Y, stringsAsFactors = F)
+D00 <- igraph::graph_from_edgelist(as.matrix(graphList), directed = T)
+
+for(n in seq_len(length(BottomClass))){
+#n <- 1
+a <- igraph::as_ids(igraph::shortest_paths(D00, 
+                       from = BottomClass[n], 
+                       to = TopClass)$vpath[[1]])
+b <- paste(a[length(a):1], collapse='/')
+DatDF <- c(DatDF, b)
+}
+
+jsTree::jsTree(DatDF)
+jsTree::jsTree(DatDF) %>%
+  htmlwidgets::saveWidget(sub("agVisNetwork_process_", "agJsTree_Wikidata_Process_",  FileName))
 
 ```
 

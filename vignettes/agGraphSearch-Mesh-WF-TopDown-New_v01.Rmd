@@ -299,6 +299,7 @@ Use the below propertys for researching the class hierarchy.
 
 ```{r echo=TRUE, eval=FALSE}
 #Match List
+MeshLabelR <- readRDS("./00_Mesh_Input/MeshLabelsR.Rds")
 words02 <- readRDS("./01_Mesh_Out/words02_Jpn.Rds")
 head(words02)
 
@@ -306,7 +307,7 @@ table(words02$cosine2 == words02$Lab00)
 table(words02$cosine2 == words02$Lab01)
 
 #Mesh D term List
-MeshLabels00 <- MeshLabelsR
+MeshLabels00 <- MeshLabelR
 head( MeshLabels00 )
 
 dim( MeshLabels00 )
@@ -330,9 +331,10 @@ length(unique(MeshLabels01$Property))
 unique(MeshLabels01$Property)
 length(unique(MeshLabels01$Object))
 
+MeshLabels01
 LabList00 <- unique(MeshLabels01$Subject)
-
 head(LabList00)
+length(LabList00)
 saveRDS(LabList00, "./01_Mesh_Out/LabList00.Rds")
 
 ```
@@ -477,15 +479,18 @@ table(MeshLabelR$SubInfo)
 MeshOthers <- readRDS("./00_Mesh_Input/Mesh_othersR.Rds")
 
 #Perform All
-library( agGraphSearch )
+library(agGraphSearch)
 Dat <- extractUpperConcepts4Mesh(Lab_List=LabList00,
                                  Data=MeshOthers,
                                  Labels=MeshLabelR,
                                  Property="subClassOf")
 
 head(Dat)
+purrr::map(Dat, function(x) length(x[[2]]))
+
 length(Dat)
 Dat00 <- c()
+
 for(n in seq_len(length(Dat))){
 #n <- 1
 Dat00 <- c(Dat00, Dat[[n]][[2]])
@@ -494,18 +499,22 @@ Dat00 <- c(Dat00, Dat[[n]][[2]])
 table(Dat00)
 Dat01 <- data.frame(Name=names(table(Dat00)), Count=as.numeric(table(Dat00)), row.names = seq_len(length(table(Dat00))))
 Dat01
+
 head(MeshLabelR)
 Dat02 <- merge(Dat01, MeshLabelR, by.x = "Name", by.y = "Subject", all.x = T, all.y = F)[,c(1:4)]
 Dat03 <- Dat02[order(-Dat02$Count),]
 rownames(Dat03) <- 1:nrow(Dat03)
-saveRDS(Dat03, "./00_Mesh_Input/Mesh_Dat02.Rds")
+Dat03
+saveRDS(Dat03, "./00_Mesh_Input/Mesh_Dat03.Rds")
+
+
 ```
 
 # Visualize the relation network
 
 ```{r echo=TRUE, eval=FALSE}
-
-Dat03
+#Read data
+Dat03 <- readRDS("./00_Mesh_Input/Mesh_Dat03.Rds")
 #MeshLabelsR.Rds
 MeshLabelR <- readRDS("./00_Mesh_Input/MeshLabelsR.Rds")
 #Mesh_othersR.Rds
@@ -518,18 +527,18 @@ Dat03 <- rbind(Dat03, ADD)
 head(Dat03)
 tail(Dat03)
 
-DepN <- 4
+Dat03 <- Dat03[1:22,]
+########################################################################
+########################################################################
+DepN <- 25
 for(n in seq_len(nrow(Dat03))){
 #n <- 1
 a <- Dat03[n,1]
 b <- Dat03[n,4]
 
 #下位探索
+message(a)
 DatSubClassOfDown <- c(); x <- 1; Query <- a
-
-tim <- format(Sys.time(), "%y%m%d-%H%M%S")
-FileName <- paste0("agVisNetwork_", formatC(n, flag = "0", width = 3), "_下位探索_Depth", formatC(DepN, flag = "0", width = 2), "_", gsub(" ", "", b), "_", tim, ".html")
-OutName <- paste0("agVisNetwork_", formatC(n, flag = "0", width = 3), "_下位探索_Depth", formatC(DepN, flag = "0", width = 2), "_", gsub(" ", "", b), "_", tim, ".Rds")
 
 repeat{
 print(x)
@@ -551,19 +560,31 @@ DatSubClassOfDown <- DatSubClassOfDown[as.numeric(rownames(unique(DatSubClassOfD
 DatSubClassOfDown <- DatSubClassOfDown[,-ncol(DatSubClassOfDown)]
 
 DatSubClassOfDown00 <- MergeMeshData(DatSubClassOfDown, MeshLabelR)
-saveRDS(DatSubClassOfDown00, OutName)
-#head(DatSubClassOfDown00)
 
+head(DatSubClassOfDown00)
+en0 <- length(unique(c(DatSubClassOfDown00$subject, DatSubClassOfDown00$parentClass)))
+en1 <- nrow(DatSubClassOfDown00)
+tim <- format(Sys.time(), "%y%m%d-%H%M%S")
+
+FileName <- paste0("agVisNetwork_", formatC(n, flag = "0", width = 3), "_下位探索_Depth", formatC(DepN, flag = "0", width = 2), "_", gsub(" ", "", b), "_", tim, 
+                   "_エンティティ数", en0, "_トリプル数", en1, ".html")
+OutName <- paste0("agVisNetwork_", formatC(n, flag = "0", width = 3), "_下位探索_Depth", formatC(DepN, flag = "0", width = 2), "_", gsub(" ", "", b), "_", tim, 
+                  "_エンティティ数", en0, "_トリプル数", en1, ".Rds")
+
+#head(DatSubClassOfDown00)
 agVisNetwork(Graph=DatSubClassOfDown00,
              Selected=NULL, 
              Browse=FALSE, 
              Output=TRUE,
              FilePath=FileName)
+saveRDS(DatSubClassOfDown00, OutName)
 
 system(paste0("mv ", FileName, " ./03_Mesh_Out"))
 system(paste0("mv ", OutName, " ./03_Mesh_Out"))
 
 }
+########################################################################
+########################################################################
 
 ##Jpn
 File <- "agVisNetwork_003_下位探索_Depth25_PhysicalPhenomena_210831-184747.Rds"

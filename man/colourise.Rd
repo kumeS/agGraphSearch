@@ -16,9 +16,17 @@ colourise(text, fg = "black", bg = NULL)
 \description{
 If R is not currently running in a system that supports terminal colours
 the text will be returned unchanged.
-}
-\details{
+
 Allowed colours are: black, blue, brown, cyan, dark gray, green, light
 blue, light cyan, light gray, light green, light purple, light red,
 purple, red, white, yellow
+}
+\examples{
+{
+
+print(colourise("Red", "red"))
+cat(colourise("Red", "red"), "\n")
+cat(colourise("White on red", "white", "red"), "\n")
+
+}
 }

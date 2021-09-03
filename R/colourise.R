@@ -1,6 +1,6 @@
-#' Colourise text for display in the terminal.
+#' @title Colourise text for display in the terminal.
 #'
-#' If R is not currently running in a system that supports terminal colours
+#' @description If R is not currently running in a system that supports terminal colours
 #' the text will be returned unchanged.
 #'
 #' Allowed colours are: black, blue, brown, cyan, dark gray, green, light
@@ -10,11 +10,16 @@
 #' @param text character vector
 #' @param fg foreground colour, defaults to white
 #' @param bg background colour, defaults to transparent
-#' @export colourise
-#' @export rcmd_running
+#' @export colourise rcmd_running
+#'
+#' @examples {
+#'
 #' print(colourise("Red", "red"))
 #' cat(colourise("Red", "red"), "\n")
 #' cat(colourise("White on red", "white", "red"), "\n")
+#'
+#' }
+
 
 colourise <- function(text, fg = "black", bg = NULL) {
   term <- Sys.getenv()["TERM"]

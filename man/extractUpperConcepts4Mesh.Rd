@@ -4,7 +4,7 @@
 \alias{extractUpperConcepts4Mesh}
 \title{The upper class search of Mesh RDF}
 \usage{
-extractUpperConcepts4Mesh(Lab_List, Data, Labels, broaderProperty)
+extractUpperConcepts4Mesh(Lab_List, Data, Labels, Property)
 }
 \arguments{
 \item{Lab_List}{a character vector of input.}
@@ -13,7 +13,7 @@ extractUpperConcepts4Mesh(Lab_List, Data, Labels, broaderProperty)
 
 \item{Labels}{a RDF data.}
 
-\item{broaderProperty}{a string vector of property.}
+\item{Property}{a string vector of property.}
 }
 \value{
 data.frame

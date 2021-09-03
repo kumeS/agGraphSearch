@@ -65,7 +65,7 @@ if(nrow(MeshOB01) != 0 && x < 50){
     Dat02 <- Dat01[,c("subject", "property",
                   "parentClass", "subjectLabel", "parentClassLabel")]
   }
-  Top <- Dat02$parentClass[!(unique(Dat02$parentClass) %in% unique(Dat02$subject))]
+  Top <- unique(Dat02$parentClass)[!(unique(Dat02$parentClass) %in% unique(Dat02$subject))]
   DatFinal[[n]] <- list(Dat02, Top)
   names(DatFinal)[n] <- List[n]
   break
