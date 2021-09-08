@@ -1,4 +1,4 @@
-##' @title Compute distance metrics between input strings and rdfs
+##' @title ComputeDistance: Compute distance metrics between input strings and rdfs
 ##'
 ##' @param InputTerms a vector of character; a target list of words.
 ##' @param RDFterms a vector of character.

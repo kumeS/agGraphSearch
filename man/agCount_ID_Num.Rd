@@ -2,7 +2,7 @@
 % Please edit documentation in R/agCount_ID_Num.R
 \name{agCount_ID_Num}
 \alias{agCount_ID_Num}
-\title{Count of concept relations using URI/ID via SPARQL.}
+\title{agCount_ID_Num: Count of concept relations using URI/ID via SPARQL.}
 \usage{
 agCount_ID_Num(
   Entity_ID,

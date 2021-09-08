@@ -2,12 +2,12 @@
 % Please edit documentation in R/wikiQID2Label.R
 \name{wikiQID2Label}
 \alias{wikiQID2Label}
-\title{convert QID to Label via SPARQL query}
+\title{wikiQID2Label: convert QID to Label via SPARQL query}
 \usage{
 wikiQID2Label(EntityQID, lang = 1, Message = F)
 }
 \arguments{
-\item{EntityQID}{a character of QID with wd:.}
+\item{EntityQID}{a character of QID (ex. wd:Q99527517) .}
 
 \item{lang}{a numeric: 1: jpn, 2, en.}
 

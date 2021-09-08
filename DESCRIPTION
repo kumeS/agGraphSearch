@@ -37,6 +37,7 @@ Imports: RCurl,
   networkD3,
   plotly,
   igraph,
+  jsTree,
   WikidataQueryServiceR
 Suggests: furrr, 
   progress, 

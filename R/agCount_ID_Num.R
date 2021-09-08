@@ -1,4 +1,4 @@
-##' @title Count of concept relations using URI/ID via SPARQL.
+##' @title agCount_ID_Num: Count of concept relations using URI/ID via SPARQL.
 ##'
 ##' @param Entity_ID a character vector corresponing to the entity ID.
 ##' @param EndPoint a string of SPARQL endpoint. ex. http://....

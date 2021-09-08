@@ -1,6 +1,6 @@
-##' @title convert QID to Label via SPARQL query
+##' @title wikiQID2Label: convert QID to Label via SPARQL query
 ##'
-##' @param EntityQID a character of QID with wd:.
+##' @param EntityQID a character of QID (ex. wd:Q99527517) .
 ##' @param lang a numeric: 1: jpn, 2, en.
 ##' @param Message a logical
 ##'
@@ -14,7 +14,6 @@
 
 wikiQID2Label <- function(EntityQID, lang=1, Message=F){
 if(is.null(EntityQID)){return(message("Warning: Not proper value of File_path"))}
-#EntityQID="wd:Q99527517"
 
 QID <- EntityQID
 if(lang == 1){ lang1 <- "ja, en" } else { if(lang == 2){ lang1 <- "ja" } else { lang1 <- "en" } }

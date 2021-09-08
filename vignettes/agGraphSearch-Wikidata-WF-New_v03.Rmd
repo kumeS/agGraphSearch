@@ -32,11 +32,19 @@ Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the followi
 library("agGraphSearch")
 ```
 
-This workflow can be skipped. The next workflow should be started. 
+# prepare Dataset
+
+```{r echo=TRUE, eval=FALSE}
+df <- readRDS("./00_Input/Relation_P31_P279_df.Rds")
+colnames(df) <- c("Subject", "Property", "Object")
+head(df)
+
+if(!exists("Wikilabels")){ Wikilabels <- data.frame(readRDS("./00_Input/WikiLab.Rds")) }
+```
 
 # prepare QIDs
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=TRUE, eval=TRUE}
 rm(list=ls()[!(ls() %in% c("df", "Wikilabels"))])
 
 #変化 (wd:Q1150070)
@@ -80,25 +88,62 @@ QIDup <- c("wd:Q1150070", "wd:Q3249551", "wd:Q1914636",
 QIDdown <- unique(c("wd:Q471702",  "wd:Q213016",  "wd:Q15211908", "wd:Q108000", "wd:Q3240978",
              "wd:Q210028",  "wd:Q29652844", "wd:Q2035846", "wd:Q215328",
              "wd:Q1363994", "wd:Q1651044",  "wd:Q747713", "wd:Q720899", "wd:Q720899",
-             "wd:Q900800",  "wd:Q3819233", "wd:Q588936",
+             "wd:Q900800", "wd:Q588936",
              "wd:Q181898", "wd:Q185357", "wd:Q210028", "wd:Q552456", "wd:Q14946524",
              "wd:Q124131", "wd:Q3155522", "wd:Q133900", "wd:Q14946524",
-             "wd:Q192005", "wd:Q452648", "wd:Q139143", "wd:Q3680646", "wd:Q648191"))
+             "wd:Q192005", "wd:Q452648", "wd:Q139143", "wd:Q3680646", "wd:Q648191",
+             "wd:Q825643"))
 QIDup <- unique(c(QIDup, QIDdown))
 
 #除外リスト
-Ex <- c("wd:Q82264", "wd:Q61951", "wd:Q1433061", "wd:Q229367", "wd:Q747713", 
+Ex <- unique(c("wd:Q82264", "wd:Q61951", "wd:Q1433061", "wd:Q229367", "wd:Q747713", 
         "wd:Q79782", "wd:Q13406206", "wd:Q3929317", "wd:Q16525404",
-        "wd:Q9363879", "wd:Q9363879", "wd:Q44432", "wd:Q496098")
+        "wd:Q9363879", "wd:Q9363879", "wd:Q44432", "wd:Q496098", "wd:Q59295937",
+        "wd:Q854618"))
+
+```
+
+```{r echo=TRUE, eval=FALSE}
+#工学的プロセス.wd:Q10843872
+QIDup <- c("wd:Q10843872")
+QIDdown <- c("wd:Q10843872")
+Ex <- c()
+
+#重合反応.wd:Q181898
+QIDup <- c("wd:Q181898")
+QIDdown <- c("wd:Q181898")
+Ex <- c()
+
+#熱力学過程.wd:Q213016
+QIDup <- c("wd:Q213016")
+QIDdown <- c("wd:Q213016")
+Ex <- c()
+
+#相転移.wd:Q185357
+QIDup <- c("wd:Q185357")
+QIDdown <- c("wd:Q185357")
+Ex <- c()
+
+#材料特性.wd:Q3523867
+QIDup <- c("wd:Q3523867")
+QIDdown <- c("wd:Q3523867")
+Ex <- c()
+
+#物理量.wd:Q107715
+QIDup <- c("wd:Q107715")
+QIDdown <- c("wd:Q107715")
+Ex <- c()
+
+#弾性率.wd:Q192005
+QIDup <- c("wd:Q192005")
+QIDdown <- c("wd:Q192005")
+Ex <- c()
+
 ```
 
 ## search the upper-hieracry
 
 ```{r}
-#df <- readRDS("./00_Input/Relation_P31_P279_df.Rds")
-colnames(df) <- c("Subject", "Property", "Object")
-#head(df)
-
 ######################################################################
 ######################################################################
 #上位探索 subClassOf & instanceOf
@@ -113,6 +158,7 @@ Query <- b1$Object
 if(x == DepN){break}
 x <- x + 1
 }
+
 ######################################################################
 #下位探索 subClassOf
 #カウント
@@ -210,9 +256,7 @@ Dat <- rbind(Dat, DatInstanceOfDown)
 
 #remove
 table(Dat$Depth)
-#Dat <- Dat[!(Dat$Depth %in% c("down07", "down08", "down09", "down10", "down11", "down12", "down13")),]
 Dat <- Dat[,-4]
-#Dat <- rbind(DatSubClassOfDown, DatInstanceOfDown)
 ######################################################################
 ######################################################################
 #create dir
@@ -225,29 +269,18 @@ Dat$triple <- paste0(Dat$subject, ".", Dat$property, ".", Dat$parentClass)
 Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
 Dat <- Dat[,-ncol(Dat)]
 head(Dat); dim(Dat)
-######################################################################
-######################################################################
 length(unique(c(Dat$subject, Dat$parentClass)))
-#saveRDS(Dat, "./01_Wiki_Out/Wiki_Dat_up_down.Rds")
 ######################################################################
 ######################################################################
 ######################################################################
-##Read Data
-#rm(list=ls())
-#Dat <- readRDS("./01_Wiki_Out/Wiki_Dat_up_down.Rds")
-
-#if(!exists("Wikilabels")){ Wikilabels <- data.frame(readRDS("./00_Input/WikiLab.Rds")) }
-Wikilabels00 <- Wikilabels[Wikilabels$Subject %in% unique(c(Dat$subject, Dat$parentClass)),]
-
-######################################################################
-######################################################################
-#Add labels
 library(agGraphSearch)
 library(magrittr)
 
+#Add labels
+Wikilabels00 <- Wikilabels[Wikilabels$Subject %in% unique(c(Dat$subject, Dat$parentClass)),]
 Dat00 <- MergeWikiData(Data=Dat, Labels=Wikilabels00)
-#saveRDS(Dat00, "./01_Wiki_Out/Wiki_Dat00.Rds")
-#Dat00 <- readRDS("./01_Wiki_Out/Wiki_Dat00.Rds")
+
+#Create file name
 FileName <- paste0("agVisNetwork_process_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
 
 head(Dat00); dim(Dat00); table(Dat00$property)
@@ -276,62 +309,39 @@ a <- wikiQID2Label(EntityQID = d[n])
 if(!is.na(a$entityNamej[1])){
 Dat01$subjectLabel[Dat01$subject == d[n]] <- a$entityNamej[1]
 Dat01$parentClassLabel[Dat01$parentClass == d[n]] <- a$entityNamej[1] 
-}else{}}
+}}
 
+#save output
 head(Dat01)
 readr::write_excel_csv(Dat01, file = paste0("./01_Wiki_Out/", sub(".html", ".csv", FileName)), col_names = T)
 #Dat01 <- data.frame(readr::read_csv(paste0("./01_Wiki_Out/", sub(".html", ".csv", FileName)), col_names = T))
 
+#グラフ末端のQIDエンティティを削除する
+head(Dat01)
+a <- unique(Dat01$subjectLabel[grepl("^wd:Q", Dat01$subjectLabel)])
+b <- unique(Dat01$parentClassLabel[grepl("^wd:Q", Dat01$parentClassLabel)])
+ab <- a[!(a %in% b)]
+Dat01a <- Dat01[!(Dat01$subjectLabel %in% ab),]
+
 #グラフ可視化
-agVisNetwork(Graph=Dat01,
+agVisNetwork(Graph=Dat01a,
              Selected=NULL, 
              Browse=TRUE, 
              Output=TRUE,
              FilePath=FileName)
-
 system(paste0("mv ", FileName, " ./01_Wiki_Out"))
 
 #ツリー可視化
+library(jsTree)
 agJsTree(Data=Dat01, 
          TopClass="エンティティ.wd:Q35120", 
-         Brouse=TRUE, SaveHtmlFile=TRUE, FileName=NULL, Output=NULL){
-
-
-
-head(Dat01)
-library(jsTree)
-
-Dat02 <- Dat01
-Dat02$X <- paste0(Dat02$subjectLabel, ".", Dat02$subject)
-Dat02$Y <- paste0(Dat02$parentClassLabel, ".", Dat02$parentClass)
-Dat03 <- Dat02[,c("X", "Y")]
-head(Dat03)
-
-DatDF <- c()
-TopClass <- "エンティティ.wd:Q35120"
-BottomClass <- unique(Dat03$X)[!(unique(Dat03$X) %in% unique(Dat03$Y))]
-
-graphList <- data.frame(from=Dat03$X, to=Dat03$Y, stringsAsFactors = F)
-D00 <- igraph::graph_from_edgelist(as.matrix(graphList), directed = T)
-
-#最短パスの取得
-for(n in seq_len(length(BottomClass))){
-#n <- 1
-a <- igraph::as_ids(igraph::shortest_paths(D00, 
-                       from = BottomClass[n], 
-                       to = TopClass)$vpath[[1]])
-b <- paste(a[length(a):1], collapse='/')
-DatDF <- c(DatDF, b)
-}
-
-
-jsTree::jsTree(DatDF, width="125%", height="150%")
-jsTree::jsTree(DatDF, width="125%", height="150%") %>%
-  htmlwidgets::saveWidget(sub("agVisNetwork_process_", "agJsTree_Wikidata_Process_",  FileName))
-system(paste0("mv ", sub("agVisNetwork_process_", "agJsTree_Wikidata_Process_",  FileName), " ./01_Wiki_Out"))
+         Brouse=TRUE, 
+         SaveHtmlFile=TRUE, 
+         ExcludeQID=TRUE,
+         FileName=sub("agVisNetwork_process_", "agJsTree_Wikidata_Process_",  FileName), 
+         Output="./01_Wiki_Out")
 
 ```
-
 
 # Session information {.unnumbered}
 ```{r sessionInfo, echo=FALSE}
