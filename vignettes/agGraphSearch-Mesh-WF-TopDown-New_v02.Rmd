@@ -33,9 +33,12 @@ Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the followi
 #rm( list=ls() )
 library(agGraphSearch)
 library(magrittr)
+#install.packages(c("knitr", "DT", "formattable", "filesstrings", "visNetwork", "networkD3", "igraph", "jsTree", "WikidataQueryServiceR"))
+#BiocManager::install("BiocStyle")
+#install.packages(c("stringdist"))
 
 #Re-build
-rm( list=ls() )
+rm(list=ls())
 
 if(F){
 system("rm -rf ./agGraphSearch/NAMESPACE")
@@ -130,17 +133,17 @@ words <- unique(words)
 
 head(words)
 length(unique(words))
+words00 <- unique(unlist(words)); words00 <- words00[!is.na(words00)]
+words01 <- unique(tolower(words00))
+head(words01)
 
 #小文字変換
+MeshLabelsR <- readRDS("./00_Mesh_Input/MeshLabelsR.Rds")
 head(MeshLabelsR)
 MeshLabels01 <- unique(tolower(MeshLabelsR$Object))
 head(MeshLabels01)
 length(MeshLabels01)
 
-head(words)
-words00 <- unique(unlist(words)); words00 <- words00[!is.na(words00)]
-words01 <- unique(tolower(words00))
-head(words01)
 
 #文字列距離実行
 library( agGraphSearch )
@@ -149,9 +152,12 @@ Dat <- ComputeDistance(InputTerms=words01,
                        q=2, nthread=4, TopWords=3)
   
 head(Dat)
+#Dat[is.na(Dat)] <- 0
 table(Dat$PerfectMatch > 0)
 table(Dat$PartialMatch > 0)
 table(Dat$cosine1 > 0)
+table(Dat$cosine3 < 0.075)
+#saveRDS(Dat, "./01_Mesh_Out/Dat_OCR_en_match.Rds")
 
 ```
 
@@ -159,6 +165,7 @@ table(Dat$cosine1 > 0)
 #コサインが良いかも
 
 ```{r echo=TRUE, eval=FALSE}
+if(F){
 #rm( list=ls() )
 
 #options(digits=5) 
@@ -181,22 +188,24 @@ summary(Thres$cosine3[Thres$Check == 0])
 #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 # 0.0762  0.2417  0.3164  0.3138  0.3814  0.6087 
 #厳し目基準なら、Thres = 0.075
-
 head(Thres)
-words02 <- Thres[Thres$cosine3 < 0.075, ]
+}
+
+head(Dat)
+words02 <- Dat[Dat$cosine3 < 0.075, ]
 head(words02)
 dim(words02)
 rownames(words02) <- 1:nrow(words02)
+#saveRDS(words02, "./01_Mesh_Out/Dat_OCR_en_words02.Rds")
 
-#saveRDS(words02, "./01_Mesh_Out/words02.Rds")
 ```
 
 # Translate English to Japanese
 
 ```{r echo=TRUE, eval=FALSE}
-rm(list=ls())
+#rm(list=ls())
 
-words02 <- readRDS("./01_Mesh_Out/words02.Rds")
+words02 <- readRDS("./01_Mesh_Out/Dat_OCR_en_words02.Rds")
 head(words02)
 
 words02$Lab00 <- NA
@@ -225,20 +234,23 @@ table(grepl("[,]", words02$Lab01))
 words02$Jpn <- NA
 head(words02, n=10)
 
-#Translate to Jpn
-if(F){
+#proxy at OECU
+if(T){
 proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
 Sys.setenv("http_proxy" = proxy_url)
 Sys.setenv("https_proxy" = proxy_url)
 Sys.setenv("ftp_proxy" = proxy_url)
 }
 
+#Translate to Jpn
 head(words02)
-for(n in 1:length(words02$Lab01)){
+wordsTerms <- unique(words02$Terms)
+for(n in 1:length(wordsTerms)){
 #n <- 1
-print(n)
-Result <- DeePL(Sentence=words02$Lab01[n], Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
-words02$Jpn[n] <- Result
+Result <- DeePL(Sentence=wordsTerms[n], Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
+words02$Jpn[words02$Terms == wordsTerms[n]] <- Result
+message(colourise(paste("  No.: ", n), fg = "green", bg = NULL))
+message(colourise(paste("  ", wordsTerms[n], "=>", Result), fg = "green", bg = NULL))
 }
 
 head(words02, n=10)
@@ -249,37 +261,35 @@ words02[is.na(words02)] <- 0
 a <- words02$PerfectMatch > 0
 unique(words02$Terms[a])
 sum(a)
-#[1] 54
+#[1] 266
 
 #PartialMatch
 a <- words02$PartialMatch > 0
 unique(words02$Terms[a])
 sum(a)
-#[1] 57
+#[1] 454
 
 #cosine3
 a <- words02$cosine3 < 0.075
 unique(words02$Terms[a])
 sum(a)
-#[1] 101
+#[1] 493
 
 #######################################
 #Save
-#saveRDS(words02, "./01_Mesh_Out/words02_Jpn.Rds")
-#readr::write_excel_csv(words02, file="./01_Mesh_Out/words02_Jpn.csv", col_names = T, append=F)
+#saveRDS(words02, "./01_Mesh_Out/OCR_en2jpn_words02.Rds")
+#readr::write_excel_csv(words02, file="./01_Mesh_Out/OCR_en2jpn_words02.csv", col_names = T, append=F)
 #######################################
 ```
 
 # Linking to the Mesh
 
-Use the below propertys for researching the class hierarchy.
-- meshv:broaderDescriptor
-- meshv:concept
-
 ```{r echo=TRUE, eval=FALSE}
+#rm(list=ls())
+
 #Match List
 MeshLabelR <- readRDS("./00_Mesh_Input/MeshLabelsR.Rds")
-words02 <- readRDS("./01_Mesh_Out/words02_Jpn.Rds")
+words02 <- readRDS("./01_Mesh_Out/OCR_en2jpn_words02.Rds")
 head(words02)
 
 table(words02$cosine2 == words02$Lab00)
@@ -309,12 +319,13 @@ length(unique(MeshLabels01$Subject))
 length(unique(MeshLabels01$Property))
 unique(MeshLabels01$Property)
 length(unique(MeshLabels01$Object))
+#491words/entities
 
 MeshLabels01
 LabList00 <- unique(MeshLabels01$Subject)
 head(LabList00)
 length(LabList00)
-saveRDS(LabList00, "./01_Mesh_Out/LabList00.Rds")
+saveRDS(LabList00, "./01_Mesh_Out/OCR_en_LabList00.Rds")
 
 ```
 
@@ -322,7 +333,11 @@ saveRDS(LabList00, "./01_Mesh_Out/LabList00.Rds")
 
 ```{r echo=TRUE, eval=FALSE}
 #修正版の読み込み
-rm(list=ls())
+#rm(list=ls())
+
+#words
+LabList00 <- readRDS("./01_Mesh_Out/OCR_en_LabList00.Rds")
+LabList00
 
 #MeshLabelsR.Rds
 MeshLabelR <- readRDS("./00_Mesh_Input/MeshLabelsR.Rds")
@@ -344,8 +359,8 @@ table(MeshOthers$ObjInfo)
 ##############################################
 #Trial 01
 ##############################################
-txt <- "Polymers"
-a1 <- MeshLabelR[MeshLabelR$Object == txt,]
+txt <- LabList00
+a1 <- MeshLabelR[MeshLabelR$Subject %in% txt,]
 
 a1
 #              Subject   Property   Object OtherInfo    SubInfo
@@ -354,9 +369,12 @@ a1
 a2 <- a1$Subject
 a2
 
+########################################################
+#上位探索
+########################################################
 Dat <- c(); x <- 1; Query <- a2
 repeat{
-print(x)
+message(x)
 b1 <- MeshOthers[MeshOthers$Subject %in% Query,]
 if(dim(b1)[1] == 0){break}
 Dat <- rbind(Dat, b1)
@@ -364,10 +382,14 @@ Query <- b1$Object
 x <- x + 1
 if(x == 100){break}
 }
+saveRDS(Dat, "./02_Mesh_Out/OCR_en_upClass.Rds")
 
-x <- 1; Query <- a2
+########################################################
+#下位探索
+########################################################
+Dat <- c(); x <- 1; Query <- a2
 repeat{
-print(x)
+message(x)
 b2 <- MeshOthers[MeshOthers$Object %in% Query,]
 if(dim(b2)[1] == 0){break}
 Dat <- rbind(Dat, b2)
@@ -375,6 +397,14 @@ Query <- b2$Subject
 x <- x + 1
 if(x == 100){break}
 }
+saveRDS(Dat, "./02_Mesh_Out/OCR_en_downClass.Rds")
+
+########################################################
+#Bind data
+########################################################
+upClass <- readRDS("./02_Mesh_Out/OCR_en_upClass.Rds")
+downClass <- readRDS("./02_Mesh_Out/OCR_en_downClass.Rds")
+Dat <- rbind(upClass, downClass)
 
 head(Dat); dim(Dat)
 rownames(Dat) <- 1:nrow(Dat)
@@ -392,6 +422,8 @@ FileName <- paste0("agVisNetwork_polymers_", format(Sys.time(), "%y%m%d-%H%M%S")
 
 head(Dat00); dim(Dat00); table(Dat00$property)
 table(Dat00$property)
+
+saveRDS(Dat00, "./02_Mesh_Out/OCR_Dat02.Rds")
 
 ########################################################################
 #Jpn
@@ -420,21 +452,54 @@ Sys.setenv("https_proxy" = proxy_url)
 Sys.setenv("ftp_proxy" = proxy_url)
 }
 
+##################################################################
 DatJpn02 <- Label2Jpn(Data=DatJpn, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
-saveRDS(DatJpn02, "./02_Mesh_Out/DatJpn02.Rds")
-FileName <- paste0("agVisNetwork_polymers_Jpn_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
+#ここから9/8
+saveRDS(DatJpn02, "./02_Mesh_Out/OCR_DatJpn02.Rds")
+##################################################################
 
 DatJpn03 <- DatJpn02
 DatJpn03 <- DatJpn03[DatJpn03$property != "meshv:preferredConcept",]
 #DatJpn03 <- DatJpn03[DatJpn03$property != "meshv:preferredConceptR",]
 head(DatJpn03); dim(DatJpn03)
 
-#All
-agVisNetwork(Graph=DatJpn03,
+topClass <- unique(DatJpn03$parentClass)[!(unique(DatJpn03$parentClass) %in% unique(DatJpn03$subject))]
+
+for(k in 1:length(topClass)){
+# k <- 1
+Dat <- c(); x <- 1; Query <- topClass[k]
+
+repeat{
+b2 <- DatJpn03[DatJpn03$parentClass %in% Query,]
+if(dim(b2)[1] == 0){break}
+Dat <- rbind(Dat, b2)
+Query <- b2$subject
+message(x)
+x <- x + 1
+if(x == 100){break}
+}
+
+head(Dat)
+rownames(Dat) <- 1:nrow(Dat)
+
+a <- DatJpn03[DatJpn03$parentClass %in% topClass[k],]
+FileName <- paste0("agVisNetwork_OCR_Jpn_", topClass[k], "_",
+                   a$parentClassLabel[1], "_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
+
+#All: 検索エンティティをyellowに
+agVisNetwork(Graph=Dat,
              Selected=NULL, 
              Browse=TRUE, 
              Output=TRUE,
+             ColoredSeed=LabList00,
              FilePath=FileName)
+#table(LabList00 == "mesh:D000937")
+suppressMessages(filesstrings::move_files(FileName, "./03_Mesh_Out_OCR_Jpn"))
+
+}
+
+
+
 
 ```
 

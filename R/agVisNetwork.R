@@ -11,6 +11,8 @@
 ##' @importFrom visNetwork visIgraphLayout
 ##' @importFrom visNetwork visOptions
 ##' @importFrom networkD3 saveNetwork
+##' @importFrom purrr map
+##'
 
 ## visNetwork version
 agVisNetwork <- function(Graph,
@@ -21,15 +23,16 @@ agVisNetwork <- function(Graph,
                          StarSize=10,
                          FontSize=7,
                          Selected=NULL,
-                         Browse=FALSE,
+                         Browse=TRUE,
                          Output=FALSE,
+                         ColoredSeed=NULL,
                          FilePath=paste0("agVisNetwork_", format(Sys.time(), "%y%m%d"),".html"),
                          outputNodesEdges=FALSE){
 
 if(is.null(Graph)){return(message("Warning: Not proper value of Graph"))}
 if(!is.data.frame(Graph)){return(message("Warning: Not proper value of Graph"))}
 if(nrow(Graph) > 10000){return(message("Warning: should be less than 10000 rows"))}
-HeightSclale = "750px"; WidthSclale = "110%"; SEED=123
+HeightSclale = "1500px"; WidthSclale = "110%"; SEED=123
 
 set.seed(SEED)
 
@@ -126,6 +129,13 @@ if(Count > 1){
         }else{}}
     }else{}
   }
+
+if(!is.null(ColoredSeed)){
+a <- paste0("mesh:", unlist(purrr::map(nodes$id, function(x){strsplit(x, split = "[.]mesh[:]")[[1]][2]})))
+nodes$color.background[a %in% ColoredSeed] <- "#ffff00"
+nodes$color.border[a %in% ColoredSeed] <- "#ffd700"
+nodes$size[a %in% ColoredSeed] <- 12
+}
 
   if(!any(colnames(Graph) == "propertyLabel")){}else{
     if(any(colnames(Graph) == "parentClassLabel")){}else{
