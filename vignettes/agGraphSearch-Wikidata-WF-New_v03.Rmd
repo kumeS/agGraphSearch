@@ -104,6 +104,7 @@ Ex <- unique(c("wd:Q82264", "wd:Q61951", "wd:Q1433061", "wd:Q229367", "wd:Q74771
 ```
 
 ```{r echo=TRUE, eval=FALSE}
+if(F){
 #工学的プロセス.wd:Q10843872
 QIDup <- c("wd:Q10843872")
 QIDdown <- c("wd:Q10843872")
@@ -138,6 +139,7 @@ Ex <- c()
 QIDup <- c("wd:Q192005")
 QIDdown <- c("wd:Q192005")
 Ex <- c()
+}
 
 ```
 
