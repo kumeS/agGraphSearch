@@ -86,6 +86,7 @@ You should split compound words as a pre-processing.
 words <- data.frame(readr::read_csv("./00_Mesh_Input/高分子辞典OCR_2column_en.csv", col_names = F, show_col_types = F))
 words <- unlist(words, use.names = F)
 words <- data.frame(X1=words[!is.na(words)])
+dim(words)
 ```
 
 # check the data
@@ -143,7 +144,6 @@ head(MeshLabelsR)
 MeshLabels01 <- unique(tolower(MeshLabelsR$Object))
 head(MeshLabels01)
 length(MeshLabels01)
-
 
 #文字列距離実行
 library( agGraphSearch )
@@ -207,6 +207,7 @@ rownames(words02) <- 1:nrow(words02)
 
 words02 <- readRDS("./01_Mesh_Out/Dat_OCR_en_words02.Rds")
 head(words02)
+dim(words02)
 
 words02$Lab00 <- NA
 head(words02)
@@ -291,6 +292,7 @@ sum(a)
 MeshLabelR <- readRDS("./00_Mesh_Input/MeshLabelsR.Rds")
 words02 <- readRDS("./01_Mesh_Out/OCR_en2jpn_words02.Rds")
 head(words02)
+dim(words02)
 
 table(words02$cosine2 == words02$Lab00)
 table(words02$cosine2 == words02$Lab01)
@@ -329,7 +331,7 @@ saveRDS(LabList00, "./01_Mesh_Out/OCR_en_LabList00.Rds")
 
 ```
 
-# Check structures of Polymers
+# Obtain all class hierarchy
 
 ```{r echo=TRUE, eval=FALSE}
 #修正版の読み込み
@@ -338,6 +340,7 @@ saveRDS(LabList00, "./01_Mesh_Out/OCR_en_LabList00.Rds")
 #words
 LabList00 <- readRDS("./01_Mesh_Out/OCR_en_LabList00.Rds")
 LabList00
+str(LabList00)
 
 #MeshLabelsR.Rds
 MeshLabelR <- readRDS("./00_Mesh_Input/MeshLabelsR.Rds")
@@ -359,16 +362,16 @@ table(MeshOthers$ObjInfo)
 ##############################################
 #Trial 01
 ##############################################
-txt <- LabList00
+txt <- unique(LabList00)
 a1 <- MeshLabelR[MeshLabelR$Subject %in% txt,]
-
 a1
 #              Subject   Property   Object OtherInfo    SubInfo
 #1242522  mesh:D011108 rdfs:label Polymers       @en IDs:mesh:D
 #1906322 mesh:M0017208 rdfs:label Polymers       @en IDs:mesh:M
-a2 <- a1$Subject
+a2 <- unique(a1$Subject)
 a2
 
+table(txt %in% a2)
 ########################################################
 #上位探索
 ########################################################
@@ -382,30 +385,8 @@ Query <- b1$Object
 x <- x + 1
 if(x == 100){break}
 }
-saveRDS(Dat, "./02_Mesh_Out/OCR_en_upClass.Rds")
 
-########################################################
-#下位探索
-########################################################
-Dat <- c(); x <- 1; Query <- a2
-repeat{
-message(x)
-b2 <- MeshOthers[MeshOthers$Object %in% Query,]
-if(dim(b2)[1] == 0){break}
-Dat <- rbind(Dat, b2)
-Query <- b2$Subject
-x <- x + 1
-if(x == 100){break}
-}
-saveRDS(Dat, "./02_Mesh_Out/OCR_en_downClass.Rds")
-
-########################################################
-#Bind data
-########################################################
-upClass <- readRDS("./02_Mesh_Out/OCR_en_upClass.Rds")
-downClass <- readRDS("./02_Mesh_Out/OCR_en_downClass.Rds")
-Dat <- rbind(upClass, downClass)
-
+#重複を除く
 head(Dat); dim(Dat)
 rownames(Dat) <- 1:nrow(Dat)
 colnames(Dat) <- c("subject", "property", "parentClass", "OtherInfo", "SubInfo", "ObjInfo")
@@ -415,23 +396,60 @@ Dat <- Dat[,-ncol(Dat)]
 head(Dat); dim(Dat)
 length(unique(c(Dat$subject, Dat$parentClass)))
 
+#最上位
+a3 <- unique(Dat$parentClass)[!(unique(Dat$parentClass) %in% unique(Dat$subject))]
+str(a3)
+########################################################
+#下位探索: 最上位から全部取得
+########################################################
+Dat <- c(); x <- 1; Query <- a3
+repeat{
+message(x)
+b2 <- MeshOthers[MeshOthers$Object %in% Query,]
+if(dim(b2)[1] == 0){break}
+Dat <- rbind(Dat, b2)
+Query <- b2$Subject
+x <- x + 1
+if(x == 100){break}
+}
+
+#重複を除く
+head(Dat); dim(Dat)
+rownames(Dat) <- 1:nrow(Dat)
+colnames(Dat) <- c("subject", "property", "parentClass", "OtherInfo", "SubInfo", "ObjInfo")
+Dat$triple <- paste0(Dat$subject, ".", Dat$property, ".", Dat$parentClass)
+Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
+Dat <- Dat[,-ncol(Dat)]
+
+head(Dat); dim(Dat)
+length(unique(c(Dat$subject, Dat$parentClass)))
+#saveRDS(Dat, "./02_Mesh_Out/OCR_en_downClass.Rds")
+
+########################################################
+#Bind data
+########################################################
+#rm(list=ls())
+MeshLabelR <- readRDS("./00_Mesh_Input/MeshLabelsR.Rds")
+upClass <- readRDS("./02_Mesh_Out/OCR_en_upClass.Rds")
+downClass <- readRDS("./02_Mesh_Out/OCR_en_downClass.Rds")
+Dat <- readRDS("./02_Mesh_Out/OCR_en_downClass.Rds")
+
 #Add labels
-library(agGraphSearch)
+#library(agGraphSearch)
 Dat00 <- MergeMeshData(Data=Dat, Labels=MeshLabelR)
-FileName <- paste0("agVisNetwork_polymers_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
 
 head(Dat00); dim(Dat00); table(Dat00$property)
 table(Dat00$property)
-
-saveRDS(Dat00, "./02_Mesh_Out/OCR_Dat02.Rds")
+#saveRDS(Dat00, "./02_Mesh_Out/OCR_Dat02.Rds")
 
 ########################################################################
 #Jpn
 ########################################################################
 head(Dat)
 DatJpn <- Dat00
-
 dim(DatJpn)
+colnames(DatJpn)
+
 DatJpn$triple <- paste0(DatJpn$subject, ".", DatJpn$property, ".", DatJpn$parentClass)
 rownames(DatJpn) <- 1:nrow(DatJpn)
 DatJpn00 <- DatJpn[as.numeric(rownames(unique(DatJpn["triple"]))),]
@@ -453,9 +471,55 @@ Sys.setenv("ftp_proxy" = proxy_url)
 }
 
 ##################################################################
-DatJpn02 <- Label2Jpn(Data=DatJpn, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
+#a <- readRDS("./02_Mesh_Out/OCR_DatJpn02.Rds")
+head(a)
+aa <- data.frame(IDs=c(a$subject, a$parentClass), Jpn=c(a$subjectLabel, a$parentClassLabel))
+aa1 <- aa[as.numeric(rownames(unique(aa["IDs"]))),]
+head(aa1)
+
+head(DatJpn)
+bb <- data.frame(IDs=c(DatJpn$subject, DatJpn$parentClass), Jpn=c(DatJpn$subjectLabel, DatJpn$parentClassLabel))
+bb1 <- bb[as.numeric(rownames(unique(bb["IDs"]))),]
+head(bb1)
+
+bb2 <- bb1[!(bb1$IDs %in% unique(aa1$IDs)),]
+
+str(bb2)
+dim(bb2)
+length(unique(bb2$IDs))
+head(bb2)
+bb3 <- bb2
+
+##################################################################
+#日本語訳
+for(k in 1:length(bb2$IDs)){
+#k <- 1
+wordsList <- bb2[k,2]
+message(colourise(paste(k, "/", length(bb2$IDs)), fg = "blue", bg = NULL))
+if(grepl("[,][ ]", wordsList) & !grepl("[,][ ]and", wordsList)){
+a1 <- strsplit(wordsList, split = ", ")[[1]]
+aa <- paste(a1[length(a1):1], collapse = " ")
+}else{
+aa <-  wordsList
+}
+
+Jpn <- DeePL(aa, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
+bb3[k,2] <- Jpn
+message(colourise(paste("  ", wordsList, "=>", Jpn), fg = "green", bg = NULL))
+}
+
+######################
+##ここから実施する。
+#日本語リスト
+head(aa1)
+head(bb3)
+dd <- rbind(aa1, bb3)
+dim(dd)
+######################
+
+#DatJpn02 <- Label2Jpn(Data=DatJpn, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
 #ここから9/8
-saveRDS(DatJpn02, "./02_Mesh_Out/OCR_DatJpn02.Rds")
+#saveRDS(DatJpn02, "./02_Mesh_Out/OCR_DatJpn02_new.Rds")
 ##################################################################
 
 DatJpn03 <- DatJpn02
@@ -464,6 +528,8 @@ DatJpn03 <- DatJpn03[DatJpn03$property != "meshv:preferredConcept",]
 head(DatJpn03); dim(DatJpn03)
 
 topClass <- unique(DatJpn03$parentClass)[!(unique(DatJpn03$parentClass) %in% unique(DatJpn03$subject))]
+
+
 
 for(k in 1:length(topClass)){
 # k <- 1
@@ -492,6 +558,7 @@ agVisNetwork(Graph=Dat,
              Browse=TRUE, 
              Output=TRUE,
              ColoredSeed=LabList00,
+             ColoredTopClass=topClass,
              FilePath=FileName)
 #table(LabList00 == "mesh:D000937")
 suppressMessages(filesstrings::move_files(FileName, "./03_Mesh_Out_OCR_Jpn"))
@@ -503,157 +570,133 @@ suppressMessages(filesstrings::move_files(FileName, "./03_Mesh_Out_OCR_Jpn"))
 
 ```
 
-# Extract the upper classes
+# Convert to RDF
+
+Meshから抽出した結果のRDF変換
 
 ```{r echo=TRUE, eval=FALSE}
-rm(list=ls())
-#Read data
-LabList00 <- readRDS("./01_Mesh_Out/LabList00.Rds")
-head(LabList00)
+#rm(list=ls())
+#dir.create("04_Mesh_Out_OCR_RDF")
+Dat02 <- readRDS("./02_Mesh_Out/OCR_Dat02.Rds")
+DatJpn03 <- readRDS("./02_Mesh_Out/OCR_DatJpn02.Rds")
+topClass <- unique(DatJpn03$parentClass)[!(unique(DatJpn03$parentClass) %in% unique(DatJpn03$subject))]
+LabList00 <- readRDS("./01_Mesh_Out/OCR_en_LabList00.Rds")
 
-#MeshLabelsR.Rds
-MeshLabelR <- readRDS("./00_Mesh_Input/MeshLabelsR.Rds")
+#SPARQL結果をN-triplesに変換
 
-head(MeshLabelR); dim(MeshLabelR)
-table(MeshLabelR$OtherInfo == "BLANK")
-table(MeshLabelR$Property)
-table(MeshLabelR$SubInfo)
+if(T){
+#クラス階層
+a <- DatJpn03
+b <- Dat02
+  
+##NA対応
+table(is.na(a))
 
-#Mesh_othersR.Rds
-MeshOthers <- readRDS("./00_Mesh_Input/Mesh_othersR.Rds")
+#ループ消す
+head(a)
+table(a$subject != a$parentClass)
+a <- a[a$subject != a$parentClass, ]
 
-#Perform All
-library(agGraphSearch)
-Dat <- extractUpperConcepts4Mesh(Lab_List=LabList00,
-                                 Data=MeshOthers,
-                                 Labels=MeshLabelR,
-                                 Property="subClassOf")
+#table(grepl("mesh[:]", a$subject))
+#table(grepl("mesh[:]", a$parentClass))
 
-head(Dat)
-purrr::map(Dat, function(x) length(x[[2]]))
+nt <- paste("<", sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$subject), "> ",
+            "<http://www.w3.org/2000/01/rdf-schema#subClassOf> ",
+            "<", sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$parentClass), "> .",
+            sep="")
+nt <- unique(nt)
 
-length(Dat)
-Dat00 <- c()
+write.table(nt, "./04_Mesh_Out_OCR_RDF/RDF_from_mesh_v01.nt", sep="",
+             row.names = F, col.names = F, append=F, quote = F)
 
-for(n in seq_len(length(Dat))){
-#n <- 1
-Dat00 <- c(Dat00, Dat[[n]][[2]])
+colnames(a)
+
+#Labels: a
+nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$subject), '> ',
+            '<http://www.w3.org/2000/01/rdf-schema#label> ',
+            '"', a$subjectLabel, '"@ja.',
+            sep="")
+nt <- unique(nt)
+write.table(nt, "./04_Mesh_Out_OCR_RDF/RDF_from_mesh_v01.nt", sep="",
+             row.names = F, col.names = F, append=T, quote = F)
+
+nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$parentClass), '> ',
+            '<http://www.w3.org/2000/01/rdf-schema#label> ',
+            '"', a$parentClassLabel, '"@ja.',
+            sep="")
+nt <- unique(nt)
+write.table(nt, "./04_Mesh_Out_OCR_RDF/RDF_from_mesh_v01.nt", sep="",
+             row.names = F, col.names = F, append=T, quote = F)
+
+#Labels: b
+#head(b)
+nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", b$subject), '> ',
+            '<http://www.w3.org/2000/01/rdf-schema#label> ',
+            '"', b$subjectLabel, '"@en.',
+            sep="")
+nt <- unique(nt)
+write.table(nt, "./04_Mesh_Out_OCR_RDF/RDF_from_mesh_v01.nt", sep="",
+             row.names = F, col.names = F, append=T, quote = F)
+
+nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", b$parentClass), '> ',
+            '<http://www.w3.org/2000/01/rdf-schema#label> ',
+            '"', b$parentClassLabel, '"@en.',
+            sep="")
+nt <- unique(nt)
+write.table(nt, "./04_Mesh_Out_OCR_RDF/RDF_from_mesh_v01.nt", sep="",
+             row.names = F, col.names = F, append=T, quote = F)
 }
 
-table(Dat00)
-Dat01 <- data.frame(Name=names(table(Dat00)), Count=as.numeric(table(Dat00)), row.names = seq_len(length(table(Dat00))))
-Dat01
+if(T){
+#検索エンティティ
+cc <- LabList00
+nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", cc), '> ',
+            '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://class/search> .',
+            sep="")
+nt <- unique(nt)
+write.table(nt, "./04_Mesh_Out_OCR_RDF/RDF_from_mesh_v01.nt", sep="",
+             row.names = F, col.names = F, append=T, quote = F)
 
-head(MeshLabelR)
-Dat02 <- merge(Dat01, MeshLabelR, by.x = "Name", by.y = "Subject", all.x = T, all.y = F)[,c(1:4)]
-Dat03 <- Dat02[order(-Dat02$Count),]
-rownames(Dat03) <- 1:nrow(Dat03)
-Dat03
-saveRDS(Dat03, "./00_Mesh_Input/Mesh_Dat03.Rds")
 
+#上位エンティティ
+d <- topClass
+nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", d), '> ',
+            '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://class/top> .',
+            sep="")
+nt <- unique(nt)
+write.table(nt, "./04_Mesh_Out_OCR_RDF/RDF_from_mesh_v01.nt", sep="",
+             row.names = F, col.names = F, append=T, quote = F)
+
+}
+
+##################################################################
+#集計
+e <- readLines("./04_Mesh_Out_OCR_RDF/RDF_from_mesh_v01.nt")
+str(e)
+length(unique(e))
+write.table(data.frame(X=e), "./04_Mesh_Out_OCR_RDF/RDF_from_mesh_v01.nt", sep="",
+             row.names = F, col.names = F, append=F, quote = F)
+##################################################################
+
+e <- getwd()
+file <- "/04_Mesh_Out_OCR_RDF/RDF_from_mesh_v01.nt"
+i <- "/Users/sk/Desktop/AllegroGraph/ssh/id_rsa"
+paste("scp -i ",  i, " -r ", e, file, " admin@172.17.42.44:/data1/NEDO", sep="")
 
 ```
 
-# Visualize the relation network
+## 結果
 
-```{r echo=TRUE, eval=FALSE}
-#Read data
-Dat03 <- readRDS("./00_Mesh_Input/Mesh_Dat03.Rds")
-#MeshLabelsR.Rds
-MeshLabelR <- readRDS("./00_Mesh_Input/MeshLabelsR.Rds")
-#Mesh_othersR.Rds
-MeshOthers <- readRDS("./00_Mesh_Input/Mesh_othersR.Rds")
-ADD <- data.frame(Name=c("mesh:D008420", "mesh:D055641"),
-           Count=0,
-           Property =NA,
-           Object=c("Manufactured Materials", "Mathematical Concepts"))
-Dat03 <- rbind(Dat03, ADD)
-head(Dat03)
-tail(Dat03)
+Mesh RDFからクラス階層を抽出した結果
+1. 高分子辞典のOCR語彙を使用
+初期入力語彙: 4520語彙（高分子辞典 英語の語彙のみ）
 
-Dat03 <- Dat03[1:22,]
-########################################################################
-########################################################################
-DepN <- 25
-for(n in seq_len(nrow(Dat03))){
-#n <- 1
-a <- Dat03[n,1]
-b <- Dat03[n,4]
+2. Mesh RDFの語彙(英語)とエンティティリンキング(コサイン類似度)
+エンティティリンキング後: 491 エンティティ
 
-#下位探索
-message(a)
-DatSubClassOfDown <- c(); x <- 1; Query <- a
+最上位エンティティ: 69 エンティティ
+下位展開した結果: XXX エンティティ / 57359トリプル
 
-repeat{
-print(x)
-b1 <- MeshOthers[MeshOthers$Object %in% Query,]
-b1 <- b1[b1$Property == "subClassOf",]
-if(dim(b1)[1] == 0){break}
-b1$Depth <- paste0("down", formatC(x, flag = "0", width = "2"))
-DatSubClassOfDown <- rbind(DatSubClassOfDown, b1)
-Query <- b1$Subject
-if(x == DepN){break}
-x <- x + 1
-}
 
-rownames(DatSubClassOfDown) <- 1:nrow(DatSubClassOfDown)
-DatSubClassOfDown$triple <- paste0(DatSubClassOfDown$Subject, ".", 
-                                   DatSubClassOfDown$Property, ".", 
-                                   DatSubClassOfDown$Object)
-DatSubClassOfDown <- DatSubClassOfDown[as.numeric(rownames(unique(DatSubClassOfDown["triple"]))),]
-DatSubClassOfDown <- DatSubClassOfDown[,-ncol(DatSubClassOfDown)]
 
-DatSubClassOfDown00 <- MergeMeshData(DatSubClassOfDown, MeshLabelR)
-
-head(DatSubClassOfDown00)
-en0 <- length(unique(c(DatSubClassOfDown00$subject, DatSubClassOfDown00$parentClass)))
-en1 <- nrow(DatSubClassOfDown00)
-tim <- format(Sys.time(), "%y%m%d-%H%M%S")
-
-FileName <- paste0("agVisNetwork_", formatC(n, flag = "0", width = 3), "_下位探索_Depth", formatC(DepN, flag = "0", width = 2), "_", gsub(" ", "", b), "_", tim, 
-                   "_エンティティ数", en0, "_トリプル数", en1, ".html")
-OutName <- paste0("agVisNetwork_", formatC(n, flag = "0", width = 3), "_下位探索_Depth", formatC(DepN, flag = "0", width = 2), "_", gsub(" ", "", b), "_", tim, 
-                  "_エンティティ数", en0, "_トリプル数", en1, ".Rds")
-
-#head(DatSubClassOfDown00)
-agVisNetwork(Graph=DatSubClassOfDown00,
-             Selected=NULL, 
-             Browse=FALSE, 
-             Output=TRUE,
-             FilePath=FileName)
-saveRDS(DatSubClassOfDown00, OutName)
-
-system(paste0("mv ", FileName, " ./03_Mesh_Out"))
-system(paste0("mv ", OutName, " ./03_Mesh_Out"))
-
-}
-########################################################################
-########################################################################
-
-##Jpn
-File <- "agVisNetwork_003_下位探索_Depth25_PhysicalPhenomena_210831-184747.Rds"
-Dat <- readRDS(paste0("./03_Mesh_Out/", File))
-head(Dat)
-
-#Translate to Jpn
-if(F){
-proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
-Sys.setenv("http_proxy" = proxy_url)
-Sys.setenv("https_proxy" = proxy_url)
-Sys.setenv("ftp_proxy" = proxy_url)
-}
-
-DatJpn <- Label2Jpn(Dat, Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
-
-agVisNetwork(Graph=DatJpn,
-             Selected=NULL, 
-             Browse=FALSE, 
-             Output=TRUE,
-             FilePath=sub(".Rds", "_Jpn.html", File))
-saveRDS(DatJpn, sub(".Rds", "_Jpn.Rds", File))
-
-system(paste0("mv ", sub(".Rds", "_Jpn.html", File), " ./03_Mesh_Out"))
-system(paste0("mv ", sub(".Rds", "_Jpn.Rds", File), " ./03_Mesh_Out"))
-
-```
 

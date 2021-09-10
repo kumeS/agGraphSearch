@@ -20,7 +20,7 @@ MeshLabels01 <- Labels[,c("Subject", "Object")]
 
 #head(Dat); dim(Dat)
 colnames(Dat) <- tolower(colnames(Dat))
-Dat$triple <- paste0(Dat$subject, ".", Dat$property, ".", Dat$parentClass)
+Dat$triple <- paste0(Dat$subject, ".", Dat$property, ".", Dat$parentclass)
 rownames(Dat) <- 1:nrow(Dat)
 Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
 Dat <- Dat[,-ncol(Dat)]

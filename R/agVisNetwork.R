@@ -26,6 +26,7 @@ agVisNetwork <- function(Graph,
                          Browse=TRUE,
                          Output=FALSE,
                          ColoredSeed=NULL,
+                         ColoredTopClass=NULL,
                          FilePath=paste0("agVisNetwork_", format(Sys.time(), "%y%m%d"),".html"),
                          outputNodesEdges=FALSE){
 
@@ -135,6 +136,11 @@ a <- paste0("mesh:", unlist(purrr::map(nodes$id, function(x){strsplit(x, split =
 nodes$color.background[a %in% ColoredSeed] <- "#ffff00"
 nodes$color.border[a %in% ColoredSeed] <- "#ffd700"
 nodes$size[a %in% ColoredSeed] <- 12
+nodes$font.color <- "black"
+if(!is.null(ColoredTopClass)){
+nodes$font.size[a %in% ColoredTopClass] <- 8
+nodes$font.color[a %in% ColoredTopClass] <- "red"
+}
 }
 
   if(!any(colnames(Graph) == "propertyLabel")){}else{
