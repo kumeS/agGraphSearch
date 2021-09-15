@@ -38,7 +38,8 @@ Imports: RCurl,
   plotly,
   igraph,
   jsTree,
-  WikidataQueryServiceR
+  WikidataQueryServiceR,
+  stringdist
 Suggests: furrr, 
   progress, 
   rlang,
