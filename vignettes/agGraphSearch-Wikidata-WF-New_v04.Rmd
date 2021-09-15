@@ -40,18 +40,16 @@ library("agGraphSearch")
 #YYYY
 
 #Read data
-df <- readRDS("./00_Input/Relation_P31_P279_df.Rds")
+df <- readRDS("./01_Wiki_00_Input/Relation_P31_P279_df.Rds")
 colnames(df) <- c("Subject", "Property", "Object")
 head(df)
 
-if(!exists("Wikilabels")){ Wikilabels <- data.frame(readRDS("./00_Input/WikiLab.Rds")) }
+if(!exists("Wikilabels")){ Wikilabels <- data.frame(readRDS("./01_Wiki_00_Input/WikiLab.Rds")) }
 head(Wikilabels)
 
-vignette("vignette/agGraphSearch-Wikidata-WF-New_v04.Rmd", package="agGraphSearch")
+#view vignette
+browseURL("https://github.com/kumeS/agGraphSearch/blob/main/vignettes/agGraphSearch-Wikidata-WF-New_v04.Rmd")
 ```
-
-
-
 
 # prepare QIDs
 
@@ -174,6 +172,7 @@ x <- x + 1
 
 #表示用の変数
 DataUp <- Data
+colnames(DataUp) <- c("subject", "property", "parentClass", "depth")
 
 ######################################################################
 #下位探索 subClassOf
@@ -269,7 +268,6 @@ table(DatInstanceOfDown$Depth)
 #グラフの結合
 Dat <- rbind(Data, DatSubClassOfDown)
 Dat <- rbind(Dat, DatInstanceOfDown)
-DataUp <- Dat
 
 #remove
 table(Dat$Depth)
@@ -277,7 +275,7 @@ Dat <- Dat[,-4]
 ######################################################################
 ######################################################################
 #create dir
-if(!dir.exists("01_Wiki_Out")){dir.create("01_Wiki_Out")}
+if(!dir.exists("01_Wiki_01_Out")){dir.create("01_Wiki_01_Out")}
 ######################################################################
 head(Dat); dim(Dat)
 rownames(Dat) <- 1:nrow(Dat)
@@ -305,10 +303,14 @@ table(Dat00$property)
 Dat01 <- Dat00
 head(Dat01)
 
-#Rename
+##############################################
+#Rename via SPARQL
+##############################################
+head(Dat01)
 d <- unique(c(Dat01[,c("subjectLabel")][grepl("wd:", Dat01[,c("subjectLabel")])], 
-              Dat01[,c("parentClass")][grepl("wd:", Dat01[,c("parentClass")])]))
+              Dat01[,c("parentClass")][grepl("wd:", Dat01[,c("parentClassLabel")])]))
 length(d)
+#[1] 139
 
 #OECUプロキシ設定
 if(T){
@@ -328,44 +330,59 @@ Dat01$subjectLabel[Dat01$subject == d[n]] <- a$entityNamej[1]
 Dat01$parentClassLabel[Dat01$parentClass == d[n]] <- a$entityNamej[1] 
 }}
 
+##############################################
 #save output
+##############################################
 head(Dat01)
-readr::write_excel_csv(Dat01, file = paste0("./01_Wiki_Out/", sub(".html", ".csv", FileName)), col_names = T)
-#Dat01 <- data.frame(readr::read_csv(paste0("./01_Wiki_Out/", sub(".html", ".csv", FileName)), col_names = T))
+readr::write_excel_csv(Dat01, file = paste0("./01_Wiki_01_Out/", sub(".html", ".csv", FileName)), col_names = T)
+#Dat01 <- data.frame(readr::read_csv(paste0("./01_Wiki_01_Out/", sub(".html", ".csv", FileName)), col_names = T))
 
-#グラフ末端のQIDエンティティを削除する
+##############################################
+#グラフ末端のQIDエンティティ表記(ラベル無し)を削除する
+##############################################
 head(Dat01)
 a <- unique(Dat01$subjectLabel[grepl("^wd:Q", Dat01$subjectLabel)])
 b <- unique(Dat01$parentClassLabel[grepl("^wd:Q", Dat01$parentClassLabel)])
 ab <- a[!(a %in% b)]
 Dat01a <- Dat01[!(Dat01$subjectLabel %in% ab),]
 
+##############################################
 #グラフ可視化
+##############################################
 agVisNetwork(Graph=Dat01a,
              Selected=NULL, 
              Browse=TRUE, 
              Output=TRUE,
              FilePath=FileName)
-system(paste0("mv ", FileName, " ./01_Wiki_Out"))
+system(paste0("mv ", FileName, " ./01_Wiki_01_Out"))
 
+##############################################
 #上位概念の可視化
-DataUp <- MergeWikiData(Data=DataUp[grepl("^up", Dat$Depth),], 
-                        Labels=Wikilabels00)
-agVisNetwork(Graph=DataUp,
+##############################################
+head(DataUp)
+head(Dat01a)
+DataUp$triple <- paste0(DataUp$subject, ".", DataUp$property, ".", DataUp$parentClass)
+Dat01a$triple <- paste0(Dat01a$subject, ".", Dat01a$property, ".", Dat01a$parentClass)
+DataUp00 <- Dat01a[Dat01a$triple %in% unique(DataUp$triple),]
+
+agVisNetwork(Graph=DataUp00,
              Selected=NULL, 
              Browse=TRUE, 
              Output=TRUE,
+             ColoredSeed=QIDup,
              FilePath="DataUp.html")
+system(paste0("mv ", "DataUp.html", " ./01_Wiki_01_Out"))
 
+##############################################
 #ツリー可視化
-library(jsTree)
-agJsTree(Data=Dat01, 
+##############################################
+agJsTree(Data=Dat01,
          TopClass="エンティティ.wd:Q35120", 
          Brouse=TRUE, 
          SaveHtmlFile=TRUE, 
          ExcludeQID=TRUE,
          FileName=sub("agVisNetwork_process_", "agJsTree_Wikidata_Process_",  FileName), 
-         Output="./01_Wiki_Out")
+         Output="./01_Wiki_01_Out")
 
 ```
 

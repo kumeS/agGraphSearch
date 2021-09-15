@@ -137,7 +137,12 @@ if(Count > 1){
   }
 
 if(!is.null(ColoredSeed)){
+if(grepl("mesh:", nodes$id[1])){
 a <- paste0("mesh:", unlist(purrr::map(nodes$id, function(x){strsplit(x, split = "[.]mesh[:]")[[1]][2]})))
+}
+if(grepl("wd:", nodes$id[1])){
+a <- paste0("wd:", unlist(purrr::map(nodes$id, function(x){strsplit(x, split = "[.]wd[:]")[[1]][2]})))
+}
 nodes$color.background[a %in% ColoredSeed] <- "#ffff00"
 nodes$color.border[a %in% ColoredSeed] <- "#ffd700"
 nodes$size[a %in% ColoredSeed] <- 12

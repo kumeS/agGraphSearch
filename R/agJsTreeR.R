@@ -1,4 +1,4 @@
-##' @title agJsTree: jsTree for agGraphSearch
+##' @title agJsTreeR: jsTree for agGraphSearch (modified)
 ##'
 ##' @param Data a input data.frame.
 ##' @param TopClass a string of the top class. ex. entity.wd:Q35120.
@@ -12,7 +12,7 @@
 ##'
 ##' @return html
 ##' @author Satoshi Kume
-##' @export agJsTree
+##' @export agJsTreeR
 ##' @importFrom jsTree jsTree
 ##' @importFrom igraph graph_from_edgelist
 ##' @importFrom igraph as_ids
@@ -22,7 +22,7 @@
 ##'
 
 #library(jsTree)
-agJsTree <- function(Data,
+agJsTreeR <- function(Data,
                      TopClass,
                      Brouse=TRUE,
                      SaveHtmlFile=TRUE,
@@ -84,9 +84,9 @@ jsTree::jsTree(DatDF, width=Width, height=Height)
 if(is.null(FileName)){
 if(SaveHtmlFile){
 jsTree::jsTree(DatDF, width=Width, height=Height) %>%
-  htmlwidgets::saveWidget("agJsTree.html")
+  htmlwidgets::saveWidget("agJsTreeR.html")
 if(!is.null(Output)){
-suppressMessages(filesstrings::file.move(files="agJsTree.html", destinations=Output, overwrite = TRUE))
+suppressMessages(filesstrings::file.move(files="agJsTreeR.html", destinations=Output, overwrite = TRUE))
 }
 }
 }else{
