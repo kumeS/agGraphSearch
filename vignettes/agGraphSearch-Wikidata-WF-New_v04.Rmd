@@ -35,12 +35,23 @@ library("agGraphSearch")
 # prepare Dataset
 
 ```{r echo=TRUE, eval=FALSE}
+#Download Data
+#XXXX
+#YYYY
+
+#Read data
 df <- readRDS("./00_Input/Relation_P31_P279_df.Rds")
 colnames(df) <- c("Subject", "Property", "Object")
 head(df)
 
 if(!exists("Wikilabels")){ Wikilabels <- data.frame(readRDS("./00_Input/WikiLab.Rds")) }
+head(Wikilabels)
+
+vignette("vignette/agGraphSearch-Wikidata-WF-New_v04.Rmd", package="agGraphSearch")
 ```
+
+
+
 
 # prepare QIDs
 
@@ -160,6 +171,9 @@ Query <- b1$Object
 if(x == DepN){break}
 x <- x + 1
 }
+
+#表示用の変数
+DataUp <- Data
 
 ######################################################################
 #下位探索 subClassOf
