@@ -49,11 +49,12 @@ head(Wikilabels)
 
 #view vignette
 browseURL("https://github.com/kumeS/agGraphSearch/blob/main/vignettes/agGraphSearch-Wikidata-WF-New_v04.Rmd")
+
 ```
 
 # prepare QIDs
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 rm(list=ls()[!(ls() %in% c("df", "Wikilabels"))])
 
 #変化 (wd:Q1150070)
@@ -152,12 +153,12 @@ Ex <- c()
 
 ```
 
-## search the upper-hieracry
+# search the upper-hieracry
 
-```{r}
-######################################################################
+```{r  echo=TRUE, eval=FALSE}
 ######################################################################
 #上位探索 subClassOf & instanceOf
+######################################################################
 Data <- c(); x <- 1; Query <- QIDup; DepN <- 20
 repeat{
 message("Depth: ", x)
