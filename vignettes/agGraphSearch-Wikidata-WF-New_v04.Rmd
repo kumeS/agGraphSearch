@@ -255,6 +255,7 @@ table(DatInstanceOfDown$Depth)
 #グラフの結合
 Dat <- rbind(Data, DatSubClassOfDown)
 Dat <- rbind(Dat, DatInstanceOfDown)
+DataUp <- Dat
 
 #remove
 table(Dat$Depth)
@@ -332,6 +333,15 @@ agVisNetwork(Graph=Dat01a,
              Output=TRUE,
              FilePath=FileName)
 system(paste0("mv ", FileName, " ./01_Wiki_Out"))
+
+#上位概念の可視化
+DataUp <- MergeWikiData(Data=DataUp[grepl("^up", Dat$Depth),], 
+                        Labels=Wikilabels00)
+agVisNetwork(Graph=DataUp,
+             Selected=NULL, 
+             Browse=TRUE, 
+             Output=TRUE,
+             FilePath="DataUp.html")
 
 #ツリー可視化
 library(jsTree)

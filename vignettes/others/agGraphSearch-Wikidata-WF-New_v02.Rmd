@@ -294,7 +294,7 @@ system(paste0("mv ", FileName, " ./01_Wiki_Out"))
 #ツリー可視化
 agJsTree(Data=Dat01, 
          TopClass="エンティティ.wd:Q35120", 
-         Brouse=TRUE, SaveHtmlFile=TRUE, FileName=NULL, Output=NULL){
+         Brouse=TRUE, SaveHtmlFile=TRUE, FileName=NULL, Output=NULL)
 
 
 

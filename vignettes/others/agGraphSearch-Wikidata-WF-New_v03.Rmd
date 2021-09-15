@@ -1,0 +1,361 @@
+---
+title: "Process relations from Wikidata"
+author:
+  - name: Satoshi Kume
+date: "`r Sys.Date()`"
+graphics: no
+package: agGraphSearch, knitr, SPARQL
+output:
+  BiocStyle::html_document:
+  toc_float: true
+vignette: >
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{agGraphSearch}
+  %\VignetteIndexEntry{Process relations from Wikidata}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r style, echo = FALSE, results = 'asis', message=FALSE}
+BiocStyle::markdown()
+```
+
+**Last modified:** `r file.info("agGraphSearch-WF-002.Rmd")$mtime`<br />
+**Compiled**: `r date()`
+
+# Getting started
+
+Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
+
+```{r library, message=FALSE}
+library("agGraphSearch")
+```
+
+# prepare Dataset
+
+```{r echo=TRUE, eval=FALSE}
+df <- readRDS("./00_Input/Relation_P31_P279_df.Rds")
+colnames(df) <- c("Subject", "Property", "Object")
+head(df)
+
+if(!exists("Wikilabels")){ Wikilabels <- data.frame(readRDS("./00_Input/WikiLab.Rds")) }
+```
+
+# prepare QIDs
+
+```{r echo=TRUE, eval=TRUE}
+rm(list=ls()[!(ls() %in% c("df", "Wikilabels"))])
+
+#変化 (wd:Q1150070)
+#過程 (wd:Q3249551)
+#行為 (wd:Q1914636)
+#物理的プロセス (wd:Q17320256)
+#プロセス機能 (wd:Q900800)
+#物理現象 (wd:Q1293220)
+#熱力学過程 (wd:Q213016)
+#技術 (wd:Q2695280)
+#製造プロセス  (wd:Q1408288)
+#工学的プロセス (wd:Q14359196)
+#自然過程 (wd:Q13878858)
+#計画プロセス (wd:Q104637332)
+#材料加工 (wd:Q104637425)
+#成形プロセス (wd:Q1363994)
+#化学過程 (wd:Q2281940)
+#化学反応 (wd:Q36534)
+#物質の変換 (wd:Q3537517)
+#重合反応 (wd:Q181898)
+#連鎖反応 (化学反応) (wd:Q1739960)
+
+#Process
+#上位
+QIDup <- c("wd:Q1150070", "wd:Q3249551", "wd:Q1914636", 
+         "wd:Q17320256", "wd:Q900800", "wd:Q1293220", 
+         "wd:Q213016", "wd:Q2695280", "wd:Q1408288",
+         "wd:Q10843872", "wd:Q13878858", "wd:Q104637332",
+         "wd:Q104637425", "wd:Q1363994", "wd:Q2281940",
+         "wd:Q36534", "wd:Q3537517", "wd:Q181898", "wd:Q1739960")
+
+#下位
+#QIDdown <- c("wd:Q17320256")
+#QIDdown <- c("wd:Q10843872")
+#QIDdown <- c("wd:Q900800")
+#QIDdown <- c("wd:Q13878858")
+#QIDdown <- c("wd:Q3537517")
+#QIDdown <- c("wd:Q36534")
+
+#下位リスト
+QIDdown <- unique(c("wd:Q471702",  "wd:Q213016",  "wd:Q15211908", "wd:Q108000", "wd:Q3240978",
+             "wd:Q210028",  "wd:Q29652844", "wd:Q2035846", "wd:Q215328",
+             "wd:Q1363994", "wd:Q1651044",  "wd:Q747713", "wd:Q720899", "wd:Q720899",
+             "wd:Q900800", "wd:Q588936",
+             "wd:Q181898", "wd:Q185357", "wd:Q210028", "wd:Q552456", "wd:Q14946524",
+             "wd:Q124131", "wd:Q3155522", "wd:Q133900", "wd:Q14946524",
+             "wd:Q192005", "wd:Q452648", "wd:Q139143", "wd:Q3680646", "wd:Q648191",
+             "wd:Q825643"))
+QIDup <- unique(c(QIDup, QIDdown))
+
+#除外リスト
+Ex <- unique(c("wd:Q82264", "wd:Q61951", "wd:Q1433061", "wd:Q229367", "wd:Q747713", 
+        "wd:Q79782", "wd:Q13406206", "wd:Q3929317", "wd:Q16525404",
+        "wd:Q9363879", "wd:Q9363879", "wd:Q44432", "wd:Q496098", "wd:Q59295937",
+        "wd:Q854618"))
+
+```
+
+```{r echo=TRUE, eval=FALSE}
+if(F){
+#工学的プロセス.wd:Q10843872
+QIDup <- c("wd:Q10843872")
+QIDdown <- c("wd:Q10843872")
+Ex <- c()
+
+#重合反応.wd:Q181898
+QIDup <- c("wd:Q181898")
+QIDdown <- c("wd:Q181898")
+Ex <- c()
+
+#熱力学過程.wd:Q213016
+QIDup <- c("wd:Q213016")
+QIDdown <- c("wd:Q213016")
+Ex <- c()
+
+#相転移.wd:Q185357
+QIDup <- c("wd:Q185357")
+QIDdown <- c("wd:Q185357")
+Ex <- c()
+
+#材料特性.wd:Q3523867
+QIDup <- c("wd:Q3523867")
+QIDdown <- c("wd:Q3523867")
+Ex <- c()
+
+#物理量.wd:Q107715
+QIDup <- c("wd:Q107715")
+QIDdown <- c("wd:Q107715")
+Ex <- c()
+
+#弾性率.wd:Q192005
+QIDup <- c("wd:Q192005")
+QIDdown <- c("wd:Q192005")
+Ex <- c()
+}
+
+```
+
+## search the upper-hieracry
+
+```{r}
+######################################################################
+######################################################################
+#上位探索 subClassOf & instanceOf
+Data <- c(); x <- 1; Query <- QIDup; DepN <- 20
+repeat{
+message("Depth: ", x)
+b1 <- df[df$Subject %in% Query,]
+if(dim(b1)[1] == 0){break}
+b1$Depth <- paste0("up", formatC(x, flag = "0", width = "2"))
+Data <- rbind(Data, b1)
+Query <- b1$Object
+if(x == DepN){break}
+x <- x + 1
+}
+
+######################################################################
+#下位探索 subClassOf
+#カウント
+######################################################################
+if(F){
+DatSubClassOfDownCount <- c()
+for(n in 1:length(QIDdown)){
+DatSubClassOfDown <- c(); x <- 1; DepN <- 20; Query <- QIDdown[n]
+message("Query: ", Query)
+repeat{
+print(x)
+Query <- Query[!(Query %in% Ex)]
+b1 <- df[df$Object %in% Query,]
+b1 <- b1[b1$Property == "wdt:P279",]
+if(dim(b1)[1] == 0){
+  if(is.null(DatSubClassOfDown)){
+  DatSubClassOfDownCount[n] <- 0
+  break 
+  }else{
+  rownames(DatSubClassOfDown) <- 1:nrow(DatSubClassOfDown)
+  DatSubClassOfDown$triple <- paste0(DatSubClassOfDown$Subject, ".", 
+                                     DatSubClassOfDown$Property, ".", 
+                                     DatSubClassOfDown$Object)
+  DatSubClassOfDown <- DatSubClassOfDown[as.numeric(rownames(unique(DatSubClassOfDown["triple"]))),]
+  DatSubClassOfDownCount[n] <- nrow(DatSubClassOfDown)
+  break
+  }
+}
+b1$Depth <- paste0("down", formatC(x, flag = "0", width = "2"))
+DatSubClassOfDown <- rbind(DatSubClassOfDown, b1)
+Query <- b1$Subject
+if(x == DepN){
+  rownames(DatSubClassOfDown) <- 1:nrow(DatSubClassOfDown)
+  DatSubClassOfDown$triple <- paste0(DatSubClassOfDown$Subject, ".", 
+                                     DatSubClassOfDown$Property, ".", 
+                                     DatSubClassOfDown$Object)
+  DatSubClassOfDown <- DatSubClassOfDown[as.numeric(rownames(unique(DatSubClassOfDown["triple"]))),]
+  DatSubClassOfDownCount[n] <- nrow(DatSubClassOfDown)
+  break}
+x <- x + 1
+Query <- Query[!(Query %in% Ex)]
+}}
+
+#取得数
+data.frame(QIDdown, DatSubClassOfDownCount)
+}
+
+######################################################################
+######################################################################
+#下位探索 subClassOf
+#取得
+DatSubClassOfDown <- c(); x <- 1; Query <- QIDdown; DepN <- 20
+repeat{
+message("Depth: ", x)
+Query <- Query[!(Query %in% Ex)]
+b1 <- df[df$Object %in% Query,]
+b1 <- b1[b1$Property == "wdt:P279",]
+if(dim(b1)[1] == 0){break}
+b1$Depth <- paste0("down", formatC(x, flag = "0", width = "2"))
+DatSubClassOfDown <- rbind(DatSubClassOfDown, b1)
+Query <- b1$Subject
+if(x == DepN){break}
+x <- x + 1
+Query <- Query[!(Query %in% Ex)]
+}
+
+######################################################################
+######################################################################
+#下位探索 instanceOf
+DatInstanceOfDown <- c(); x <- 1; Query <- QIDdown; DepN <- 20
+repeat{
+message("Depth: ", x)
+b1 <- df[df$Object %in% Query,]
+b1 <- b1[b1$Property == "wdt:P31",]
+if(dim(b1)[1] == 0){break}
+b1$Depth <- paste0("down", formatC(x, flag = "0", width = "2"))
+DatInstanceOfDown <- rbind(DatInstanceOfDown, b1)
+Query <- b1$Subject
+if(x == DepN){break}
+x <- x + 1
+Query <- Query[!(Query %in% Ex)]
+}
+
+######################################################################
+#詳細
+######################################################################
+table(DatSubClassOfDown$Depth)
+table(DatInstanceOfDown$Depth)
+
+######################################################################
+######################################################################
+#グラフの結合
+Dat <- rbind(Data, DatSubClassOfDown)
+Dat <- rbind(Dat, DatInstanceOfDown)
+DataUp <- Dat
+
+#remove
+table(Dat$Depth)
+Dat <- Dat[,-4]
+######################################################################
+######################################################################
+#create dir
+if(!dir.exists("01_Wiki_Out")){dir.create("01_Wiki_Out")}
+######################################################################
+head(Dat); dim(Dat)
+rownames(Dat) <- 1:nrow(Dat)
+colnames(Dat) <- c("subject", "property", "parentClass")
+Dat$triple <- paste0(Dat$subject, ".", Dat$property, ".", Dat$parentClass)
+Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
+Dat <- Dat[,-ncol(Dat)]
+head(Dat); dim(Dat)
+length(unique(c(Dat$subject, Dat$parentClass)))
+######################################################################
+######################################################################
+######################################################################
+library(agGraphSearch)
+library(magrittr)
+
+#Add labels
+Wikilabels00 <- Wikilabels[Wikilabels$Subject %in% unique(c(Dat$subject, Dat$parentClass)),]
+Dat00 <- MergeWikiData(Data=Dat, Labels=Wikilabels00)
+
+#Create file name
+FileName <- paste0("agVisNetwork_process_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
+
+head(Dat00); dim(Dat00); table(Dat00$property)
+table(Dat00$property)
+Dat01 <- Dat00
+head(Dat01)
+
+#Rename
+d <- unique(c(Dat01[,c("subjectLabel")][grepl("wd:", Dat01[,c("subjectLabel")])], 
+              Dat01[,c("parentClass")][grepl("wd:", Dat01[,c("parentClass")])]))
+length(d)
+
+#OECUプロキシ設定
+if(T){
+proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
+Sys.setenv("http_proxy" = proxy_url)
+Sys.setenv("https_proxy" = proxy_url)
+Sys.setenv("ftp_proxy" = proxy_url)
+}
+
+#Wikidataの最新ラベルに変更する
+for(n in 1:length(d)){
+#n <-1
+message("Progress: ", n, " / ", length(d))
+a <- wikiQID2Label(EntityQID = d[n])
+if(!is.na(a$entityNamej[1])){
+Dat01$subjectLabel[Dat01$subject == d[n]] <- a$entityNamej[1]
+Dat01$parentClassLabel[Dat01$parentClass == d[n]] <- a$entityNamej[1] 
+}}
+
+#save output
+head(Dat01)
+readr::write_excel_csv(Dat01, file = paste0("./01_Wiki_Out/", sub(".html", ".csv", FileName)), col_names = T)
+#Dat01 <- data.frame(readr::read_csv(paste0("./01_Wiki_Out/", sub(".html", ".csv", FileName)), col_names = T))
+
+#グラフ末端のQIDエンティティを削除する
+head(Dat01)
+a <- unique(Dat01$subjectLabel[grepl("^wd:Q", Dat01$subjectLabel)])
+b <- unique(Dat01$parentClassLabel[grepl("^wd:Q", Dat01$parentClassLabel)])
+ab <- a[!(a %in% b)]
+Dat01a <- Dat01[!(Dat01$subjectLabel %in% ab),]
+
+#グラフ可視化
+agVisNetwork(Graph=Dat01a,
+             Selected=NULL, 
+             Browse=TRUE, 
+             Output=TRUE,
+             FilePath=FileName)
+system(paste0("mv ", FileName, " ./01_Wiki_Out"))
+
+#上位概念の可視化
+DataUp <- MergeWikiData(Data=DataUp[grepl("^up", Dat$Depth),], 
+                        Labels=Wikilabels00)
+agVisNetwork(Graph=DataUp,
+             Selected=NULL, 
+             Browse=TRUE, 
+             Output=TRUE,
+             FilePath="DataUp.html")
+
+#ツリー可視化
+library(jsTree)
+agJsTree(Data=Dat01, 
+         TopClass="エンティティ.wd:Q35120", 
+         Brouse=TRUE, 
+         SaveHtmlFile=TRUE, 
+         ExcludeQID=TRUE,
+         FileName=sub("agVisNetwork_process_", "agJsTree_Wikidata_Process_",  FileName), 
+         Output="./01_Wiki_Out")
+
+```
+
+# Session information {.unnumbered}
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```

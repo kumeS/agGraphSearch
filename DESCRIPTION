@@ -1,7 +1,7 @@
 Package: agGraphSearch
 Type: Package
 Title: Graph search for the RDF stores of AllegroGraph
-Version: 0.99.2
+Version: 0.99.3
 Encoding: UTF-8
 Authors@R: c(
     person (given = "Satoshi", family = "Kume",
@@ -23,11 +23,12 @@ Depends: R (>= 4.0.0), SPARQL
 Imports: RCurl,
   XML,
   franc,
-  magrittr, 
-  purrr, 
-  readr, 
-  stringr, 
-  BiocStyle, 
+  magrittr,
+  purrr,
+  readr,
+  stringr,
+  BiocManager,
+  BiocStyle,
   knitr,
   DT,
   formattable,
@@ -40,11 +41,11 @@ Imports: RCurl,
   jsTree,
   WikidataQueryServiceR,
   stringdist
-Suggests: furrr, 
-  progress, 
+Suggests: furrr,
+  progress,
   rlang,
   data.tree,
-  testthat, 
+  testthat,
   VennDiagram, 
   htmltools,
   tidyverse, 
