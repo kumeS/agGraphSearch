@@ -35,8 +35,10 @@ Dat <- Data
 Dat$X <- paste0(Dat$subjectLabel, ".", Dat$subject)
 Dat$Y <- paste0(Dat$parentClassLabel, ".", Dat$parentClass)
 DatXY <- Dat[,c("X", "Y")]
+
 head(DatXY)
 DatDF <- c()
+
 BottomClass <- unique(DatXY$X)[!(unique(DatXY$X) %in% unique(DatXY$Y))]
 #Create graph data
 graphList <- data.frame(from=DatXY$X, to=DatXY$Y, stringsAsFactors = F)

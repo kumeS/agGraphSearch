@@ -18,6 +18,7 @@
 ##' @importFrom igraph as_ids
 ##' @importFrom igraph shortest_paths
 ##' @importFrom filesstrings file.move
+##' @importFrom htmlwidgets saveWidget
 ##'
 ##'
 
@@ -43,17 +44,31 @@ head(DatXY)
 DatDF <- c()
 BottomClass <- unique(DatXY$X)[!(unique(DatXY$X) %in% unique(DatXY$Y))]
 
+#Obtain shortest path
+for(m in 1:length(TopClass)){
+#m <- 1
+Datt <- c(); x <- 1; Query <- TopClass[m]
+repeat{
+b2 <- DatXY[DatXY$Y %in% Query,]
+if(dim(b2)[1] == 0){break}
+Datt <- rbind(Datt, b2)
+Query <- b2$X
+#message(x)
+x <- x + 1
+if(x == 50){break}
+}
+
 #Create graph data
-graphList <- data.frame(from=DatXY$X, to=DatXY$Y, stringsAsFactors = F)
+graphList <- data.frame(from=Datt$X, to=Datt$Y, stringsAsFactors = F)
+cc <- unique(c(Datt$X, Datt$Y)); cc0 <- cc[cc %in% BottomClass]
 D00 <- igraph::graph_from_edgelist(as.matrix(graphList), directed = T)
 
-#Obtain shortest path
-for(n in seq_len(length(BottomClass))){
+for(n in seq_len(length(cc0))){
 #n <- 1
 a <- igraph::as_ids(igraph::shortest_paths(D00,
-                       from = BottomClass[n],
-                       to = TopClass)$vpath[[1]])
-
+                       from = cc0[n],
+                       to = TopClass[m])$vpath[[1]])
+if(!identical(a, character(0))){
 if(ExcludeQID){
 if(!grepl("^wd:Q", a[1])){
 b <- paste(a[length(a):1], collapse='/')
@@ -62,9 +77,9 @@ DatDF <- c(DatDF, b)
 }else{
 b <- paste(a[length(a):1], collapse='/')
 DatDF <- c(DatDF, b)
-}
-}
+}}}}
 
+DatDF <- unique(DatDF)
 if(any(DatDF == "NA")){DatDF <- DatDF[DatDF != "NA"]}
 #DatDF
 #head(Dat)

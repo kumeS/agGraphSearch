@@ -299,6 +299,7 @@ library( magrittr )
 #Extract IDs
 ##################################################################
 #一時的に小文字に変換してマッティング
+##################################################################
 MeshLabels01 <- MeshLabels00[c(tolower(MeshLabels00$Object) %in% tolower(words02$Lab00)),]
 
 head(MeshLabels01)
@@ -372,7 +373,9 @@ x <- x + 1
 if(x == 100){break}
 }
 
+##################################################################
 #重複を除く
+##################################################################
 head(Dat); dim(Dat)
 rownames(Dat) <- 1:nrow(Dat)
 colnames(Dat) <- c("subject", "property", "parentClass", "OtherInfo", "SubInfo", "ObjInfo")
@@ -382,7 +385,9 @@ Dat <- Dat[,-ncol(Dat)]
 head(Dat); dim(Dat)
 length(unique(c(Dat$subject, Dat$parentClass)))
 
+##################################################################
 #最上位
+##################################################################
 a3 <- unique(Dat$parentClass)[!(unique(Dat$parentClass) %in% unique(Dat$subject))]
 str(a3)
 a3
@@ -420,6 +425,7 @@ try(agJsTree(Data=DatX,
          FileName=paste0("agVisNetwork_upClass_", a3[n], ".html"), 
          Output="./03_Mesh_OCR_03_Out"))
 }
+
 ##################################################################
 #下位探索: 最上位から全部取得
 ##################################################################
@@ -532,6 +538,7 @@ length(bb2$IDs)
 
 ##################################################################
 #日本語訳
+##################################################################
 for(k in 7645:length(bb2$IDs)){
 #k <- 1
 wordsList <- bb2[k,2]
@@ -555,6 +562,7 @@ message(colourise(paste("  ", wordsList, "=>", Jpn), fg = "green", bg = NULL))
 ##################################################################
 ##################################################################
 #日本語リスト
+##################################################################
 head(aa1);dim(aa1)
 head(bb4);dim(bb4)
 
@@ -567,6 +575,7 @@ length(unique(dd$IDs))
 ##################################################################
 ##################################################################
 #代入
+##################################################################
 DatJpn01 <- DatJpn
 head(DatJpn01); dim(DatJpn01)
 head(dd); dim(dd)
@@ -586,9 +595,7 @@ length(unique(c(DatJpn03$subject, DatJpn03$parentClass)))
 #Save
 #saveRDS(DatJpn03, "./03_Mesh_OCR_01_Out/OCR_DatJpn03_new.Rds")
 }
-##################################################################
-##################################################################
-##################################################################
+
 ##################################################################
 #個別にグラフ化
 ##################################################################
@@ -622,7 +629,9 @@ a <- DatJpn03[DatJpn03$parentClass %in% topClass[k],]
 FileName <- paste0("agVisNetwork_OCR_Jpn_", topClass[k], "_",
                    a$parentClassLabel[1], "_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
 
+##################################################################
 #All: 検索エンティティをyellowに
+##################################################################
 try(agVisNetwork(Graph=Dat,
              Selected=NULL, 
              Browse=TRUE, 
@@ -633,6 +642,18 @@ try(agVisNetwork(Graph=Dat,
 #table(LabList00 == "mesh:D000937")
 suppressMessages(filesstrings::move_files(FileName, "./03_Mesh_OCR_04_Jpn"))
 }
+
+##################################################################
+#ツリー可視化
+##################################################################
+head(DatJpn03)
+agJsTreeR(Data=DatJpn03,
+          TopClass=topClass,
+          Brouse=TRUE,
+          SaveHtmlFile=TRUE,
+          FileName="ExtractedMesh_tree.html",
+          Output=NULL,
+          ExcludeQID=TRUE)
 
 ```
 
@@ -745,32 +766,29 @@ write.table(data.frame(X=unique(e)),
             "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01R.nt", sep="",
              row.names = F, col.names = F, append=F, quote = F)
 ##################################################################
-e <- getwd()
-file <- "/03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt"
-i <- "/Users/sk/Desktop/AllegroGraph/ssh/id_rsa"
-paste("scp -i ",  i, " -r ", e, file, " admin@172.17.42.44:/data1/NEDO", sep="")
 
-#scp -i /Users/sk/Desktop/AllegroGraph/ssh/id_rsa -r /Users/sk/Desktop/ToDo_210901/00_Package_agGraphSearch_v02/03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt admin@172.17.42.44:/data1/NEDO
 ```
 
-## 結果
+## Summary
 
 Mesh RDFからクラス階層を抽出した結果
+
 1. 高分子辞典のOCR語彙を使用
+
 初期入力語彙: 4520語彙（高分子辞典 英語の語彙のみ）
 
 2. Mesh RDFの語彙(英語)とエンティティリンキング(コサイン類似度)
+
 エンティティリンキング後: 491 エンティティ
 
 上位展開して、最上位エンティティ: 69 エンティティ
+
 下位展開した結果: 49127 エンティティ / 57359トリプル
 
-
-```{r}
-dim(DatJpn03)
-length(unique(c(DatJpn03$subject, DatJpn03$parentClass)))
-
-table(topClass %in% a3)
+```{r echo=TRUE, eval=FALSE}
+#dim(DatJpn03)
+#length(unique(c(DatJpn03$subject, DatJpn03$parentClass)))
+#table(topClass %in% a3)
 
 
 ```
