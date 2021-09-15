@@ -2,7 +2,7 @@
 % Please edit documentation in R/ComputeDistance.R
 \name{ComputeDistance}
 \alias{ComputeDistance}
-\title{Compute distance metrics between input strings and rdfs}
+\title{ComputeDistance: Compute distance metrics between input strings and rdfs}
 \usage{
 ComputeDistance(InputTerms, RDFterms, q = 2, nthread = 4, TopWords = 3)
 }

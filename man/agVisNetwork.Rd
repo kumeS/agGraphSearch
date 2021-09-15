@@ -13,8 +13,14 @@ agVisNetwork(
   StarSize = 10,
   FontSize = 7,
   Selected = NULL,
-  Browse = FALSE,
+  Browse = TRUE,
   Output = FALSE,
+  ColoredSeed = NULL,
+  ColoredTopClass = NULL,
+  Layout = "layout_with_fr",
+  MaxRow = 100000,
+  Physics = F,
+  Smooth = F,
   FilePath = paste0("agVisNetwork_", format(Sys.time(), "\%y\%m\%d"), ".html"),
   outputNodesEdges = FALSE
 )

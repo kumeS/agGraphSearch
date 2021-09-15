@@ -12,6 +12,7 @@
 ##' @importFrom visNetwork visOptions
 ##' @importFrom networkD3 saveNetwork
 ##' @importFrom purrr map
+##' @importFrom magrittr %>%
 ##'
 
 ## visNetwork version
@@ -27,12 +28,16 @@ agVisNetwork <- function(Graph,
                          Output=FALSE,
                          ColoredSeed=NULL,
                          ColoredTopClass=NULL,
+                         Layout="layout_with_fr",
+                         MaxRow=100000,
+                         Physics=F,
+                         Smooth=F,
                          FilePath=paste0("agVisNetwork_", format(Sys.time(), "%y%m%d"),".html"),
                          outputNodesEdges=FALSE){
 
 if(is.null(Graph)){return(message("Warning: Not proper value of Graph"))}
 if(!is.data.frame(Graph)){return(message("Warning: Not proper value of Graph"))}
-if(nrow(Graph) > 10000){return(message("Warning: should be less than 10000 rows"))}
+if(nrow(Graph) > MaxRow){return(message("Warning: should be less than ", MaxRow, " rows"))}
 HeightSclale = "1500px"; WidthSclale = "110%"; SEED=123
 
 set.seed(SEED)
@@ -154,7 +159,11 @@ nodes$font.color[a %in% ColoredTopClass] <- "red"
                color = list(color = "lightblue", highlight = "pink")) %>%
       visNetwork::visNodes(borderWidth=0.25, shadow = list(enabled = TRUE, size = 5),
                font=list(size = FontSize)) %>%
-      visNetwork::visIgraphLayout(layout = "layout_with_fr") %>%
+      visNetwork::visIgraphLayout(layout = Layout,
+                                  physics = Physics,
+                                  smooth = Smooth,
+                                  type = "full",
+                                  randomSeed = 1234) %>%
       visNetwork::visOptions(highlightNearest = TRUE, nodesIdSelection = list(enabled=T), selectedBy = "group", autoResize=T)
   }else{
     VIS <-  visNetwork::visNetwork(nodes, edges, height = HeightSclale, width = WidthSclale) %>%
@@ -163,7 +172,11 @@ nodes$font.color[a %in% ColoredTopClass] <- "red"
                color = list(color = "lightblue", highlight = "pink")) %>%
       visNetwork::visNodes(borderWidth=0.25, shadow = list(enabled = TRUE, size = 5),
                font=list(size = FontSize)) %>%
-      visNetwork::visIgraphLayout(layout = "layout_with_fr") %>%
+      visNetwork::visIgraphLayout(layout = Layout,
+                                  physics = Physics,
+                                  smooth = Smooth,
+                                  type = "full",
+                                  randomSeed = 1234) %>%
       visNetwork::visOptions(highlightNearest = TRUE, nodesIdSelection = list(enabled=T, selected=Selected), selectedBy = "group", autoResize=T)
   }
   if(outputNodesEdges){

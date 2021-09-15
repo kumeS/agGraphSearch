@@ -35,8 +35,8 @@ Width="125%"
 Height="175%"
 
 Dat <- Data
-Dat$X <- paste0(Dat$subjectLabel, ".", Dat$subject)
-Dat$Y <- paste0(Dat$parentClassLabel, ".", Dat$parentClass)
+Dat$X <- paste0(Dat$subject)
+Dat$Y <- paste0(Dat$parentClass)
 DatXY <- Dat[,c("X", "Y")]
 head(DatXY)
 
@@ -63,6 +63,18 @@ DatDF <- c(DatDF, b)
 b <- paste(a[length(a):1], collapse='/')
 DatDF <- c(DatDF, b)
 }
+}
+
+if(any(DatDF == "NA")){DatDF <- DatDF[DatDF != "NA"]}
+#DatDF
+#head(Dat)
+a1 <- paste0(Dat$subjectLabel, ".", Dat$subject)
+a2 <- paste0(Dat$parentClassLabel, ".", Dat$parentClass)
+a3 <- data.frame(X=c(Dat$subject, Dat$parentClass),
+                 Y=c(a1, a2), row.names = 1:(length(a1)+length(a2)))
+a4 <- a3[rownames(unique(a3["X"])),]
+for(n in 1:nrow(a4)){
+  DatDF <- gsub(a4[n,1], a4[n,2], DatDF)
 }
 
 if(Brouse){

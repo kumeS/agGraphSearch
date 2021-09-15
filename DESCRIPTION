@@ -52,4 +52,4 @@ License: Artistic-2.0
 VignetteBuilder: knitr
 URL: https://github.com/kumeS/agGraphSearch
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
