@@ -35,34 +35,6 @@ system( "R CMD INSTALL agGraphSearch" )
 library( "agGraphSearch" )
 ```
 
-## Optional setting at OECU
-
-Run the following commands in the R console.
-
-```r
-#Proxy setting at OECU
-proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
-Sys.setenv("http_proxy" = proxy_url)
-Sys.setenv("https_proxy" = proxy_url)
-Sys.setenv("ftp_proxy" = proxy_url)
-
-#Test 1
-curlGetHeaders("http://www.google.com/")
-# OK if the optput is 200
-install.packages("readr")
-# OK if it is installed successfully.
-
-#Test 2
-install.packages("BiocManager")
-BiocManager::install("BiocStyle")
-install.packages( "devtools" )
-devtools::install_github( "kumeS/agGraphSearch" )
-library( "agGraphSearch" )
-
-#Test 3
-#system( "git clone https://github.com/kumeS/agGraphSearch.git" )
-```
-
 ## Tutorial
 
 - [Installation & Basic functions](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-installation.html)
@@ -119,6 +91,34 @@ library( "agGraphSearch" )
 		  - http://lsd
 		  - http://nikkaji
 		  - http://icd10
+
+## Optional setting at OECU
+
+Run the following commands in the R console.
+
+```r
+#Proxy setting at OECU
+proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
+Sys.setenv("http_proxy" = proxy_url)
+Sys.setenv("https_proxy" = proxy_url)
+Sys.setenv("ftp_proxy" = proxy_url)
+
+#Test 1
+curlGetHeaders("http://www.google.com/")
+# OK if the optput is 200
+install.packages("readr")
+# OK if it is installed successfully.
+
+#Test 2
+install.packages("BiocManager")
+BiocManager::install("BiocStyle")
+install.packages( "devtools" )
+devtools::install_github( "kumeS/agGraphSearch" )
+library( "agGraphSearch" )
+
+#Test 3
+#system( "git clone https://github.com/kumeS/agGraphSearch.git" )
+```
 
 ## Author / maintainer
 
