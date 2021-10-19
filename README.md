@@ -32,15 +32,15 @@ library( "agGraphSearch" )
 
 - [Installation](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-installation.html)
 
-- [Installation 日本語チュートリアル](http://translate.google.com/translate?hl=&sl=en&tl=ja&u=https%3A%2F%2Fkumes.github.io%2FagGraphSearch%2Fvignettes%2FagGraphSearch-installation.html)
+- [Installation (Japanese)](http://translate.google.com/translate?hl=&sl=en&tl=ja&u=https%3A%2F%2Fkumes.github.io%2FagGraphSearch%2Fvignettes%2FagGraphSearch-installation.html)
 
 - [A short-tutorial for agGraphSearch](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-short-tutorial.html)
 
-- [agGraphSearch 日本語ショートチュートリアル](http://translate.google.com/translate?hl=&sl=en&tl=ja&u=https%3A%2F%2Fkumes.github.io%2FagGraphSearch%2Fvignettes%2FagGraphSearch-short-tutorial.html)
+- [A Japanese short-tutorial for agGraphSearch](http://translate.google.com/translate?hl=&sl=en&tl=ja&u=https%3A%2F%2Fkumes.github.io%2FagGraphSearch%2Fvignettes%2FagGraphSearch-short-tutorial.html)
 
-- [agGraphSearch tutorial: A workflow to use agGraphSearch and Wikidata with PolyInfo terms](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Wikidata-WF.html)
+- [(Wikidata) agGraphSearch tutorial: A workflow to use agGraphSearch and Wikidata with PolyInfo terms](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Wikidata-WF.html)
 
-- [agGraphSearch tutorial: A workflow to use agGraphSearch and Mesh RDF with PolyInfo terms](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Mesh-WF-PolyInfo.html)
+- [(Mesh) agGraphSearch tutorial: A workflow to use agGraphSearch and Mesh RDF with PolyInfo terms](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Mesh-WF-PolyInfo.html)
 
 ## Some examples of function execution in the package
 

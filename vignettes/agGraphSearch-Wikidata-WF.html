@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2021-10-18" />
+<meta name="date" content="2021-10-19" />
 
 <title>A workflow to use agGraphSearch and Wikidata with PolyInfo terms</title>
 
@@ -171,7 +171,7 @@ function toggle_visibility(id1) {
 
 <h1 class="title toc-ignore">A workflow to use agGraphSearch and Wikidata with PolyInfo terms</h1>
 <p class="author-name">Satoshi Kume</p>
-<h4 class="date">2021-10-18</h4>
+<h4 class="date">2021-10-19</h4>
 <h4 class="package">Package</h4>
 <p>agGraphSearch, knitr, SPARQL</p>
 
@@ -206,7 +206,8 @@ function toggle_visibility(id1) {
 <li><a href="#graph-analysis-algorism"><span class="toc-section-number">6.3</span> Graph analysis algorism</a></li>
 </ul></li>
 <li><a href="#subordinate-search"><span class="toc-section-number">7</span> Subordinate search</a></li>
-<li><a href="#evaluation"><span class="toc-section-number">8</span> Evaluation</a></li>
+<li><a href="#calucation"><span class="toc-section-number">8</span> Calucation</a></li>
+<li><a href="#evaluation"><span class="toc-section-number">9</span> Evaluation</a></li>
 </ul>
 </div>
 
@@ -223,8 +224,8 @@ document.addEventListener("DOMContentLoaded", function() {
       links[i].target = '_blank';
 });
 </script>
-<p><strong>Last modified:</strong> 2021-10-18 22:35:14<br />
-<strong>Compiled</strong>: Mon Oct 18 22:35:16 2021</p>
+<p><strong>Last modified:</strong> 2021-10-19 14:04:28<br />
+<strong>Compiled</strong>: Tue Oct 19 14:43:23 2021</p>
 <div id="getting-started" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Getting started</h1>
 <div id="requirements" class="section level2" number="1.1">
@@ -273,7 +274,8 @@ words &lt;- unique(unlist(wordsj, use.names = F))
 words &lt;- words[!is.na(words)]
 
 #show the head
-head(words)</code></pre>
+head(words)
+length(words)</code></pre>
 <p>I also showed how to use the English terms obtained from PolyInfo Database (total 463 terms).</p>
 <pre class="r"><code>if(F){
 #Read English terms
@@ -311,7 +313,7 @@ ClassHi &lt;- readRDS(&quot;./04_Wiki_PolyInfo_00/Relation_P279_P31_df.Rds&quot;
 
 #Check data
 head(ClassHi)
-table(ClassHi$Property)
+#table(ClassHi$Property)
 
 #Remove loops
 table(ClassHi$Subject != ClassHi$Object)
@@ -539,7 +541,10 @@ suppressMessages(filesstrings::file.move(files = paste0(&quot;./agVisNetwork_&qu
 </div>
 <div id="calculate-the-common-upper-entities" class="section level2" number="6.2">
 <h2><span class="header-section-number">6.2</span> Calculate the common upper entities</h2>
-<pre class="r"><code>#QID.dat &lt;- readRDS(&quot;./QID.dat.Rds&quot;)
+<pre class="r"><code>library(magrittr)
+#QID.dat &lt;- readRDS(&quot;./QID.dat.Rds&quot;)
+#Labels &lt;- readRDS(&quot;./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds&quot;)
+#str(QID.dat)
 
 #################################################
 #Calculate the common upper entities
@@ -605,7 +610,9 @@ E02 &lt;- length(unique(QID.dat_02$triple))
 E02
 #[1] 1292
 
+#################################
 #Calculate CU entities
+#################################
 CUcounts00
 cu_table &lt;- table(CUcounts00)
 cu_table &lt;- cu_table[rev(order(cu_table))]
@@ -670,10 +677,7 @@ SearchRnage01$Object[is.na(SearchRnage01$Object)] &lt;- SearchRnage01$CommonEnti
 head(SearchRnage01, n=15)
 tail(SearchRnage01, n=15)
 
-
-barplot(table(SearchRnage01$Levels))
-
-#Barplot</code></pre>
+#saveRDS(SearchRnage01, &quot;SearchRnage01.Rds&quot;)</code></pre>
 </div>
 </div>
 <div id="subordinate-search" class="section level1" number="7">
@@ -728,8 +732,109 @@ saveRDS(Dat,
                &quot;.Rds&quot;))
 }</code></pre>
 </div>
-<div id="evaluation" class="section level1" number="8">
-<h1><span class="header-section-number">8</span> Evaluation</h1>
+<div id="calucation" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> Calucation</h1>
+<pre class="r"><code>#SearchRnage01 &lt;- readRDS(&quot;SearchRnage01.Rds&quot;)
+dim(SearchRnage01)
+
+#01 Barplot
+a &lt;- data.frame(No=names(table(SearchRnage01$Levels)),
+                each_entity=as.numeric(table(SearchRnage01$Levels)))
+
+head(a)
+fig &lt;- plotly::plot_ly(a, x = ~No, y = ~each_entity, type = &#39;bar&#39;, name = &#39;&#39;,
+               hovertemplate = paste(&#39;%{y}&#39;, sep=&quot;&quot;),
+               marker = list(color = &#39;rgb(158,202,225)&#39;, line = list(color = &#39;rgb(8,48,107)&#39;, width = 0.25)))
+fig &lt;- fig %&gt;% plotly::layout(title = paste(&quot;Number of ECU entities&quot;, sep=&quot;&quot;),
+                      yaxis = list(title = &#39;Entity number&#39;, linewidth = 1),
+                      xaxis = list(title = &quot;NES&quot;, ticks = &quot;outside&quot;, linewidth = 0,
+                                     tick0 = 1, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+if(!dir.exists(&quot;04_Wiki_PolyInfo_04&quot;)){dir.create(&quot;04_Wiki_PolyInfo_04&quot;)}
+Filename &lt;- paste0(&quot;./Barplot_results_&quot;, format(Sys.time(), &quot;%y%m%d&quot;),&quot;_01.html&quot;)
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0(&quot;mv &quot;, Filename, &quot; ./04_Wiki_PolyInfo_04&quot;))
+
+##02 
+ECU.list &lt;- SearchRnage01
+ECU.list$UniTripleNum &lt;- NA
+ECU.list$UniEntityNum &lt;- NA
+TotalData &lt;- NULL
+
+for(n in 1:nrow(ECU.list)){
+#n &lt;- 1
+message(n)
+
+b &lt;- readRDS(paste0(&quot;./04_Wiki_PolyInfo_03/&quot;, 
+               formatC(n, width = 4, flag = &quot;0&quot;),
+                &quot;_L&quot;, ECU.list$Levels[n], &quot;_&quot;,
+               ECU.list$CommonEntity[n], &quot;.Rds&quot;))
+
+#head(b)
+b$triple &lt;- paste0(b$Subject, &quot;.&quot;,
+                    b$Property, &quot;.&quot;,
+                    b$Object)
+ECU.list$UniTripleNum[n] &lt;- length(unique(b$triple))
+ECU.list$UniEntityNum[n] &lt;- length(unique(c(b$Subject, b$Object)))
+#head(ECU.list)
+#head(b); head(b[,-4])
+TotalData[[n]] &lt;- b[,-4]
+}
+
+head(ECU.list)
+rownames(ECU.list) &lt;- 1:nrow(ECU.list)
+#str(TotalData)
+TotalDataECU &lt;- NULL
+
+for(m in 1:7){
+  #m &lt;- 1
+  message(&quot;m: &quot;, m)
+  d &lt;- ECU.list[ECU.list$Levels == m,]
+  d1 &lt;- as.numeric(rownames(d))
+  temp &lt;- NULL
+  for(n in d1){
+    #n &lt;- 1
+    message(&quot;n: &quot;, n)
+    temp &lt;- rbind(temp, TotalData[[n]])
+  }
+temp$triple &lt;- paste0(temp$Subject, &quot;.&quot;,
+                       temp$Property, &quot;.&quot;,
+                       temp$Object)
+rownames(temp) &lt;- 1:nrow(temp)
+temp &lt;- temp[as.numeric(rownames(unique(temp[&quot;triple&quot;]))),]
+#head(temp)
+TotalDataECU[[m]] &lt;- temp
+}
+
+str(TotalDataECU)
+CountDat &lt;- data.frame(No=1:7,
+                       UniEntityNum=NA,
+                       UniTripleNum=NA,
+                       AccEntityNum=NA,
+                       AccTripleNum=NA)
+temp &lt;- NULL
+
+for(n in 1:length(TotalDataECU)){
+  #n &lt;- 1
+  message(&quot;n: &quot;, n)
+  e &lt;- TotalDataECU[[n]]
+  #head(e)
+  CountDat$UniEntityNum[n]  &lt;- length(unique(c(e$Subject, e$Object)))
+  CountDat$UniTripleNum[n] &lt;- length(unique(e$triple))
+  
+  temp &lt;- rbind(temp, TotalDataECU[[n]])
+  rownames(temp) &lt;- 1:nrow(temp)
+  temp &lt;- temp[as.numeric(rownames(unique(temp[&quot;triple&quot;]))),]
+  CountDat$AccEntityNum[n]  &lt;- length(unique(c(temp$Subject, temp$Object)))
+  CountDat$AccTripleNum[n] &lt;- length(unique(temp$triple))
+}
+
+CountDat</code></pre>
+</div>
+<div id="evaluation" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> Evaluation</h1>
 </div>
 
 
