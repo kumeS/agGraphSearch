@@ -1,6 +1,5 @@
 ---
-title: "Workflow to use agGraphSearch for leukemia terms"
-shorttitle: "Short tutorial: graph search for leukemia"
+title: "Short tutorial: a workflow to use agGraphSearch for leukemia terms"
 author:
   - name: Satoshi Kume
 date: "`r Sys.Date()`"
@@ -12,7 +11,7 @@ output:
 vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
-  %\VignetteIndexEntry{Workflow to use agGraphSearch for leukemia terms}
+  %\VignetteIndexEntry{Short tutorial: a workflow to use agGraphSearch for leukemia terms}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
@@ -25,18 +24,17 @@ BiocStyle::markdown()
 **Last modified:** `r file.info("agGraphSearch-short-tutorial.Rmd")$mtime`<br>
 **Compiled**: `r date()`
 
-
 # Introduction
 
-## Background
+In the context of the semantic web, structured data or structured knowledge should be suitable toward more machine-readable. 
+These structured data is often described by an RDF data model.
 
-In the context of the semantic web, structured data refers to data that is written in a rule-based manner and has reference relationships between data. In other words, it is data that has been made more machine-readable by adding metadata to it. Typical examples of structured data or structured knowledge are ontologies and Linked Open Data such as wikidata and DBpedia. Structured data is often described by an RDF data model.
+The agGraphSearch package provides a tool-set to handle such structured data. 
+The main functions of this package are to map a lexical list of domain terms to the data and then 
+extract a target subset of class-related conceptual hierarchy in a common entity-based manner. 
+This aimed to support the construction of an initial model of domain-specific ontology from Linked Open Data (LOD)
 
-There is a need to understand the object/domain of interest through structured knowledge. However, the subject of interest is often described in terms of unstructured data, i.e., a vague range of data given as a list of text or vocabulary. Therefore, there is a huge gap in the mapping between these data.
-
-Unless you are an expert in ontology and LOD, you will need to define your subject of interest clearly in the early stages and map it to the structured data. It is difficult to map them to structured data.
-
-Therefore, to support the construction of the initial model of the structured data of the domain of interest In order to support this, a Based on a small lexical list of interest, a subset of We built a toolset for extracting a subset of the corresponding structured data To support the construction of an initial model of structured data for the domain of interest, we constructed a toolset to extract a subset of the corresponding structured data based on a small vocabulary list of interest.
+This tutorial will provide the procedure to obtain structured data from Wikidata as a real case study.
 
 ```{r Fig01, fig.cap = "Overview of the domain ontology construction.", echo = FALSE}
 suppressWarnings(library(EBImage))
@@ -45,13 +43,7 @@ img <- system.file("images", "Fig_01.png", package="agGraphSearch")
 EBImage::display(EBImage::readImage(files = img))
 ```
 
-This tutorial will provide the procedure to obtain structured data from LOD as a real case study.
-
-
-## agGraphSearch package
-
-The agGraphSearch package is a tool-set to support the construction of domain ontology.
-This package provides a methodology for extracting target domain concepts from a large-scale public Linked Open Data (LOD) system. 
+This package provides a methodology for extracting target domain concepts from a large-scale LOD system. 
 In the proposed method, the class-related hierarchy of the domain concept by the occurrences of common upper-level entities and the chain of those path relationships is obtained. 
 The proposed method was described in Figure 1.
 
@@ -64,10 +56,9 @@ EBImage::display(EBImage::readImage(files = img))
 
 As an example of class hierarchy extraction from LOD, 
 this short tutorial provides a workflow to obtain and visualize 
-conceptual hierarchies related to leukemia from wikidata endpoint 
-using its some entity labels.
+conceptual hierarchies related to leukemia from wikidata using its some entity labels.
 
-Overview of the workflow of the proposed method was descrived in Figure 2.
+Overview of the workflow of the proposed method was described in Figure 3.
 
 ```{r Fig03, fig.cap = "Overview of the workflow of the proposed method", echo = FALSE}
 suppressWarnings(library(EBImage))
@@ -78,7 +69,7 @@ EBImage::display(EBImage::readImage(files = img))
 
 This result is similar to [the network graph obtained with wikidata graph builder](https://angryloki.github.io/wikidata-graph-builder/?property=P279&item=Q29496&iterations=2&mode=reverse).
 
-## Getting started
+# Getting started agGraphSearch
 
 Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
 
@@ -91,13 +82,9 @@ if(!require("agGraphSearch")){
 
 #load
 library("agGraphSearch")
-
-#GitHub URL
-#browseURL("https://github.com/kumeS/agGraphSearch")
-
 ```
 
-# Workflow for searching the graph for leukemia.
+# Workflow for searching strtuctures for leukemia.
 
 ## Vocabularies related to leukemia.
 
@@ -111,7 +98,7 @@ The proper number of search terms is under researching.
 If the locally extraction of domain hierarchy is performed,
 Search terms should be used more than 3 terms at least.
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 terms <- c("acute lymphocytic leukemia",
            "Chronic eosinophilic leukemia",
            "philadelphia-positive myelogenous leukemia")
@@ -140,7 +127,7 @@ In this tutorial, in addition to QIDs, we used the property relations of represe
 
 ### Check SPARQL query
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 ter00 <- terms[1]
 
 #check Query
@@ -172,7 +159,7 @@ This program executes SPARQL with a for-loop.
 
 Inputs are 3 terms.
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 #create an empty variable
 m <- c()
 
@@ -198,7 +185,7 @@ agTableDT(fm2, Width = "100px", Transpose = TRUE, AutoWidth=FALSE)
 
 ### Assigning Label information to QID
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 Lab01 <- fm2$LABEL
 
 #Check Query
@@ -206,7 +193,7 @@ CkeckQuery_agWD_Alt_Wikidata(Lab01[1])
 
 ```
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 #create an empty variable
 Lab01_res <- c()
 
@@ -225,7 +212,7 @@ saveRDS(QID, file="./02_Short_Out/SearchEntities.Rds")
 
 ### Retry SPARQL by QID
 
-```{r eval=TRUE, echo=TRUE}
+```{r eval=FALSE, echo=TRUE}
 #View query
 CkeckQuery_agCount_ID_Num_Wikidata_QID_P279_P31(QID[1])
 
@@ -281,13 +268,13 @@ img <- system.file("images", "Fig_05.png", package="agGraphSearch")
 EBImage::display(EBImage::readImage(files = img))
 ```
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 #For neighboring entities
 #Check query
 CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vP( Entity_ID=QID[1], Object="wd:Q101352" )
 ```
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 #create an exclusion QID list without "wd:"
 ExcluQ <- c("Q101352", "Q11424")
 NumQ <- length(ExcluQ)
@@ -311,7 +298,7 @@ agTableKB(QIDdf)
 
 ```
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 #For neighboring properties
 #Check query
 CkeckQuery_agCount_ID_Prop_Obj_Wikidata_vO( Entity_ID=QID[1], Property="wdt:P21")
@@ -345,7 +332,7 @@ agTableKB(QIDdf)
 
 ### instanceOf 
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 # instanceOf (wdt:P31)
 CkeckQuery_agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P31")
 ```
@@ -362,7 +349,7 @@ res3[[n]] <- agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P31")
 
 ### subClassOf 
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
 # subClassOf (wdt:P279)
 CkeckQuery_agWD_ID_Prop_Obj_Wikidata_vO(Entity_ID=QID[n], Property="wdt:P279")
 ```
@@ -660,13 +647,6 @@ sum(table(SearchNum$Levels))
 table(SearchNum$Levels)
 table(!is.na(SearchNum[,2]))
 
-```
-
-## XXX
-
-### YYY
-
-```{r}
 ```
 
 # Session information {.unnumbered}

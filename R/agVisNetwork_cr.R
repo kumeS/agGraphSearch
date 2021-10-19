@@ -1,6 +1,3 @@
-
-
-
 agVisNetwork_cr <- function(Graph=GraphData, NodeColorRandom=F, Count=2, Size=10, SmallSize=5, StarSize=10, FontSize=7, HeightSclale = "750px", WidthSclale = "110%",
                               Common=NULL, Search=NULL,CommonExpand=NULL,Compounds=NULL,
                            SEED=123, Selected=NULL, Browse=FALSE, output=FALSE, file=paste("Wikidat_visNet", format(Sys.time(), "%y%m%d_%H%M"),".html", sep=""), outputNodesEdges=FALSE){
@@ -121,30 +118,30 @@ if(Count > 1){
   }
 
   if(is.null(Selected)){
-  VIS <-  visNetwork(nodes, edges, height = HeightSclale, width = WidthSclale) %>%
-      visEdges(shadow = F,
+  VIS <-  visNetwork::visNetwork(nodes, edges, height = HeightSclale, width = WidthSclale) %>%
+      visNetwork::visEdges(shadow = F,
                arrows =list(to = list(enabled = TRUE, scaleFactor = 0.5)),
                color = list(color = "lightblue", highlight = "pink")) %>%
-      visNodes(borderWidth=0.25, shadow = list(enabled = TRUE, size = 5),
+      visNetwork::visNodes(borderWidth=0.25, shadow = list(enabled = TRUE, size = 5),
                font=list(size = FontSize)) %>%
-      visIgraphLayout(layout = "layout_with_fr") %>%
-      visOptions(highlightNearest = TRUE, nodesIdSelection = list(enabled=T), selectedBy = "group", autoResize=T)
+      visNetwork::visIgraphLayout(layout = "layout_with_fr") %>%
+      visNetwork::visOptions(highlightNearest = TRUE, nodesIdSelection = list(enabled=T), selectedBy = "group", autoResize=T)
   }else{
-    VIS <-  visNetwork(nodes, edges, height = HeightSclale, width = WidthSclale) %>%
-      visEdges(shadow = F,
+    VIS <-  visNetwork::visNetwork(nodes, edges, height = HeightSclale, width = WidthSclale) %>%
+      visNetwork::visEdges(shadow = F,
                arrows =list(to = list(enabled = TRUE, scaleFactor = 0.5)),
                color = list(color = "lightblue", highlight = "pink")) %>%
-      visNodes(borderWidth=0.25, shadow = list(enabled = TRUE, size = 5),
+      visNetwork::visNodes(borderWidth=0.25, shadow = list(enabled = TRUE, size = 5),
                font=list(size = FontSize)) %>%
-      visIgraphLayout(layout = "layout_with_fr") %>%
-      visOptions(highlightNearest = TRUE, nodesIdSelection = list(enabled=T, selected=Selected), selectedBy = "group", autoResize=T)
+      visNetwork::visIgraphLayout(layout = "layout_with_fr") %>%
+      visNetwork::visOptions(highlightNearest = TRUE, nodesIdSelection = list(enabled=T, selected=Selected), selectedBy = "group", autoResize=T)
   }
   if(outputNodesEdges){
     readr::write_excel_csv(nodes, file = paste("nodes_", format(Sys.time(), "%y%m%d_%H%M"),".csv", sep="") )
     readr::write_excel_csv(edges, file = paste("edges_", format(Sys.time(), "%y%m%d_%H%M"),".csv", sep="") )
   }else{}
   if(output){
-    VIS %>% saveNetwork(file = file)
+    VIS %>% networkD3::saveNetwork(file = file)
     if(Browse){browseURL(file)}else{return(NULL)}
   } else {}
   return(VIS)

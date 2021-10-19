@@ -1,7 +1,7 @@
 Package: agGraphSearch
 Type: Package
-Title: Graph search for the RDF stores of AllegroGraph
-Version: 0.99.3
+Title: Graph search for domain-specific concepts from the RDF-formatted data
+Version: 0.99.4
 Encoding: UTF-8
 Authors@R: c(
     person (given = "Satoshi", family = "Kume",
@@ -11,14 +11,11 @@ Authors@R: c(
     )
 Maintainer: Satoshi Kume <satoshi.kume.1984@gmail.com>
 Description: This package provides a tool set for searching RDF graph data 
-  through SPARQL and data mining. The functions for SPARQL query are designed 
-  to be executed on RDF data stored in AllegroGraph and/or Openlink Virtuoso.
-  Also, in order to support the construction of domain ontologies, 
-  this package proposes a methodology for extracting target domain concepts from 
-  a large-scale public Linked Open Data (LOD) system. 
-  The method allows to obtain the class-related hierarchy of the domain concept 
+  and data mining. This package proposes a methodology for extracting target domain concepts from 
+  a large-scale Linked Open Data (LOD) system. 
+  This method allows us to obtain the class-related hierarchy of the target domain concept 
   by the occurrences of common upper entities and the chain of those path relationships
-  using LOD, especially Wikidata.
+  using Wikidata and other RDF data.
 Depends: R (>= 4.0.0), SPARQL
 Imports: RCurl,
   XML,

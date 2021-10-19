@@ -1,5 +1,5 @@
 ---
-title: "Introduction to agGraphSearch"
+title: "Installation of agGraphSearch"
 author:
   - name: Satoshi Kume
 date: "`r Sys.Date()`"
@@ -9,7 +9,7 @@ output:
   BiocStyle::html_document:
   toc_float: true
 vignette: >
-  %\VignetteIndexEntry{Introduction to agGraphSearch}
+  %\VignetteIndexEntry{Installation of agGraphSearch}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
   %\VignetteEngine{knitr::rmarkdown}
@@ -26,14 +26,11 @@ BiocStyle::markdown()
 
 # Getting started
 
-`r Rpackage("agGraphSearch")` is an R package distributed in kumeS's GitHub site.
-To install the package, start R and enter:
+To install `r Rpackage("agGraphSearch")`, start R and enter:
 
 ```{r installation, echo=TRUE, eval=FALSE}
-#Still can not be installation (14 May 2021)
 install.packages( "devtools" )
 devtools::install_github( "kumeS/agGraphSearch" )
-library( "agGraphSearch" )
 ```
 
 Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
@@ -42,10 +39,11 @@ Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the followi
 library("agGraphSearch")
 ```
 
-Optionally, you use the following command if you want to use the docker environment.
+# How to use Rocker environment.
+
+Optionally, you use the following sh command on Mac/Linux Terminal if you want to use the Rocker environment.
 
 ```sh
-# On Terminal
 docker run \
        -d \
        --name RStudio \
@@ -54,10 +52,15 @@ docker run \
        -e PASSWORD=PassWord \
        -p 8787:8787 \
        rocker/rstudio:4.0.5
+#XXX: Your folder path
+
+#Then, browse the page
+open http://localhost:8787
 ```
 
+An alternative way, type the R code below if you want to run the Rocker environment from the R console.
+
 ```r
-# On R
 system("docker run \\
         -d \\
         --name RStudio \\
@@ -66,105 +69,34 @@ system("docker run \\
         -e PASSWORD=PassWord \\
         -p 8787:8787 \\
        rocker/rstudio:4.0.5")
+#XXX: Your folder path
+
+#Then, browse the page
+system("open http://localhost:8787")
 ```
 
-See DockerHub if you want to know details to the docker image.
+See [Rocker page](https://hub.docker.com/r/rocker/rstudio) if you want to know details to the rocker image.
 
-https://hub.docker.com/r/rocker/rstudio
+## Optional Rocker setting
 
-Then, browse the GitHub page (`http://localhost:8787`).
+Type the R code below for the settings.
 
 ```r
 ## run first on the terminal windows
 #sudo apt-get update
 #sudo apt-get install libxml2-dev libglpk-dev
 
+#Install packages
 install.packages("BiocManager")
 BiocManager::install("BiocStyle")
 
 install.packages( "devtools" )
 devtools::install_github( "kumeS/agGraphSearch" )
-
-#will get something error, then
-
-system( "git clone https://github.com/kumeS/agGraphSearch.git" )
-system( "R CMD INSTALL agGraphSearch" )
 library( "agGraphSearch" )
-
 ```
-
-- memo: Remove All packages
-
-  - remove.packages( installed.packages( priority = "NA" )[,1] )
-
-# Basic functions
-
-- Generation functions for SPARQL Query 
-
-  - agCount_ID_Num
-
-    - agCount_ID_Num_Wikidata_QID_P279_P31.R
-    
-  - agCount_ID_Prop_Obj
-
-    - agCount_ID_Prop_Obj_Wikidata_vO
-    
-    - agCount_ID_Prop_Obj_Wikidata_vP
-  
-  - agWD_Alt_Wikidata
-  
-    - agWD_ID_Prop_Obj_Wikidata_vO
-
-  - agCount_Label_Num
-
-    - agCount_Label_Num_Wikidata_P279_P31
-    
-  - agIDtoLabel
-  
-    - agIDtoLabel_Wikidata
-
-  - agWD_ID_Prop_Obj
-
-    - agWD_ID_Prop_Obj_Wikidata_vO
-    
-  - agWD_Alt
-  
-    - agWD_Alt_Wikidata
-    
-  - PropertyPath
-  
-    - PropertyPath_GraphUp_Wikidata
-
-- Analytical functions for SPARQL results
-
-  - pc_plot
-
-- Analytical functions for Graph Data 
-
-  - agGraphAnalysis
-
-- Functions for Table-type Visualization
-
-  - agTableDT
-
-  - agTableFM
-  
-  - agTableKB
-  
-- Functions for Network Graph Visualization
-
-  - agVisNetwork
-
-  - agNetwork3d
-  
-- Functions for Data Processing
-
-  - PurseNT
-  
-    - ...
-
 
 # Session information {.unnumbered}
 ```{r sessionInfo, echo=FALSE}
 sessionInfo()
 ```
+

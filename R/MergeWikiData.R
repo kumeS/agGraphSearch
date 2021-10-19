@@ -16,6 +16,7 @@ MergeWikiData <- function(Data,
 #Parameters
 Dat <- Data
 Labels01 <- Labels
+
 #head(Labels01)
 #table(Labels01$Property)
 Labels01 <- Labels01[Labels01$Property == "rdfs:label",]
@@ -37,14 +38,17 @@ Labels02$Subject[cc] <- paste0("wd:", Labels02$Subject[cc])
 
 #head(Dat); dim(Dat)
 #head(Labels02); dim(Labels02)
+if(ncol(Dat) == 3){
+  colnames(Dat) <- c("subject", "property", "parentClass")
+}
+if(ncol(Dat) == 4){
+  colnames(Dat) <- c("subject", "property", "parentClass", "triple")
+}
+
 Dat$triple <- paste0(Dat$subject, ".", Dat$property, ".", Dat$parentClass)
 rownames(Dat) <- 1:nrow(Dat)
 Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
 Dat <- Dat[,-ncol(Dat)]
-
-if(ncol(Dat) == 3){
-  colnames(Dat) <- c("subject", "property", "parentClass")
-}
 
 Dat <- Dat[order(Dat$subject, decreasing = T),]
 #head(Dat)

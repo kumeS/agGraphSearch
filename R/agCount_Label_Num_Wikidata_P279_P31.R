@@ -46,7 +46,7 @@
 ##' }
 
 agCount_Label_Num_Wikidata_P279_P31 <- function(Entity_Name,
-                                                Dir){
+                                                Dir=tempdir()){
 
 #Parameter set
 #Labels

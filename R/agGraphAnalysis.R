@@ -1,8 +1,8 @@
 ##' @title Graph analysis function for the upper-level concepts.
 ##'
 ##' @param graphList
-##' @param list1 a character vector of search entities.
-##' @param list2 a character vector of common upper-level entities
+##' @param search_List a character vector of search entities.
+##' @param CU_List a character vector of common upper-level entities
 ##' @param PlusLabel logical; add the labels or not when createing the network.
 ##' @param ParticularEntity_only logical
 ##' @param list2.WD a character vector
@@ -23,23 +23,37 @@
 ##' @return data.frame
 ##' @author Satoshi Kume
 ##' @export agGraphAnalysis
+##' @importFrom magrittr %>%
+##' @importFrom igraph decompose
+##' @importFrom igraph graph_from_edgelist
+##' @importFrom grDevices quartz
+##' @importFrom grDevices quartz.save
+##' @importFrom purrr map
+##' @importFrom readr write_csv
+##' @importFrom igraph as_ids
+##' @importFrom igraph shortest_paths
+##' @importFrom stringr str_split
+##' @importFrom igraph plot.igraph
+##' @importFrom igraph layout_with_fr
+##'
 ##' @examples \dontrun{
 ##'
 ##' library(magrittr)
 ##' agGraphAnalysis(graphList=eachGraph,
-##'                 list1=list1a,
-##'                 list2=list2b)
+##'                 search_List=list1a,
+##'                 CU_List=list2b)
 ##'
 ##' }
+##'
 
-#graphList=eachGraph; list1=list1a; list2=list2b; LowerSearch=T; UpdateList=F; breakRepeat=20;View=T; RemoveGraph=F; PlusLabel=T; FileName=TRUE; OutputResults=T; ResultsEach=F; ParticularEntity_only=FALSE; list2.WD="wd:Q35120"; GraphView=c(FALSE, FALSE, TRUE, TRUE); LvView=T;WindowSize=c(10,10,10,7.5,7.5)
+#graphList=eachGraph; search_List=list1a; CU_List=list2b; LowerSearch=T; UpdateList=F; breakRepeat=20;View=T; RemoveGraph=F; PlusLabel=T; FileName=TRUE; OutputResults=T; ResultsEach=F; ParticularEntity_only=FALSE; list2.WD="wd:Q35120"; GraphView=c(FALSE, FALSE, TRUE, TRUE); LvView=T;WindowSize=c(10,10,10,7.5,7.5)
 
 agGraphAnalysis <- function(graphList,
-                            list1,
-                            list2,
+                            search_List,
+                            CU_List,
                             PlusLabel=TRUE,
                             ParticularEntity_only=TRUE,
-                            list2.WD="wd:Q35120",
+                            top.WD="wd:Q35120",
                             UpdateList=FALSE,
                             breakRepeat=20,
                             View=TRUE,
@@ -48,7 +62,6 @@ agGraphAnalysis <- function(graphList,
                             OutputResults=TRUE,
                             ResultsEach=FALSE,
                             LowerSearch=FALSE,
-                            GraphView=c(FALSE, FALSE, TRUE, TRUE),
                             LvView=TRUE,
                             WindowSize=c(10, 10, 10, 7.5, 7.5)
                             ){
@@ -57,11 +70,17 @@ agGraphAnalysis <- function(graphList,
 if(!is.list(graphList)){ return(message("Warning: graphList is not the list type")) }
 if(!is.character(list2.WD)){ return(message("Not proper value of list2.WD")) }
 
+list1=search_List
+list2=CU_List[CU_List != "wd:Q35120"]
+list2.WD=top.WD
+
 #Parameters
+GraphView=c(TRUE, TRUE, TRUE, TRUE)
 GraphView01=GraphView[1]
 GraphView02=GraphView[2]
 GraphView03=GraphView[3]
 GraphView04=GraphView[4]
+
 WindowSize01=WindowSize[1]
 WindowSize02=WindowSize[2]
 WindowSize03=WindowSize[3]
@@ -99,7 +118,7 @@ graphList00[[nn]] <- data.frame(from=graphList[[nn]]$subject,
                               stringsAsFactors = F)
 }}
 
-#出力先の作成
+#Create an output folder
 if(!exists("FileName")){ return(message("Not proper value of FileName")) }
 if(FileName){
   Folder <- paste0("Results_", format(Sys.time(), "%y%m%d_%H%M"))
@@ -109,17 +128,17 @@ if(!exists(Folder)){dir.create(Folder)}
 FolderData <- paste(Folder, "/SaveData", sep="")
 if(!exists(FolderData)){dir.create(FolderData)}
 
-#共通エンティティごとに処理実施
+#Perform processing for each common entity
 for(p in seq_len(length(list2.wd))){
 #p <- 1
 if(View){print(paste(p, "step 01"))}
 A <- c()
 lab <- as.character(list2.wd[p]); lab.c <- lab
 
-#グラフの取り出し
+#Extracting a Graph
 Y00 <- graphList00
 
-#エッジリストの結合
+#Merge edge lists
 B <- c()
 for(m in seq_len(length(Y00))){
  B <- B %>% rbind(Y00[[m]])
@@ -129,26 +148,27 @@ for(m in seq_len(length(Y00))){
 #table(is.na(B))
 rownames(B) <- 1:nrow(B)
 
-#Bが存在しないなら、スキップ
+#skip if B does not exist
 if(is.null(B)){
 list3[list3$V1 == lab.c, 2] <- NA
 }else{
-#重複除く
+#exclude duplicates
 C <- data.frame(B, paste(B$from, ".", B$to, sep=""))
 colnames(C) <- c(colnames(B), "unique")
 C <- C[as.numeric(rownames(unique(C["unique"]))),]
 C <- C[,-ncol(C)]
 
-#ループ除く
+#Except for loops
 C <- C[C$from != C$to,]
 #head(C)
 #c(C$from, C$to)
 
-#ループ除く
+#Except for loops
 head(C)
 C$V1 <- paste0(C$from, ".", C$to)
 C$V2 <- paste0(C$to, ".", C$from)
 C$V3 <- 0
+
 for(l in seq_len(nrow(C))){
 #l <- 1
 if(any(c(C$V1[l] == C$V2))){C$V3[l] <- 1}
@@ -161,7 +181,7 @@ C <- C[,1:4]
 rownames(C) <- 1:nrow(C)
 #head(C)
 
-#エンティティ数の不一致検出
+#Entity count mismatch detection
 message("Entity count mismatch detection")
 print(paste0("length(unique(C$from)): ", length(unique(C$from))))
 print(paste0("length(unique(C$fromLab)): ", length(unique(C$fromLab))))
@@ -195,25 +215,25 @@ print(paste0("length(unique(C$to)): ", length(unique(C$to))))
 print(paste0("length(unique(C$toLab)): ", length(unique(C$toLab))))
 }
 
-#結合グラフの保存
+#Save the combined graph
 saveRDS(C, file = paste("./", FolderData, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c,
   "_A.Rdata", sep=""), compress = TRUE)
-write.table(C, file = paste("./", FolderData, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c,
-  "_A.csv", sep=""), row.names = F, sep=",")
+readr::write_csv(C, file = paste("./", FolderData, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c,
+  "_A.csv", sep=""))
 
-#グラフオブジェクトに変換
+#Convert to the graph object
 if(PlusLabel){
-D00 <- graph_from_edgelist(as.matrix(C)[,3:4], directed = T)
-D <- graph_from_edgelist(as.matrix(C)[,1:2], directed = T)
-D00.d <- decompose(D00, min.vertices =1)
-D.d <- decompose(D, min.vertices =1)
+D00 <- igraph::graph_from_edgelist(as.matrix(C)[,3:4], directed = T)
+D <- igraph::graph_from_edgelist(as.matrix(C)[,1:2], directed = T)
+D00.d <- igraph::decompose(D00, min.vertices =1)
+D.d <- igraph::decompose(D, min.vertices =1)
 
 for(k in seq_len(length(D.d))){
 #k <- 1
 D00.d1 <- D00.d[[k]]
 D.d1 <- D.d[[k]]
 
-Col00 <- c(attr(V(D.d1), "names"))
+Col00 <- c(base::attr(V(D.d1), "names"))
 Col01 <- rep("grey", length(Col00))
 Col01[Col00 %in% list1.c] <- "lightblue"
 Col01[Col00 %in% lab.c] <- "lightgreen"
@@ -223,16 +243,16 @@ Size01[Col00 %in% lab.c] <- 6
 Size02 <- rep(0.1, length(Col00))
 Size02[Col00 %in% list1.c] <- 0.1
 Size02[Col00 %in% lab.c] <- 0.12
-Col00 <- c(attr(V(D00.d1), "names"))
+Col00 <- c(base::attr(V(D00.d1), "names"))
 FONT <- "HiraKakuProN-W3"
 
-#可視化
+#visualization
 if(GraphView01){
-quartz(width=WindowSize01, height=WindowSize01)
+grDevices::quartz(width=WindowSize01, height=WindowSize01)
 set.seed(123)
-plot(D.d1,
+igraph::plot.igraph(D.d1,
      #layout =layout_as_tree(D01, mode = "in"),
-     layout=layout_with_fr(D.d1),
+     layout=igraph::layout_with_fr(D.d1),
      vertex.frame.color = Col01,
      vertex.frame.width=0.1,
      vertex.label.family=FONT,
@@ -251,13 +271,13 @@ plot(D.d1,
 title(paste("Common: ", lab.c,
             "\nGraph Num.: ", length(A[c(A == TRUE)]), sep=""),
       cex.main=1, col.main="black")
-quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_", formatC(k, width = 3, flag = "0"), "_01.pdf", sep=""),
+grDevices::quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_", formatC(k, width = 3, flag = "0"), "_01.pdf", sep=""),
             type = "pdf"); dev.off()
 }
 }
 }else{
-D <- graph_from_edgelist(as.matrix(C), directed = T)
-Col00 <- c(attr(V(D), "names"))
+D <- igraph::graph_from_edgelist(as.matrix(C), directed = T)
+Col00 <- c(base::attr(V(D), "names"))
 Col01 <- rep("grey", length(Col00))
 Col01[Col00 %in% list1.c] <- "lightblue"
 Col01[Col00 %in% lab.c] <- "lightgreen"
@@ -269,13 +289,13 @@ Size02[Col00 %in% list1.c] <- 0.2
 Size02[Col00 %in% lab.c] <- 0.25
 FONT <- "Times"
 
-#可視化
+#visualization
 if(GraphView01){
-quartz(width=WindowSize01, height=WindowSize01)
+grDevices::quartz(width=WindowSize01, height=WindowSize01)
 set.seed(123)
-plot(D,
+igraph::plot.igraph(D,
      #layout =layout_as_tree(D01, mode = "in"),
-     layout=layout_with_fr(D),
+     layout=igraph::layout_with_fr(D),
      vertex.frame.color = Col01,
      vertex.frame.width=0.1,
      vertex.label.family=FONT,
@@ -294,16 +314,16 @@ plot(D,
 title(paste("Common: ", lab.c,
             "\nGraph Num.: ", length(A[c(A == TRUE)]), sep=""),
       cex.main=1, col.main="black")
-quartz.save(file = paste("./", Folder, "/Graph_", "_", lab.c, "_01_", formatC(p, width = 4, flag = "0"), ".pdf", sep=""),
+grDevices::quartz.save(file = paste("./", Folder, "/Graph_", "_", lab.c, "_01_", formatC(p, width = 4, flag = "0"), ".pdf", sep=""),
             type = "pdf"); dev.off()
 }
 }
 
 if(View){print(paste(p, "step 02"))}
-#隣接行列に変換
+#Convert to the adjacency matrix
 E <- as.data.frame(as.matrix(as_adj(D)))
 
-#共通エンティティの下位をすべて取得
+#Get all subordinates of the common entity
 #LowerSearch =T
 if(LowerSearch){
 G <- c()
@@ -333,32 +353,32 @@ G <- C[,1:2]
 }
 
 #head(G)
-#ループ除く
+#Except for loops
 G_loop <- data.frame(G, paste(G$from, ".", G$to, sep=""))
 colnames(G_loop) <- c("from", "to", "unique")
 G_loop <- G_loop[as.numeric(rownames(unique(G_loop["unique"]))),]
 G_loop <- G_loop[,1:2]
 
-##グラフの修正
-##トリプルの関係が共通エンティティ同士なら除外
+
+#Exclude if the triple relationship is between common entities.
 G_mod <- G_loop
 G_mod$from <- G_loop$from %in% list2.c
 G_mod$to <- G_loop$to %in% list2.c
 G_mod00 <- G_loop[(!apply(G_mod, 1, all)),]
 
-#保存
+#Save
 saveRDS(G_loop, file = paste("./", FolderData, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c,
   "_B.Rdata", sep=""), compress = TRUE)
-write.table(G_loop, file = paste("./", FolderData, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c,
-  "_B.csv", sep=""), row.names = F, sep=",")
+readr::write_csv(G_loop, file = paste("./", FolderData, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c,
+  "_B.csv", sep=""))
 
 if(View){print(paste(p, "step 03"))}
-###最短パスの計算
+###Calculate the shortest path
 #head(G_mod00)
 G.path00 <- G_mod00
 
 if(dim(G.path00)[1] != 0){
-#ラベル結合(1)
+#Label binding (1)
 head(G_loop01 <- G_loop)
 G_loop01$from.to <- paste(G_loop01$from, ".", G_loop01$to, sep="")
 head(C01 <- C)
@@ -374,7 +394,7 @@ head(G_loop03)
 table(is.na(G_loop03))
 dim(G_loop03)
 
-#ラベル結合(2)
+#Label binding(2)
 head(G.path01 <- G.path00)
 G.path01$from.to <- paste(G.path01$from, ".", G.path01$to, sep="")
 head(C01 <- C)
@@ -391,10 +411,10 @@ table(is.na(G.path03))
 #a <- map(unique(G.path03$from), function(x){ unique(G.path03[G.path03$from == x, 3])[length(unique(G.path03[G.path03$from == x, 3])) > 1] })
 #b <- a[!unlist(map(a, function(x){length(unlist(x)) == 0}))]
 
-#グラフオブジェクトに変換
-G.path <- graph_from_edgelist(as.matrix(G.path00), directed = T)
+#Convert to the graph object
+G.path <- igraph::graph_from_edgelist(as.matrix(G.path00), directed = T)
 
-#リストの更新
+#Update the list
 list4.g <- as.character(unlist(G_mod00))
 list1.g <- list1.c[list1.c %in% list4.g]
 
@@ -406,7 +426,7 @@ list2.g <- list2.c[list2.c %in% list4.g]
 
 message(paste0("Number of expand common entity: ", length(list2.g)))
 
-#Lmaxの計算
+#Calculate Lmax
 #head(list2.g)
 for(j in seq_len(length(list2.g))){
 #j <- 1
@@ -415,7 +435,7 @@ if(View){print(paste(p, "step 04 ", j))}
 
 for(l in seq_len(length(list1.g))){
 #l <- 1
-suppressWarnings(try(len <- length(as_ids(shortest_paths(G.path,
+suppressWarnings(try(len <- length(igraph::as_ids(igraph::shortest_paths(G.path,
   from = as.character(list1.g[l]), to = as.character(list2.g[j]))$vpath[[1]])) - 1, silent=T))
 if(is.null(len) | len < 0){}else{Z <- c(Z, len)}
 if(UpdateList){list1.c <- list1.c[list1.c != list1.g[l]]}else{}
@@ -437,7 +457,8 @@ saveRDS(list4, file=paste("./", Folder, "/Results_output.Rdata", sep=""))
 }
 
 #list3.p <- list3[list3$V1 %in% list2.g,]; table(is.na(list3$V2))
-#SearchLevelsも追加
+
+#added SearchLevels
 head(G.path04 <- G.path03)
 #table(!is.na(list3$V2))
 list3.SearchLevels <- list3[!is.na(list3$V2),]
@@ -452,16 +473,16 @@ for(n in seq_len(nrow(list3.SearchLevels))){
 if(LvView){G.path03 <- G.path04}
 head(G.path03)
 
-##可視化1
+##visualization
 if(PlusLabel){
 head(G_loop03)
 #apply(G_loop03, 2, function(x){length(unique(x))})
 #length(unique(paste0(G_loop03[,1], ".", G_loop03[,2])))
 #length(unique(paste0(G_loop03[,3], ".", G_loop03[,4])))
-Glab <- graph_from_edgelist(as.matrix(G_loop03[,3:4]), directed = T)
-G00 <- graph_from_edgelist(as.matrix(G_loop03[,1:2]), directed = T)
+Glab <- igraph::graph_from_edgelist(as.matrix(G_loop03[,3:4]), directed = T)
+G00 <- igraph::graph_from_edgelist(as.matrix(G_loop03[,1:2]), directed = T)
 
-Col00 <- c(attr(V(G00), "names"))
+Col00 <- c(base::attr(V(G00), "names"))
 Col01 <- rep("grey", length(Col00))
 
 Col01[Col00 %in% list1.c] <- "lightblue"
@@ -478,19 +499,19 @@ Size02[Col00 %in% list1.c] <- 0.05
 Size02[Col00 %in% list2.cc] <- 0.05
 FONT <- "HiraKakuProN-W3"
 
-if(length(Col00) == length(c(attr(V(Glab), "names")))){
-Col00 <- c(attr(V(Glab), "names"))
+if(length(Col00) == length(c(base::attr(V(Glab), "names")))){
+Col00 <- c(base::attr(V(Glab), "names"))
 }else{
-aa <- c(attr(V(Glab), "names"))
-bb <- map(aa, function(x){str_split(x, pattern="\\.")[[1]]})
+aa <- c(base::attr(V(Glab), "names"))
+bb <- purrr::map(aa, function(x){stringr::str_split(x, pattern="\\.")[[1]]})
 for(n in seq_len(length(bb))){
 #n <- 1
 Col00[Col00 == bb[[n]][1]] <- aa[n]
 }
 }
 }else{
-G00 <- graph_from_edgelist(as.matrix(G_loop), directed = T)
-Col00 <- c(attr(V(G00), "names"))
+G00 <- igraph::graph_from_edgelist(as.matrix(G_loop), directed = T)
+Col00 <- c(base::attr(V(G00), "names"))
 Col01 <- rep("grey", length(Col00))
 
 Col01[Col00 %in% list1.c] <- "lightblue"
@@ -509,11 +530,11 @@ FONT <- "Times"
 }
 
 if(GraphView02){
-quartz(width=WindowSize02, height=WindowSize02)
+grDevices::quartz(width=WindowSize02, height=WindowSize02)
 set.seed(123)
-plot(G00,
+igraph::plot.igraph(G00,
      #layout =layout_as_tree(D01, mode = "in"),
-     layout=layout_with_fr(G00),
+     layout=igraph::layout_with_fr(G00),
      vertex.frame.color = Col01,
      vertex.frame.width=0.1,
      vertex.label.family=FONT,
@@ -532,20 +553,20 @@ plot(G00,
 #title(paste("Common: ", lab.c,
 #            "\nGraph Num.: ", length(A[c(A == TRUE)]), sep=""),
 #      cex.main=1, col.main="black")
-quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_02.pdf", sep=""),
-            type = "pdf"); dev.off()
+grDevices::quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_02.pdf", sep=""),
+                       type = "pdf"); grDevices::dev.off()
 }
 
-##可視化2
+##visualization(2)
 if(nrow(G.path03) != 1){
 if(PlusLabel){
 head(G.path03)
 #apply(G.path03, 2, function(x){length(unique(x))})
 
-Glab <- graph_from_edgelist(as.matrix(G.path03)[,3:4], directed = T)
-G00_mod <- graph_from_edgelist(as.matrix(G.path03[,1:2]), directed = T)
+Glab <- igraph::graph_from_edgelist(as.matrix(G.path03)[,3:4], directed = T)
+G00_mod <- igraph::graph_from_edgelist(as.matrix(G.path03[,1:2]), directed = T)
 
-Col00 <- c(attr(V(G00_mod), "names"))
+Col00 <- c(base::attr(V(G00_mod), "names"))
 Col01 <- rep("grey", length(Col00))
 
 Col01[Col00 %in% list1.c] <- "lightblue"
@@ -562,11 +583,11 @@ Size02[Col00 %in% list1.c] <- 0.05
 Size02[Col00 %in% list2.cc] <- 0.05
 FONT <- "HiraKakuProN-W3"
 
-if(length(Col00) == length(c(attr(V(Glab), "names")))){
-Col00 <- c(attr(V(Glab), "names"))
+if(length(Col00) == length(c(base::attr(V(Glab), "names")))){
+Col00 <- c(base::attr(V(Glab), "names"))
 }else{
-aa <- c(attr(V(Glab), "names"))
-bb <- map(aa, function(x){str_split(x, pattern="\\.")[[1]]})
+aa <- c(base::attr(V(Glab), "names"))
+bb <- purrr::map(aa, function(x){stringr::str_split(x, pattern="\\.")[[1]]})
 for(n in seq_len(length(bb))){
 #n <- 1
 Col00[Col00 == bb[[n]][1]] <- aa[n]
@@ -574,8 +595,8 @@ Col00[Col00 == bb[[n]][1]] <- aa[n]
 }}
 
 }else{
-G00_mod <- graph_from_edgelist(as.matrix(G_mod00), directed = T)
-Col00 <- c(attr(V(G00_mod), "names"))
+G00_mod <- igraph::graph_from_edgelist(as.matrix(G_mod00), directed = T)
+Col00 <- c(base::attr(V(G00_mod), "names"))
 Col01 <- rep("grey", length(Col00))
 
 Col01[Col00 %in% list1.c] <- "lightblue"
@@ -591,11 +612,11 @@ FONT <- "Times"
 }
 
 if(GraphView03){
-quartz(width=WindowSize03, height=WindowSize03)
+grDevices::quartz(width=WindowSize03, height=WindowSize03)
 set.seed(123)
-plot(G00_mod,
+igraph::plot.igraph(G00_mod,
      #layout =layout_as_tree(G00, mode = "in"),
-     layout=layout_with_fr(G00_mod),
+     layout=igraph::layout_with_fr(G00_mod),
      vertex.frame.color = Col01,
      vertex.frame.width=0.1,
      vertex.label.family=FONT,
@@ -614,28 +635,28 @@ plot(G00_mod,
 #title(paste("Common: ", lab.c,
 #            "\nGraph Num.: ", length(A[c(A == TRUE)]), sep=""),
 #      cex.main=1, col.main="black")
-quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_03.pdf", sep=""),
-            type = "pdf"); dev.off()
+grDevices::quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_03.pdf", sep=""),
+            type = "pdf"); grDevices::dev.off()
 }
 
 #個別グラフ
 if(GraphView04){
 if(PlusLabel){
 head(G.path03)
-#table(G.path03$from == unlist(map(G.path03$fromLab, function(x){str_split(x, pattern="\\.")[[1]][1]})))
-#table(G.path03$to == unlist(map(G.path03$toLab, function(x){str_split(x, pattern="\\.")[[1]][1]})))
+#table(G.path03$from == unlist(map(G.path03$fromLab, function(x){stringr::str_split(x, pattern="\\.")[[1]][1]})))
+#table(G.path03$to == unlist(map(G.path03$toLab, function(x){stringr::str_split(x, pattern="\\.")[[1]][1]})))
 #apply(G.path03, 2, function(x){length(unique(x))})
 
-Glab <- graph_from_edgelist(as.matrix(G.path03)[,3:4], directed = T)
-G00_mod <- graph_from_edgelist(as.matrix(G.path03[,1:2]), directed = T)
-G00_mod.dg <- decompose(G00_mod, min.vertices = 2)
-aa <- c(attr(V(Glab), "names"))
-bb <- map(aa, function(x){str_split(x, pattern="\\.")[[1]]})
+Glab <- igraph::graph_from_edgelist(as.matrix(G.path03)[,3:4], directed = T)
+G00_mod <- igraph::graph_from_edgelist(as.matrix(G.path03[,1:2]), directed = T)
+G00_mod.dg <- igraph::decompose(G00_mod, min.vertices = 2)
+aa <- c(base::attr(V(Glab), "names"))
+bb <- purrr::map(aa, function(x){stringr::str_split(x, pattern="\\.")[[1]]})
 
 for(N in seq_len(length(G00_mod.dg))){
 #N <- 1
 G00_mod.dg00 <- G00_mod.dg[[N]]
-Col00 <- c(attr(V(G00_mod.dg00), "names"))
+Col00 <- c(base::attr(V(G00_mod.dg00), "names"))
 Col01 <- rep("grey", length(Col00))
 
 Col01[Col00 %in% list1.c] <- "lightblue"
@@ -658,17 +679,17 @@ Size02[Col00 %in% list1.c] <- cex002
 Size02[Col00 %in% list2.cc] <- cex002
 FONT <- "HiraKakuProN-W3"
 
-if(length(Col00) == length(c(attr(V(Glab), "names")))){}else{
+if(length(Col00) == length(c(base::attr(V(Glab), "names")))){}else{
 for(n in seq_len(length(bb))){
 #n <- 1
 Col00[Col00 == bb[[n]][1]] <- aa[n]
 }}
 
-quartz(width=b, height=b)
+grDevices::quartz(width=b, height=b)
 set.seed(123)
-plot(G00_mod.dg00,
+igraph::plot.igraph(G00_mod.dg00,
      #layout =layout_as_tree(G00, mode = "in"),
-     layout=layout_with_fr(G00_mod.dg00),
+     layout=igraph::layout_with_fr(G00_mod.dg00),
      vertex.frame.color = Col01,
      vertex.frame.width=0.1,
      vertex.label.family=FONT,
@@ -684,16 +705,16 @@ plot(G00_mod.dg00,
      edge.arrow.size = 0.1,
      edge.curved=0,
      edge.arrow.width = 1)
-quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_04_", N, ".pdf", sep=""),
-            type = "pdf"); dev.off()
+grDevices::quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_04_", N, ".pdf", sep=""),
+            type = "pdf"); grDevices::dev.off()
 }
 }else{
-G00_mod.dg <- decompose(G00_mod, min.vertices = 2)
+G00_mod.dg <- igraph::decompose(G00_mod, min.vertices = 2)
 
 for(N in seq_len(length(G00_mod.dg))){
 #N <- 1
 G00_mod.dg00 <- G00_mod.dg[[N]]
-Col00 <- c(attr(V(G00_mod.dg00), "names"))
+Col00 <- c(base::attr(V(G00_mod.dg00), "names"))
 Col01 <- rep("grey", length(Col00))
 
 Col01[Col00 %in% list1.c] <- "lightblue"
@@ -706,10 +727,10 @@ Size02 <- rep(0.1, length(Col00))
 Size02[Col00 %in% list1.c] <- 0.2
 Size02[Col00 %in% list2.cc] <- 0.2
 
-pdf(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_04_", N, ".pdf", sep=""),
+grDevices::pdf(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_04_", N, ".pdf", sep=""),
     width=WindowSize04, height=WindowSize04)
-plot(G00_mod.dg00,
-     layout=layout_with_fr(G00_mod.dg00)*2,
+igraph::plot.igraph(G00_mod.dg00,
+     layout=igraph::layout_with_fr(G00_mod.dg00)*2,
      vertex.frame.color = Col01,
      vertex.size = Size01,
      edge.width = 0.5,
@@ -719,7 +740,7 @@ plot(G00_mod.dg00,
      edge.arrow.size = 0.1,
      edge.curved=0,
      edge.arrow.width = 1)
-dev.off()
+grDevices::dev.off()
 }
 }
 }

@@ -1,0 +1,686 @@
+---
+title: "A workflow to use agGraphSearch and Wikidata with PolyInfo terms"
+author:
+  - name: Satoshi Kume
+date: "`r Sys.Date()`"
+graphics: no
+package: agGraphSearch, knitr, SPARQL
+output:
+  BiocStyle::html_document:
+  toc_float: true
+vignette: >
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{agGraphSearch}
+  %\VignetteIndexEntry{A workflow to use agGraphSearch and Wikidata with PolyInfo terms}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r style, echo=FALSE, message=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+**Last modified:** `r file.info("agGraphSearch-Wikidata-WF.Rmd")$mtime`<br />
+**Compiled**: `r date()`
+
+# Getting started
+
+## Requirements
+
+- macOSX 10.15 with Intel Core i7 or similar specs
+- RAM: 32GB
+- Available storage: > 20GB
+
+## Installation of agGraphSearch
+
+Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
+
+```{r library, echo=TRUE, eval=FALSE}
+#Clean the enbironment
+rm(list=ls())
+
+#Install
+install.packages("devtools")
+devtools::install_github( "kumeS/agGraphSearch", force = TRUE)
+library(agGraphSearch)
+library(magrittr)
+```
+
+## Generate temporary folders
+
+```{r echo=TRUE, eval=FALSE}
+#Create temporary folder path
+tempDIR <- tempdir()
+if(!dir.exists(paste0(tempDIR, "/", "Wiki_01_Out"))){dir.create(paste0(tempDIR, "/", "Wiki_01_Out"))}
+if(!dir.exists(paste0(tempDIR, "/", "Wiki_02_Out"))){dir.create(paste0(tempDIR, "/", "Wiki_02_Out"))}
+if(!dir.exists(paste0(tempDIR, "/", "Wiki_03_Out"))){dir.create(paste0(tempDIR, "/", "Wiki_03_Out"))}
+if(!dir.exists(paste0(tempDIR, "/", "Wiki_04_Jpn"))){dir.create(paste0(tempDIR, "/", "Wiki_04_Jpn"))}
+if(!dir.exists(paste0(tempDIR, "/", "Wiki_05_RDF"))){dir.create(paste0(tempDIR, "/", "Wiki_05_RDF"))}
+
+#show the folders
+dir(tempDIR)
+```
+
+# Read the search terms obtained from PolyInfo databse.
+
+In this tutorial, the Japanese terms obtained from PolyInfo Database will be used and the number of terms is total 510.
+
+```{r echo=TRUE, eval=FALSE}
+#Read Japanese terms
+f <- system.file("extdata", "PoLyInfo_terms_Jpn_v01.csv", package="agGraphSearch")
+wordsj <- data.frame(readr::read_csv(f, col_names = T, show_col_types = FALSE))
+
+#Processing
+words <- unique(unlist(wordsj, use.names = F))
+words <- words[!is.na(words)]
+
+#show the head
+head(words)
+length(words)
+```
+
+I also showed how to use the English terms obtained from PolyInfo Database (total 463 terms).
+
+```{r echo=TRUE, eval=FALSE}
+if(F){
+#Read English terms
+f <- system.file("extdata", "PoLyInfo_terms_En_v01.csv", package="agGraphSearch")
+wordse <- data.frame(readr::read_csv(f, col_names = T, show_col_types = FALSE))
+
+#Processing
+words <- unique(unlist(wordse, use.names = F))
+words <- words[!is.na(words)]
+
+#show the head
+head(words)
+}
+```
+
+# Wikidata datasets (25th Sep 2021)
+
+## Download the Wikidata datasets from Google Drive.
+
+Download below files and save on the local environment.
+
+```{r echo=TRUE, eval=FALSE}
+## Download Class-related hierarchy dataset (Common to English and Japanese)
+browseURL("https://drive.google.com/file/d/1YcUVgCShQOOSY0ckv1h-B4eu-4mBHLVz/view?usp=sharing")
+
+## Download Japanese labels
+browseURL("https://drive.google.com/file/d/1NMJYwDjuAujxA6tdpqUwUBtxQxYzGZ8c/view?usp=sharing")
+
+## Download English labels
+#TBD
+
+```
+
+Then, I moved the files to your working directory. 
+In this time, I manually moved their files to the "04_Wiki_PolyInfo_00" folder in the working directory .
+
+## Import Wikidata datasets
+
+```{r echo=TRUE, eval=FALSE}
+#Load the hierarchy dataset
+ClassHi <- readRDS("./04_Wiki_PolyInfo_00/Relation_P279_P31_df.Rds")
+
+#Check data
+head(ClassHi)
+#table(ClassHi$Property)
+
+#Remove loops
+table(ClassHi$Subject != ClassHi$Object)
+ClassHi <- ClassHi[ClassHi$Subject != ClassHi$Object,]
+
+#Do not run
+if(F){
+#Load the label dataset
+Labels01 <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_rdfs_df.Rds")
+Labels02 <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_Altlabel_df.Rds")
+
+#Bind, extract and check labels
+Labels <- rbind(Labels01, Labels02)
+head(Labels)
+saveRDS(Labels, "./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")  
+}
+
+#Load the label dataset
+Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
+
+```
+
+# Linking of input terms to the wikidata labels
+
+Input are 510 terms in Japanese.
+
+```{r echo=TRUE, eval=FALSE}
+#Show data
+head(words)
+head(Labels)
+
+#Linking
+LabelsR <- Labels[Labels$Object %in% words,]
+LabelsR <- LabelsR[LabelsR$Subject %in% unique(ClassHi$Subject),]
+
+#Check data
+dim(LabelsR)
+head(LabelsR)
+
+#rename row
+rownames(LabelsR) <- 1:nrow(LabelsR)
+dim(LabelsR)
+
+#Obtain the subject QID
+QID.d <- data.frame(QID=unique(LabelsR$Subject))
+```
+
+# Check relations via SPARQL query
+
+This program executes SPARQL with a for-loop.
+
+Input entities are 247.
+
+## excluding the adjacent entity
+
+```{r echo=TRUE, eval=FALSE}
+#proxy setting if you need.
+#proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
+#ProxySet(proxy_url)
+
+#Temp Function for excluding the adjacent entity
+Tem00 <- function(Entity_ID0, Object0, Property0="?p", Count0="?p"){
+Val00 <- wikiCount_QID_Property_Object(Entity_ID=Entity_ID0, Property=Property0, Object=Object0, Count=Count0)
+return(Val00)
+}
+
+#set parameters
+ExcluQ <- c("Q101352", "Q16521", "Q11424", "Q6256", 
+            "Q12308941", "Q11879590", "Q5", "Q5327369", 
+            "Q577", "Q4167410", "Q3305213", "Q13406463", 
+            "Q35120", "Q3695082", "Q131257", "Q80071", 
+            "Q4830453", "Q482994", "Q20202269", "Q2996394")
+NumQ <- length(ExcluQ)
+
+#run
+for(n in seq_len(NumQ)){
+#n <- 1
+message(n, ": ", ExcluQ[n])
+DatA <- QID.d$QID; DatB <- rep(paste0("wd:", ExcluQ[n]), length(DatA))
+a <- furrr::future_map2(unlist(DatA), unlist(DatB), Tem00, .progress = TRUE)
+eval(parse(text=paste0("QID.d$", ExcluQ[n], " <- c(unlist(a) > 0)")))
+
+readr::write_excel_csv(QID.d, 
+                       paste0(paste0(tempDIR, "/", "Wiki_01_Out"), 
+                              "/ExcluQ_", formatC(n, width = 3, flag = "0"), "_", ExcluQ[n], ".csv"), col_names = T)
+#show hits
+print(eval(parse(text=paste0("QID.d[QID.d$", ExcluQ[n], " == TRUE,c(1, ncol(QID.d))]"))))
+#remove hits
+QID.d <- QID.d[unlist(a, use.names = F) == 0,]
+print(dim(QID.d))
+}
+
+#show results
+dim(QID.d)
+head(QID.d)
+
+```
+
+## excluding the particular property
+
+```{r echo=TRUE, eval=FALSE}
+#Temp Function for excluding the particular property
+Tem01 <- function(Entity_ID0, Property0, Object0="?o", Count0="?o"){
+Val01 <- wikiCount_QID_Property_Object(Entity_ID=Entity_ID0, Property=Property0, Object=Object0, Count=Count0)
+return(Val01)
+}
+
+#set parameters
+ExcluP <- c("P131","P21","P747","P4743","P577")
+NumP <- length(ExcluP)
+
+#run
+for(n in seq_len(NumP)){
+#n <- 1
+message(n, ": ", ExcluP[n])
+DatA <- QID.d$QID; DatB <- rep(paste0("wdt:", ExcluP[n]), length(DatA))
+a <- furrr::future_map2(unlist(DatA), unlist(DatB), Tem01, .progress = TRUE)
+eval(parse(text=paste0("QID.d$", ExcluP[n], " <- c(unlist(a) > 0)")))
+
+readr::write_excel_csv(QID.d, 
+                       paste0(paste0(tempDIR, "/", "Wiki_01_Out"), 
+                              "/ExcluP_", formatC(n, width = 3, flag = "0"), "_", ExcluP[n], ".csv"), col_names = T)
+#show hits
+print(eval(parse(text=paste0("QID.d[QID.d$", ExcluP[n], " == TRUE,c(1, ncol(QID.d))]"))))
+#remove hits
+QID.d <- QID.d[unlist(a, use.names = F) == 0,]
+print(dim(QID.d))
+}
+
+#show results
+dim(QID.d)
+head(QID.d)
+
+#saveRDS(QID.d, "./QID.d.Rds")
+#QID.d <- readRDS("./QID.d.Rds")
+```
+
+## post-processing
+
+```{r echo=TRUE, eval=FALSE}
+#renames rows
+rownames(QID.d) <- 1:nrow(QID.d)
+QID.d01 <- QID.d[,-c(2:ncol(QID.d))]
+
+#the number of QID
+length(QID.d01)
+head(QID.d01)
+```
+
+# Seaching upper concepts from the search entities
+
+```{r echo=TRUE, eval=FALSE}
+#show labels
+LabelsR[LabelsR$Subject %in% QID.d01 & LabelsR$Property == "rdfs:label",]
+
+##################################################################
+#Upper search up to 30 steps
+##################################################################
+#set parameters
+QID.list <- QID.d01
+QID.dat <- NULL
+
+#Run
+for(n in 1:length(QID.list)){
+#n <- 1
+message("No.", n, ": ", QID.list[n])
+Dat <- c(); x <- 0; Query <- QID.list[n]
+
+repeat{
+x <- x + 1
+message("x: ", x)
+
+#Both wdt:P279 and wdt:P31 when x = 1
+b1 <- ClassHi[ClassHi$Subject %in% Query,]
+
+#Only wdt:P279 when x >= 2
+if(x >= 2){
+  b1 <- b1[b1$Property == "wdt:P279",]
+}
+
+if(nrow(b1) == 0){
+  rownames(Dat) <- 1:nrow(Dat)
+  Dat$triple <- paste0(Dat$Subject, ".", Dat$Property, ".", Dat$Object)
+  Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),-c(ncol(Dat))]
+  rownames(Dat) <- 1:nrow(Dat)
+  #head(Dat)
+  QID.dat[[n]] <- Dat
+  names(QID.dat)[n] <- QID.list[n]
+  break
+  }
+Dat <- rbind(Dat, b1)
+Query <- b1$Object
+if(x == 30){
+  rownames(Dat) <- 1:nrow(Dat)
+  Dat$triple <- paste0(Dat$Subject, ".", Dat$Property, ".", Dat$Object)
+  Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),-c(ncol(Dat))]
+  rownames(Dat) <- 1:nrow(Dat)
+  #head(Dat)
+  QID.dat[[n]] <- Dat
+  names(QID.dat)[n] <- QID.list[n]
+  break
+}
+}}
+
+#length(QID.dat)
+#saveRDS(QID.dat, "./QID.dat.Rds")
+#QID.dat <- readRDS("./QID.dat.Rds")
+```
+
+## Visualize Individual network diagrams.
+
+```{r echo=TRUE, eval=FALSE}
+library(agGraphSearch)
+if(!dir.exists("04_Wiki_PolyInfo_01")){dir.create("04_Wiki_PolyInfo_01")}
+
+for(n in 1:length(QID.dat)){
+#n <- 1
+message(n)
+#head(QID.dat[[1]]); head(Labels)
+Lab <- names(QID.dat)[n]; Lab00 <- paste(unlist(Labels[Labels$Subject == Lab & Labels$Property == "rdfs:label",c("Object", "Subject")]), collapse = ".")
+Lab00
+
+#Merge labels
+QID.datR <- MergeWikiData(Data=QID.dat[[n]], 
+                          Labels=Labels)
+QID.datR <- QID.datR[QID.datR$subject != QID.datR$parentClass,]
+QID.datR$subjectLabel <- paste0(QID.datR$subjectLabel, ".", QID.datR$subject)
+QID.datR$parentClassLabel <- paste0(QID.datR$parentClassLabel, ".", QID.datR$parentClass)
+head(QID.datR)
+
+agGraphSearch:::agVisNetwork_cr(Graph=QID.datR,
+                                NodeColorRandom=F, Count=2, 
+                                Size=10, SmallSize=5, StarSize=10, 
+                                FontSize=7, HeightSclale = "750px", 
+                                WidthSclale = "110%", SEED=123, Selected=Lab00, 
+                                Browse=F, output=T, file=paste0("./agVisNetwork_", formatC(n, flag="0", width=4), "_", Lab00, ".html"))
+suppressMessages(filesstrings::file.move(files = paste0("./agVisNetwork_", formatC(n, flag="0", width=4), "_", Lab00, ".html"),
+                        destinations = "./04_Wiki_PolyInfo_01", overwrite = T))
+
+}
+
+
+```
+
+## Calculate the common upper entities
+
+```{r echo=TRUE, eval=FALSE}
+library(magrittr)
+#QID.dat <- readRDS("./QID.dat.Rds")
+#Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
+#str(QID.dat)
+
+#################################################
+#Calculate the common upper entities
+#################################################
+QID.dat_02 <- c()
+CUcounts00 <- c()
+
+for(n in seq_len(length(QID.dat))){
+  #n <- 1
+  a <- QID.dat[[n]]
+  a$triple <- paste0(a$Subject, ".", a$Property, ".", a$Object)
+  b <- a[as.numeric(rownames(unique(a["triple"]))),]
+  
+  #Remove loops
+  b <- b[b$Subject != b$Object,]
+  QID.dat_02 <- QID.dat_02 %>% rbind(b)
+  
+  #CU counts
+  CUcounts00 <- c(CUcounts00, unique(b$Object))
+}
+
+head(QID.dat_02)
+dim(QID.dat_02)
+rownames(QID.dat_02) <- 1:nrow(QID.dat_02)
+
+##Check NA
+table(is.na(QID.dat_02))
+table(is.na(QID.dat_02$Subject))
+table(is.na(QID.dat_02$Object))
+
+#################################################
+## Visualize entire network diagrams
+#################################################
+#Merge labels
+head(QID.dat_02)
+QID.datR <- MergeWikiData(Data=QID.dat_02, 
+                          Labels=Labels)
+QID.datR <- QID.datR[QID.datR$subject != QID.datR$parentClass,]
+QID.datR$subjectLabel <- paste0(QID.datR$subjectLabel, ".", QID.datR$subject)
+QID.datR$parentClassLabel <- paste0(QID.datR$parentClassLabel, ".", QID.datR$parentClass)
+head(QID.datR)
+
+agGraphSearch:::agVisNetwork(Graph=QID.datR,
+                             NodeColorRandom=F, Count=2, 
+                             Size=10, SmallSize=5, StarSize=10, 
+                             FontSize=7, 
+                             Output=T, Browse=F,
+                             FilePath= paste0("./agVisNetwork_entire.html"))
+if(!dir.exists("04_Wiki_PolyInfo_02")){dir.create("04_Wiki_PolyInfo_02")}
+suppressMessages(filesstrings::file.move(files = paste0("./agVisNetwork_entire.html"),
+                        destinations = "./04_Wiki_PolyInfo_02", overwrite = T))
+
+#################################################
+#Count entities and triples
+#################################################
+#entities
+E01 <- length(unique(c(QID.dat_02$Subject, QID.dat_02$Object)))
+E01
+#[1] 763
+
+#triples
+E02 <- length(unique(QID.dat_02$triple))
+E02
+#[1] 1292
+
+#################################
+#Calculate CU entities
+#################################
+CUcounts00
+cu_table <- table(CUcounts00)
+cu_table <- cu_table[rev(order(cu_table))]
+cu_table1 <- data.frame(parentClass=names(cu_table),
+                        Freq=as.numeric(cu_table), 
+                        row.names = 1:length(cu_table),
+                        stringsAsFactors = F)
+
+head(cu_table1)
+cu_table2 <- merge(cu_table1, 
+                   Labels[Labels$Property == "rdfs:label",],
+                   by.x = "parentClass", by.y = "Subject", 
+                   all.x = T, all.y = F, sort=F)
+cu_table3 <- cu_table2[cu_table2$Freq > 1,]
+head(cu_table3)
+tail(cu_table3)
+
+#CU entities
+dim(cu_table3)
+#[1] 346   5
+
+```
+
+## Graph analysis algorism
+
+```{r echo=TRUE, eval=FALSE}
+QID.datRR <- NULL
+for(n in 1:length(QID.dat)){
+  #n <- 1
+  message(n)
+  datR <- MergeWikiData(Data=QID.dat[[n]], 
+                        Labels=Labels)
+  print(head(datR))
+  QID.datRR[[n]] <- datR
+  names(QID.datRR)[n] <- names(QID.dat)[n]
+}
+
+#set parameters
+graphList <- QID.datRR
+search_List <- QID.list
+CU_List <- cu_table3$parentClass
+
+#Calculation
+SearchRnage <- agGraphAnalysis(graphList=graphList,
+                               search_List=search_List,
+                               CU_List=CU_List)
+#system("mv -f ./Results_211018_1939 ./04_Wiki_PolyInfo_02")
+
+#Levels
+SearchRnage00 <- SearchRnage[!is.na(SearchRnage$Levels),]
+SearchRnage00 <- SearchRnage00[order(SearchRnage00$Levels),]
+rownames(SearchRnage00) <- 1:nrow(SearchRnage00)
+head(SearchRnage00)
+tail(SearchRnage00)
+
+#Merge labels
+SearchRnage01 <- merge(SearchRnage00,
+                   Labels[Labels$Property == "rdfs:label",],
+                   by.x = "CommonEntity", by.y = "Subject", 
+                   all.x = T, all.y = F, sort=F)
+SearchRnage01 <- SearchRnage01[order(SearchRnage01$Levels),]
+rownames(SearchRnage01) <- 1:nrow(SearchRnage01)
+SearchRnage01$Property <- "rdfs:label"
+SearchRnage01$Object[is.na(SearchRnage01$Object)] <- SearchRnage01$CommonEntity[is.na(SearchRnage01$Object)]
+head(SearchRnage01, n=15)
+tail(SearchRnage01, n=15)
+
+#saveRDS(SearchRnage01, "SearchRnage01.Rds")
+
+```
+
+# Subordinate search
+
+```{r echo=TRUE, eval=FALSE}
+if(!dir.exists("04_Wiki_PolyInfo_03")){dir.create("04_Wiki_PolyInfo_03")}
+ECU.list <- SearchRnage01
+
+#Run
+for(n in 1:nrow(ECU.list)){
+#n <- 1
+message("No.", n, ": ", ECU.list$CommonEntity[n], " ", ECU.list$Object[n])
+Dat <- c(); x <- 0; Query <- ECU.list$CommonEntity[n]
+
+repeat{
+x <- x + 1
+message("x: ", x)
+
+#Both wdt:P279 and wdt:P31
+b1 <- ClassHi[ClassHi$Object %in% Query,]
+
+#Only wdt:P279 when x = Levels
+if(x != ECU.list$Levels[n]){
+  b1 <- b1[b1$Property == "wdt:P279",]
+}
+
+if(nrow(b1) == 0){
+  rownames(Dat) <- 1:nrow(Dat)
+  Dat$triple <- paste0(Dat$Subject, ".", Dat$Property, ".", Dat$Object)
+  Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),-c(ncol(Dat))]
+  rownames(Dat) <- 1:nrow(Dat)
+  #head(Dat); dim(Dat)
+  break
+  }
+Dat <- rbind(Dat, b1)
+Query <- b1$Subject
+if(x == ECU.list$Levels[n]){
+  rownames(Dat) <- 1:nrow(Dat)
+  Dat$triple <- paste0(Dat$Subject, ".", Dat$Property, ".", Dat$Object)
+  Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),-c(ncol(Dat))]
+  rownames(Dat) <- 1:nrow(Dat)
+  #head(Dat); dim(Dat)
+  break
+}
+}
+#head(Dat); dim(Dat)
+print(dim(Dat))
+saveRDS(Dat,
+        paste0("./04_Wiki_PolyInfo_03/", 
+               formatC(n, width = 4, flag = "0"),
+                "_L", ECU.list$Levels[n], "_",
+               ECU.list$CommonEntity[n],
+               ".Rds"))
+}
+
+```
+
+# Calucation
+
+```{r echo=TRUE, eval=FALSE}
+#SearchRnage01 <- readRDS("SearchRnage01.Rds")
+dim(SearchRnage01)
+
+#01 Barplot
+a <- data.frame(No=names(table(SearchRnage01$Levels)),
+                each_entity=as.numeric(table(SearchRnage01$Levels)))
+
+head(a)
+fig <- plotly::plot_ly(a, x = ~No, y = ~each_entity, type = 'bar', name = '',
+               hovertemplate = paste('%{y}', sep=""),
+               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% plotly::layout(title = paste("Number of ECU entities", sep=""),
+                      yaxis = list(title = 'Entity number', linewidth = 1),
+                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
+                                     tick0 = 1, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+if(!dir.exists("04_Wiki_PolyInfo_04")){dir.create("04_Wiki_PolyInfo_04")}
+Filename <- paste0("./Barplot_results_", format(Sys.time(), "%y%m%d"),"_01.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+##02 
+ECU.list <- SearchRnage01
+ECU.list$UniTripleNum <- NA
+ECU.list$UniEntityNum <- NA
+TotalData <- NULL
+
+for(n in 1:nrow(ECU.list)){
+#n <- 1
+message(n)
+
+b <- readRDS(paste0("./04_Wiki_PolyInfo_03/", 
+               formatC(n, width = 4, flag = "0"),
+                "_L", ECU.list$Levels[n], "_",
+               ECU.list$CommonEntity[n], ".Rds"))
+
+#head(b)
+b$triple <- paste0(b$Subject, ".",
+                    b$Property, ".",
+                    b$Object)
+ECU.list$UniTripleNum[n] <- length(unique(b$triple))
+ECU.list$UniEntityNum[n] <- length(unique(c(b$Subject, b$Object)))
+#head(ECU.list)
+#head(b); head(b[,-4])
+TotalData[[n]] <- b[,-4]
+}
+
+head(ECU.list)
+rownames(ECU.list) <- 1:nrow(ECU.list)
+#str(TotalData)
+TotalDataECU <- NULL
+
+for(m in 1:7){
+  #m <- 1
+  message("m: ", m)
+  d <- ECU.list[ECU.list$Levels == m,]
+  d1 <- as.numeric(rownames(d))
+  temp <- NULL
+  for(n in d1){
+    #n <- 1
+    message("n: ", n)
+    temp <- rbind(temp, TotalData[[n]])
+  }
+temp$triple <- paste0(temp$Subject, ".",
+                       temp$Property, ".",
+                       temp$Object)
+rownames(temp) <- 1:nrow(temp)
+temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
+#head(temp)
+TotalDataECU[[m]] <- temp
+}
+
+str(TotalDataECU)
+CountDat <- data.frame(No=1:7,
+                       UniEntityNum=NA,
+                       UniTripleNum=NA,
+                       AccEntityNum=NA,
+                       AccTripleNum=NA)
+temp <- NULL
+
+for(n in 1:length(TotalDataECU)){
+  #n <- 1
+  message("n: ", n)
+  e <- TotalDataECU[[n]]
+  #head(e)
+  CountDat$UniEntityNum[n]  <- length(unique(c(e$Subject, e$Object)))
+  CountDat$UniTripleNum[n] <- length(unique(e$triple))
+  
+  temp <- rbind(temp, TotalDataECU[[n]])
+  rownames(temp) <- 1:nrow(temp)
+  temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
+  CountDat$AccEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
+  CountDat$AccTripleNum[n] <- length(unique(temp$triple))
+}
+
+CountDat
+
+
+```
+
+
+# Evaluation
+
+```{r echo=TRUE, eval=FALSE}
+
+```
+

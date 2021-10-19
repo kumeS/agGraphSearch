@@ -1,6 +1,6 @@
 ---
-title: "Workflow to use agGraphSearch and Mesh RDF: WF-002"
-shorttitle: "WF-002: match labels to the Mesh data via SPARQL"
+title: "A workflow to use agGraphSearch and Mesh RDF"
+shorttitle: "Application to a simple class hierarchy model of Mesh RDF"
 author:
   - name: Satoshi Kume
 date: "`r Sys.Date()`"
@@ -12,7 +12,7 @@ output:
 vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
-  %\VignetteIndexEntry{WF-002: match labels to the wikidata via SPARQL}
+  %\VignetteIndexEntry{A workflow to use agGraphSearch and Mesh RDF}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
@@ -117,10 +117,12 @@ if(F){
 MeshLabels <- readRDS("./03_Mesh_OCR_00/mesh_Label_en_dfR.Rds")
 head(MeshLabels)
 table(MeshLabels$Property)
+dim(MeshLabels)
 
 MeshOthers <- readRDS("./03_Mesh_OCR_00/Mesh_othersR.Rds")
 head(MeshOthers)
 table(MeshOthers$Property)
+dim(MeshOthers)
 
 MeshLabelsR <- MeshLabels[MeshLabels$Subject %in% unique(c(MeshOthers$Subject, MeshOthers$Object)),]
 dim(MeshLabelsR)
@@ -667,7 +669,7 @@ Dat02 <- readRDS("./03_Mesh_OCR_01_Out/OCR_Dat02.Rds")
 DatJpn03 <- readRDS("./03_Mesh_OCR_01_Out/OCR_DatJpn03_new.Rds")
 topClass <- unique(DatJpn03$parentClass)[!(unique(DatJpn03$parentClass) %in% unique(DatJpn03$subject))]
 LabList00 <- readRDS("./03_Mesh_OCR_01_Out/OCR_en_LabList00.Rds")
-
+#write.csv(topClass, "topClass.csv")
 #SPARQL結果をN-triplesに変換
 
 if(T){

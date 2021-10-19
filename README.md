@@ -1,12 +1,12 @@
-# agGraphSearch (under development)
+# agGraphSearch (ver 0.99.x)
 
 ## Introduction
 
-agGraphSearch, a R package, supply a tool-set for searching graph data 
-structures of RDF (Resource Description Framework) via SPARQL query.
+agGraphSearch package supplies a tool-set for searching graph structures based on RDF (Resource Description Framework)
+and extracting the subset of the class-related hierarchy with domain specific terms.
 
-This set of functions allows us to explore the graph data (triples) 
-as a function of R, without having to create any SPARQL queries on R scripts.
+This set of functions also allows us to explore the triple-like formatted dataset 
+without creating any SPARQL queries on R scripts.
 
 ## Installation
 
@@ -20,14 +20,7 @@ devtools::install_github( "kumeS/agGraphSearch" )
 library( "agGraphSearch" )
 ```
 
-An alternative way,
-if you use MacOSX, install Git by installing Homebrew on Terminal first.
-
-```r
-system("brew install git")
-```
-
-Then,
+An alternative way, type the code below in the R console window if you install Git command.
 
 ```r
 system( "git clone https://github.com/kumeS/agGraphSearch.git" )
@@ -37,15 +30,17 @@ library( "agGraphSearch" )
 
 ## Tutorial
 
-- [Installation & Basic functions](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-installation.html)
+- [Installation](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-installation.html)
 
-- [Installation & Basic functions 日本語チュートリアル](http://translate.google.com/translate?hl=&sl=en&tl=ja&u=https%3A%2F%2Fkumes.github.io%2FagGraphSearch%2Fvignettes%2FagGraphSearch-installation.html)
+- [Installation 日本語チュートリアル](http://translate.google.com/translate?hl=&sl=en&tl=ja&u=https%3A%2F%2Fkumes.github.io%2FagGraphSearch%2Fvignettes%2FagGraphSearch-installation.html)
 
 - [A short-tutorial for agGraphSearch](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-short-tutorial.html)
 
 - [agGraphSearch 日本語ショートチュートリアル](http://translate.google.com/translate?hl=&sl=en&tl=ja&u=https%3A%2F%2Fkumes.github.io%2FagGraphSearch%2Fvignettes%2FagGraphSearch-short-tutorial.html)
 
-- [agGraphSearch tutorial for MeSH](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Mesh-WF-002_v06.html)
+- [agGraphSearch tutorial: A workflow to use agGraphSearch and Wikidata with PolyInfo terms](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Wikidata-WF.html)
+
+- [agGraphSearch tutorial: A workflow to use agGraphSearch and Mesh RDF with PolyInfo terms](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Mesh-WF-PolyInfo.html)
 
 ## Some examples of function execution in the package
 
