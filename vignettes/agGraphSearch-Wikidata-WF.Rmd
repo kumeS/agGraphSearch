@@ -280,7 +280,9 @@ head(QID.d01)
 
 ```{r echo=TRUE, eval=FALSE}
 #show labels
-LabelsR[LabelsR$Subject %in% QID.d01 & LabelsR$Property == "rdfs:label",]
+SearchEntity <- Labels[Labels$Subject %in% QID.d01 & Labels$Property == "rdfs:label",]
+head(SearchEntity); dim(SearchEntity)
+#readr::write_excel_csv(SearchEntity, "SearchEntity.csv")
 
 ##################################################################
 #Upper search up to 30 steps
@@ -466,12 +468,16 @@ tail(cu_table3)
 #CU entities
 dim(cu_table3)
 #[1] 346   5
-
 ```
 
 ## Graph analysis algorism
 
 ```{r echo=TRUE, eval=FALSE}
+library(magrittr)
+#QID.dat <- readRDS("./QID.dat.Rds")
+#Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
+#str(QID.dat)
+
 QID.datRR <- NULL
 for(n in 1:length(QID.dat)){
   #n <- 1
@@ -487,6 +493,8 @@ for(n in 1:length(QID.dat)){
 graphList <- QID.datRR
 search_List <- QID.list
 CU_List <- cu_table3$parentClass
+#save(CU_List, "CU_List.Rds")
+#CU_List <- readRDS("CU_List.Rds")
 
 #Calculation
 SearchRnage <- agGraphAnalysis(graphList=graphList,
@@ -514,6 +522,8 @@ head(SearchRnage01, n=15)
 tail(SearchRnage01, n=15)
 
 #saveRDS(SearchRnage01, "SearchRnage01.Rds")
+#SearchRnage01 <- readRDS("SearchRnage01.Rds")
+#readr::write_excel_csv(SearchRnage01, "SearchRnage01.csv")
 
 ```
 
@@ -572,31 +582,16 @@ saveRDS(Dat,
 
 ```
 
-# Calucation
+# Calucation & Evaluation
 
 ```{r echo=TRUE, eval=FALSE}
-#SearchRnage01 <- readRDS("SearchRnage01.Rds")
+#SearchRnage01 <- readRDS("./04_Wiki_PolyInfo_XX/SearchRnage01.Rds")
 dim(SearchRnage01)
 
 #01 Barplot
-a <- data.frame(No=names(table(SearchRnage01$Levels)),
+SearchRnage02 <- data.frame(No=names(table(SearchRnage01$Levels)),
                 each_entity=as.numeric(table(SearchRnage01$Levels)))
-
-head(a)
-fig <- plotly::plot_ly(a, x = ~No, y = ~each_entity, type = 'bar', name = '',
-               hovertemplate = paste('%{y}', sep=""),
-               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
-fig <- fig %>% plotly::layout(title = paste("Number of ECU entities", sep=""),
-                      yaxis = list(title = 'Entity number', linewidth = 1),
-                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
-                                     tick0 = 1, dtick = 1),
-                      margin = list(l=50, r=10, b=50, t=50, pad=4))
-fig
-
-if(!dir.exists("04_Wiki_PolyInfo_04")){dir.create("04_Wiki_PolyInfo_04")}
-Filename <- paste0("./Barplot_results_", format(Sys.time(), "%y%m%d"),"_01.html")
-htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
-system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+head(SearchRnage02)
 
 ##02 
 ECU.list <- SearchRnage01
@@ -607,7 +602,6 @@ TotalData <- NULL
 for(n in 1:nrow(ECU.list)){
 #n <- 1
 message(n)
-
 b <- readRDS(paste0("./04_Wiki_PolyInfo_03/", 
                formatC(n, width = 4, flag = "0"),
                 "_L", ECU.list$Levels[n], "_",
@@ -621,8 +615,16 @@ ECU.list$UniTripleNum[n] <- length(unique(b$triple))
 ECU.list$UniEntityNum[n] <- length(unique(c(b$Subject, b$Object)))
 #head(ECU.list)
 #head(b); head(b[,-4])
-TotalData[[n]] <- b[,-4]
+TotalData[[n]] <- b
 }
+
+
+#str(TotalData)
+#saveRDS(TotalData, "./04_Wiki_PolyInfo_XX/TotalData.Rds")
+#saveRDS(ECU.list, "./04_Wiki_PolyInfo_XX/ECU.list.Rds")
+#readr::write_excel_csv(ECU.list, "./04_Wiki_PolyInfo_XX/ECU.list.csv", append=F, col_names=T)
+#TotalData <- readRDS("./04_Wiki_PolyInfo_XX/TotalData.Rds")
+#ECU.list <- readRDS("./04_Wiki_PolyInfo_XX/ECU.list.Rds")
 
 head(ECU.list)
 rownames(ECU.list) <- 1:nrow(ECU.list)
@@ -635,52 +637,591 @@ for(m in 1:7){
   d <- ECU.list[ECU.list$Levels == m,]
   d1 <- as.numeric(rownames(d))
   temp <- NULL
+  system(paste0("rm -rf ", "TotalData_OutTriples_L", m, ".csv"))
   for(n in d1){
     #n <- 1
-    message("n: ", n)
-    temp <- rbind(temp, TotalData[[n]])
-  }
-temp$triple <- paste0(temp$Subject, ".",
-                       temp$Property, ".",
-                       temp$Object)
+    print("n: ", n)
+    readr::write_csv(TotalData[[n]], 
+                     paste0("TotalData_OutTriples_L", m, ".csv"), 
+                     append=T, col_names=F)
+}
+temp <- data.frame(readr::read_csv(paste0("TotalData_OutTriples_L", m, ".csv"),
+                        show_col_types = FALSE, col_names=F))
+colnames(temp) <- c("Subject", "Property", "Object", "triple")
 rownames(temp) <- 1:nrow(temp)
 temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
 #head(temp)
-TotalDataECU[[m]] <- temp
+readr::write_csv(temp, paste0("TotalData_OutTriples_L", m, "R.csv"), append=F, col_names=F)
 }
+
+#system("rm -rf *R_Acc.csv")
+for(m in 1:7){
+#m <- 1
+message("m: ", m)
+temp <- data.frame(readr::read_csv(paste0("TotalData_OutTriples_L", m, "R.csv"),
+                        show_col_types = FALSE, col_names=F))
+for(l in m:7){
+#l <- 1
+message("l: ", l)
+readr::write_csv(temp,
+                 paste0("TotalData_OutTriples_L", l, "R_Acc.csv"), 
+                 append=T, col_names=F)  
+}}
 
 str(TotalDataECU)
 CountDat <- data.frame(No=1:7,
                        UniEntityNum=NA,
                        UniTripleNum=NA,
                        AccEntityNum=NA,
-                       AccTripleNum=NA)
-temp <- NULL
+                       AccTripleNum=NA,
+                       ExtractedNum=NA,
+                       Rate=NA,
+                       TotalAnswerNum=NA)
 
-for(n in 1:length(TotalDataECU)){
+##Evaluation
+#Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
+#OCR <- unlist(readr::read_csv("./高分子辞典OCR/高分子辞典OCR_2column_jpn_RRR.csv", col_names=F, show_col_types = FALSE), use.names = F)
+OCR.eva <- OCR[OCR %in% Labels$Object]
+length(OCR.eva)
+
+#Evaluation
+for(n in 1:7){
   #n <- 1
   message("n: ", n)
-  e <- TotalDataECU[[n]]
-  #head(e)
-  CountDat$UniEntityNum[n]  <- length(unique(c(e$Subject, e$Object)))
-  CountDat$UniTripleNum[n] <- length(unique(e$triple))
-  
-  temp <- rbind(temp, TotalDataECU[[n]])
+  #Uni
+  temp <- data.frame(readr::read_csv(paste0("TotalData_OutTriples_L", n, "R.csv"),
+                                     show_col_types = FALSE, col_names=F))
+  colnames(temp) <- c("Subject", "Property", "Object", "triple")
   rownames(temp) <- 1:nrow(temp)
   temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
+  #head(temp)
+  message("Uni")
+  CountDat$UniEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
+  CountDat$UniTripleNum[n] <- length(unique(temp$triple))
+  
+  #Acc
+  temp <- data.frame(readr::read_csv(paste0("TotalData_OutTriples_L", n, "R_Acc.csv"),
+                                     show_col_types = FALSE, col_names=F))
+  colnames(temp) <- c("Subject", "Property", "Object", "triple")
+  rownames(temp) <- 1:nrow(temp)
+  temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
+  
+  #head(temp)
+  message("Acc")
   CountDat$AccEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
   CountDat$AccTripleNum[n] <- length(unique(temp$triple))
+  
+  message("OCR")
+  Eva00 <- unique(c(temp$Subject, temp$Object))
+  #head(Labels)
+  Eva01 <- unique(Labels[Labels$Subject %in% Eva00,]$Object)
+  #Eva01
+  Eva02 <- round(sum(Eva01 %in% OCR.eva)/length(OCR.eva)*100, 3)
+  CountDat$ExtractedNum[n] <- sum(Eva01 %in% OCR.eva)
+  CountDat$Rate[n] <- Eva02
+  CountDat$TotalAnswerNum[n] <- length(OCR.eva)
+  print(CountDat)
+
 }
 
-CountDat
+#ECU 
+CountDat$each_entity <- SearchRnage02$each_entity
+CountDat$sum_entity <- cumsum(SearchRnage02$each_entity)
+
+#readr::write_csv(CountDat, "CountDat.csv", append=F, col_names=T)
+
 
 
 ```
 
-
-# Evaluation
+# Plots
 
 ```{r echo=TRUE, eval=FALSE}
+library(magrittr); library(plotly)
+SearchRnage03 <- data.frame(readr::read_csv("CountDat.csv", show_col_types = FALSE, col_names=T))
+SearchRnage03
+
+#Barplot 01
+fig <- plotly::plot_ly(SearchRnage03, x = ~No, y = ~each_entity, type = 'bar', name = '',
+               hovertemplate = paste('%{y}', sep=""),
+               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% plotly::layout(title = paste0("Number of ECU entities"),
+                      yaxis = list(title = 'Entity number', linewidth = 1),
+                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
+                                     tick0 = 1, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+if(!dir.exists("04_Wiki_PolyInfo_04")){dir.create("04_Wiki_PolyInfo_04")}
+Filename <- paste0("./Barplot_results_", format(Sys.time(), "%y%m%d"),"_01.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+#Barplot 02
+fig <- plotly::plot_ly(SearchRnage03, x = ~No, y = ~UniEntityNum, type = 'bar', name = '',
+               hovertemplate = paste('%{y}', sep=""),
+               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% plotly::layout(title = paste0("Number of concepts per ENS (with dup.)"),
+                      yaxis = list(title = 'Entity number', linewidth = 1),
+                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
+                                     tick0 = 1, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+Filename <- paste0("./Barplot_results_", format(Sys.time(), "%y%m%d"),"_02.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+#Barplot 03
+fig <- plotly::plot_ly(SearchRnage03, x = ~No, y = ~AccEntityNum, type = 'bar', name = '',
+               hovertemplate = paste('%{y}', sep=""),
+               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% plotly::layout(title = paste0("Unique cumulative number of concepts"),
+                      yaxis = list(title = 'Entity number', linewidth = 1),
+                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
+                                     tick0 = 1, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+Filename <- paste0("./Barplot_results_", format(Sys.time(), "%y%m%d"),"_03.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+#Plot
+fig <- plotly::plot_ly(SearchRnage03, x = ~No, y = ~Rate, mode = 'lines+markers', name = '',
+               hovertemplate = paste('%{y}', sep=""),
+               marker = list(color = 'rgb(158,202,225)', 
+                             size=8,
+                             line = list(color = 'rgb(8,48,107)', width = 0.5)))
+fig <- fig %>% plotly::layout(title = paste0(""),
+                      yaxis = list(title = 'Reproductive rate (%)', linewidth = 1,
+                                   tick0 = 0, dtick = 10),
+                      xaxis = list(title = "NES range", ticks = "outside", linewidth = 1,
+                                     tick0 = 0, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+Filename <- paste0("./Barplot_results_", format(Sys.time(), "%y%m%d"),"_04.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
 
 ```
 
+# Refinement
+
+```{r echo=TRUE, eval=FALSE}
+#rm(list=ls())
+library(igraph)
+if(!dir.exists("04_Wiki_PolyInfo_05")){dir.create("04_Wiki_PolyInfo_05")}
+
+SearchRnage01 <- readRDS("./04_Wiki_PolyInfo_XX/SearchRnage01.Rds")
+ClassHi <- readRDS("./04_Wiki_PolyInfo_00/ClassHiR.Rds")
+b1 <- SearchRnage01
+head(b1)
+
+QID.d <- readRDS("./04_Wiki_PolyInfo_XX/QID.d.Rds")$QID
+head(QID.d)
+
+CU_List <- readRDS("./04_Wiki_PolyInfo_XX/CU_List.Rds")
+head(CU_List)
+
+#Refinement: get the direction of the search entity
+for(n in 1:nrow(b1)){
+#n <- 1
+#n <- 35
+#n <- 70
+#head(b1)
+
+print(n)
+d <- readRDS(paste0("./04_Wiki_PolyInfo_03/",
+                    formatC(n, width = 4, flag = "0"),
+                    "_L", b1$Levels[n], "_",
+                    b1$CommonEntity[n], ".Rds"))
+head(d)
+
+g <- simplify(graph_from_edgelist(as.matrix(d[,c(1,3)]), directed = T))
+V(g)$color <- "lightyellow"
+
+f1 <- names(V(g)) %in% unique(QID.d)
+V(g)$color[f1] <- "skyblue"
+
+f2 <- names(V(g)) %in% unique(b1$CommonEntity)
+V(g)$color[f2] <- "pink"
+
+f3 <- names(V(g)) %in% CU_List[!(CU_List %in% unique(b1$CommonEntity))]
+V(g)$color[f3] <- "lightgreen"
+
+f <- names(V(g)) %in% b1$CommonEntity[n]
+V(g)$color[f] <- "blue"
+
+len <- length(V(g)$color)
+len1 <- length(V(g)$color[f1])
+len2 <- length(V(g)$color[f2])
+len3 <- length(V(g)$color[f3])
+
+if(length(names(V(g))) < 100){
+V(g)$size <- 3
+V(g)$size[f] <- 6
+V(g)$size[f1] <- 4
+V(g)$size[f2] <- 4
+E(g)$width <- 0.75
+V(g)$label.cex <- 0.1
+CEX=0.1
+}else{
+if(length(names(V(g))) < 500){
+V(g)$size <- 2
+V(g)$size[f] <- 6
+V(g)$size[f1] <- 4
+V(g)$size[f2] <- 4
+E(g)$width <- 0.5
+V(g)$label.cex <- 0.05
+CEX=0.05
+}else{
+V(g)$size <- 0.5
+V(g)$size[f] <- 3
+V(g)$size[f1] <- 1.5
+V(g)$size[f2] <- 1.5
+E(g)$width <- 0.1
+V(g)$label.cex <- 0
+CEX=0.01
+}}
+
+E(g)$lty <- 1
+
+##########################################
+#Pathway
+##########################################
+h1 <- c(1:length(names(V(g))))[names(V(g)) %in% b1$CommonEntity[n]]
+h2 <- c(1:length(names(V(g))))[names(V(g)) %in% QID.d]
+h2 <- h2[!c(h2 %in% h1)]
+
+i <- c()
+if(identical(h2, integer(0))){
+i[[1]] <- NA
+}else{
+for(m in 1:length(h2)){
+#m <- 1
+suppressMessages(h3 <- names(get.shortest.paths(g,
+                                                from=h1,
+                                                to=h2[m],
+                                                mode = "in")$vpath[[1]]))
+if(length(h3) == 2){
+i[[m]] <- NA
+}else{
+i[[m]] <- c(h3)
+}
+} 
+}
+
+if(all(is.na(unlist(i)))){
+V(g)$color[V(g)$color == "lightyellow"] <- "firebrick2"
+
+saveRDS(d,
+        paste0("./04_Wiki_PolyInfo_05/",
+               formatC(n, width = 4, flag = "0"),
+               "_L", b1$Levels[n], "_",
+               b1$CommonEntity[n], "_refine.Rds"))
+
+}else{
+ii <- c()
+for(l in 1:length(i)){
+#l <- 1
+if(!all(is.na(unlist(i[[l]])))){
+#l <- 2
+i0 <- i[[l]]
+i0 <- i0[!c(i0 %in% b1$CommonEntity[n])]
+for(k in 1:length(i0)){
+#k <- 1
+ii <- c(ii, names(subcomponent(g, c(1:length(names(V(g))))[names(V(g)) %in% i0[k]], "in")))
+}
+}else{
+ii <- c(ii, names(neighbors(g, v=b1$CommonEntity[n], mode = "in")))
+}
+}
+
+ii <- ii[!(ii %in% b1$CommonEntity[n])]
+ii <- ii[!(ii %in% QID.d)]
+V(g)$color[names(V(g)) %in% unique(ii)] <- "firebrick2"
+
+#head(d)
+Ex <- unique(names(V(g))[V(g)$color == "lightyellow"])
+
+#head(d)
+d1 <- d[!(d$Subject %in% Ex),]
+d1 <- d1[!(d1$Object %in% Ex),]
+#dim(d1)
+saveRDS(d1,
+        paste0("./04_Wiki_PolyInfo_05/",
+               formatC(n, width = 4, flag = "0"),
+               "_L", b1$Levels[n], "_",
+               b1$CommonEntity[n], "_refine.Rds"))
+
+}
+
+##plot 1
+set.seed(123)
+system.time(layout03 <- layout_with_fr(g))
+el <- data.table::as.data.table(as_edgelist(g)) %>%
+  data.table::setnames(c("x","y"))
+
+d_layout <- data.table::data.table(x_coord = layout03[,1], y_coord = layout03[,2], id = names(V(g)))
+el_w_layout <- merge(el, d_layout, by.x = "x", by.y = "id", all.x = TRUE) %>%
+        data.table::setnames( c("x_coord", "y_coord"), c("x1", "y1") ) %>%
+        merge( d_layout, by.x = "y", by.y = "id", all.x = TRUE ) %>%
+        data.table::setnames( c("x_coord", "y_coord"), c("x2", "y2") )
+
+head(d_layout)
+quartz(width=7.5, height=7.5)
+par(bg="white", cex.main=0.5, family="HiraKakuProN-W3", mgp=c(2.5, 1, 0), mai=c(0.5, 0.5, 0.5, 0.5))
+plot(d_layout[,1:2], axes = F, type = "n", xlab = NA, ylab = NA,
+  xlim=c(c(range(d_layout$x_coord)) + c(-diff(range(d_layout$x_coord))*0.05, diff(range(d_layout$x_coord))*0.05)),
+  ylim=c(c(range(d_layout$y_coord)) + c(-diff(range(d_layout$y_coord))*0.05, diff(range(d_layout$y_coord))*0.05)))
+segments(x0  = el_w_layout$x1, x   = el_w_layout$x2,
+         y0  = el_w_layout$y1, y   = el_w_layout$y2,
+         col = scales::alpha("grey", .3))
+points(d_layout$x_coord, d_layout$y_coord, pch = 21, col="grey", lwd=0.2, cex = V(g)$size, bg=V(g)$color,
+       main=paste0( b1$Label.j[n], "\nTotal: ", len, ", Search: ", len1, ", Common: ", len2, ", both: ", len3))
+if(len < 10000){
+text(d_layout$x_coord, d_layout$y_coord, labels=d_layout$id, cex=CEX)
+}
+
+quartz.save(file = paste0("./04_Wiki_PolyInfo_05/",
+            formatC(n, width = 4, flag = "0"),
+            "_L", b1$Levels[n], "_",
+            b1$CommonEntity[n], "_refine1.png"),
+            type = "png", dpi=300); dev.off()
+
+##plot 2
+if(!all(is.na(unlist(i)))){
+g <- simplify(graph_from_edgelist(as.matrix(d1[,c(1,3)]), directed = T))
+V(g)$color <- "lightyellow"
+
+f1 <- names(V(g)) %in% unique(QID.d)
+V(g)$color[f1] <- "skyblue"
+
+f2 <- names(V(g)) %in% unique(b1$CommonEntity)
+V(g)$color[f2] <- "pink"
+
+f3 <- names(V(g)) %in% CU_List[!(CU_List %in% unique(b1$CommonEntity))]
+V(g)$color[f3] <- "lightgreen"
+
+f <- names(V(g)) %in% b1$CommonEntity[n]
+V(g)$color[f] <- "blue"
+
+V(g)$color[names(V(g)) %in% unique(ii)] <- "firebrick2"
+
+len <- length(V(g)$color)
+len1 <- length(V(g)$color[f1])
+len2 <- length(V(g)$color[f2])
+len3 <- length(V(g)$color[f3])
+
+if(length(names(V(g))) < 100){
+V(g)$size <- 3
+V(g)$size[f] <- 6
+V(g)$size[f1] <- 4
+V(g)$size[f2] <- 4
+E(g)$width <- 0.75
+V(g)$label.cex <- 0.1
+CEX=0.1
+}else{
+if(length(names(V(g))) < 500){
+V(g)$size <- 2
+V(g)$size[f] <- 6
+V(g)$size[f1] <- 4
+V(g)$size[f2] <- 4
+E(g)$width <- 0.5
+V(g)$label.cex <- 0.05
+CEX=0.05
+}else{
+V(g)$size <- 0.5
+V(g)$size[f] <- 3
+V(g)$size[f1] <- 1.5
+V(g)$size[f2] <- 1.5
+E(g)$width <- 0.1
+V(g)$label.cex <- 0
+CEX=0.01
+}}
+
+E(g)$lty <- 1
+
+set.seed(123)
+system.time(layout03 <- layout_with_fr(g))
+el <- data.table::as.data.table(as_edgelist(g)) %>%
+  data.table::setnames(c("x","y"))
+
+d_layout <- data.table::data.table(x_coord = layout03[,1], y_coord = layout03[,2], id = names(V(g)))
+el_w_layout <- merge(el, d_layout, by.x = "x", by.y = "id", all.x = TRUE) %>%
+        data.table::setnames( c("x_coord", "y_coord"), c("x1", "y1") ) %>%
+        merge( d_layout, by.x = "y", by.y = "id", all.x = TRUE ) %>%
+        data.table::setnames( c("x_coord", "y_coord"), c("x2", "y2") )
+
+head(d_layout)
+quartz(width=7.5, height=7.5)
+par(bg="white", cex.main=0.5, family="HiraKakuProN-W3", mgp=c(2.5, 1, 0), mai=c(0.5, 0.5, 0.5, 0.5))
+plot(d_layout[,1:2], axes = F, type = "n", xlab = NA, ylab = NA,
+  xlim=c(c(range(d_layout$x_coord)) + c(-diff(range(d_layout$x_coord))*0.05, diff(range(d_layout$x_coord))*0.05)),
+  ylim=c(c(range(d_layout$y_coord)) + c(-diff(range(d_layout$y_coord))*0.05, diff(range(d_layout$y_coord))*0.05)))
+segments(x0  = el_w_layout$x1, x   = el_w_layout$x2,
+         y0  = el_w_layout$y1, y   = el_w_layout$y2,
+         col = scales::alpha("grey", .3))
+points(d_layout$x_coord, d_layout$y_coord, pch = 21, col="grey", lwd=0.2, cex = V(g)$size, bg=V(g)$color,
+       main=paste0( b1$Label.j[n], "\nTotal: ", len, ", Search: ", len1, ", Common: ", len2, ", both: ", len3))
+if(len < 10000){
+text(d_layout$x_coord, d_layout$y_coord, labels=d_layout$id, cex=CEX)
+}
+quartz.save(file = paste0("./04_Wiki_PolyInfo_05/",
+            formatC(n, width = 4, flag = "0"),
+            "_L", b1$Levels[n], "_",
+            b1$CommonEntity[n], "_refine2.png"),
+            type = "png", dpi=300); dev.off()
+
+#Num
+d.len <- length(unique(c(d$Subject, d$Object)))
+d1.len <- length(unique(c(d1$Subject, d1$Object)))
+d2 <- paste0("Delete: ", d.len, " => ", d1.len)
+
+readr::write_csv(data.frame(d2),
+                file = paste0("./04_Wiki_PolyInfo_05/",
+                              formatC(n, width = 4, flag = "0"),
+                              "_L", b1$Levels[n], "_",
+                              b1$CommonEntity[n], "_Delete.csv"),
+                append=F, col_names=F)
+
+if(n == 1){
+readr::write_csv(data.frame(X=paste0("No: ", n), Y=d2),
+                file = paste0("./04_Wiki_PolyInfo_05/Delete_all.csv"),
+                append=F, col_names=F)
+}else{
+readr::write_csv(data.frame(X=paste0("No: ", n), Y=d2),
+                file = paste0("./04_Wiki_PolyInfo_05/Delete_all.csv"),
+                append=T, col_names=F)
+}
+}
+}
+
+```
+
+# Evaluation after the refinement
+
+```{r echo=TRUE, eval=FALSE}
+if(!dir.exists("04_Wiki_PolyInfo_06")){dir.create("04_Wiki_PolyInfo_06")}
+
+#ECU.list <- readRDS("./04_Wiki_PolyInfo_XX/ECU.list.Rds")
+head(ECU.list)
+#ECU.list <- ECU.list[1:123,]
+k <- 4
+
+for(m in 1:k){
+  #m <- 1
+  message("m: ", m)
+  d <- ECU.list[ECU.list$Levels == m,]
+  d1 <- as.numeric(rownames(d))
+  temp <- NULL
+  system(paste0("rm -rf ", "./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", m, ".csv"))
+  for(n in d1){
+    #n <- 1
+    message("n: ", n)
+    Dat <- readRDS(paste0("./04_Wiki_PolyInfo_05/",
+                          formatC(n, width = 4, flag = "0"),
+                          "_L", ECU.list$Levels[n], "_",
+                          ECU.list$CommonEntity[n], "_refine.Rds"))
+    readr::write_csv(Dat, 
+                     paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", m, ".csv"), 
+                     append=T, col_names=F)
+}
+
+temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", m, ".csv"),
+                        show_col_types = FALSE, col_names=F))
+colnames(temp) <- c("Subject", "Property", "Object")
+temp$triple <- paste0(temp$Subject, ".", temp$Property, ".", temp$Object)
+rownames(temp) <- 1:nrow(temp)
+temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
+#head(temp)
+readr::write_csv(temp, paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", m, "R.csv"), append=F, col_names=F)
+}
+
+#remove
+system("rm -rf ./04_Wiki_PolyInfo_06/*R_Acc.csv")
+
+for(m in 1:k){
+#m <- 1
+message("m: ", m)
+temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", m, "R.csv"),
+                        show_col_types = FALSE, col_names=F))
+for(l in m:k){
+#l <- 1
+message("l: ", l)
+readr::write_csv(temp,
+                 paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", l, "R_Acc.csv"), 
+                 append=T, col_names=F)  
+}}
+
+CountDatR <- data.frame(No=1:k,
+                       UniEntityNum=NA,
+                       UniTripleNum=NA,
+                       AccEntityNum=NA,
+                       AccTripleNum=NA,
+                       ExtractedNum=NA,
+                       Rate=NA,
+                       TotalAnswerNum=NA)
+
+##Evaluation
+#Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
+#OCR <- unlist(readr::read_csv("./高分子辞典OCR/高分子辞典OCR_2column_jpn_RRR.csv", col_names=F, show_col_types = FALSE), use.names = F)
+OCR.eva <- OCR[OCR %in% Labels$Object]
+length(OCR.eva)
+
+#Evaluation
+for(n in 1:k){
+  #n <- 1
+  message("n: ", n)
+  #Uni
+  temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", n, "R.csv"),
+                                     show_col_types = FALSE, col_names=F))
+  colnames(temp) <- c("Subject", "Property", "Object", "triple")
+  rownames(temp) <- 1:nrow(temp)
+  temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
+  #head(temp)
+  message("Uni")
+  CountDatR$UniEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
+  CountDatR$UniTripleNum[n] <- length(unique(temp$triple))
+  
+  #Acc
+  temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", n, "R_Acc.csv"),
+                                     show_col_types = FALSE, col_names=F))
+  colnames(temp) <- c("Subject", "Property", "Object", "triple")
+  rownames(temp) <- 1:nrow(temp)
+  temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
+  
+  #head(temp)
+  message("Acc")
+  CountDatR$AccEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
+  CountDatR$AccTripleNum[n] <- length(unique(temp$triple))
+  
+  message("OCR")
+  Eva00 <- unique(c(temp$Subject, temp$Object))
+  #head(Labels)
+  Eva01 <- unique(Labels[Labels$Subject %in% Eva00,]$Object)
+  #Eva01
+  Eva02 <- round(sum(Eva01 %in% OCR.eva)/length(OCR.eva)*100, 3)
+  CountDatR$ExtractedNum[n] <- sum(Eva01 %in% OCR.eva)
+  CountDatR$Rate[n] <- Eva02
+  CountDatR$TotalAnswerNum[n] <- length(OCR.eva)
+  print(CountDatR)
+}
+
+SearchRnage01 <- readRDS("./04_Wiki_PolyInfo_XX/SearchRnage01.Rds")
+dim(SearchRnage01)
+
+#01 Barplot
+SearchRnage02 <- data.frame(No=names(table(SearchRnage01$Levels)),
+                each_entity=as.numeric(table(SearchRnage01$Levels)))
+head(SearchRnage02)
+
+#ECU 
+CountDatR$each_entity <- SearchRnage02$each_entity[1:k]
+CountDatR$sum_entity <- cumsum(SearchRnage02$each_entity)[1:k]
+
+#readr::write_csv(CountDatR, "./04_Wiki_PolyInfo_XX/CountDatR.csv", append=F, col_names=T)
+
+
+```
