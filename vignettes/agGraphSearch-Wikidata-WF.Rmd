@@ -28,7 +28,7 @@ BiocStyle::markdown()
 
 ## Requirements
 
-- macOSX 10.15 with Intel Core i7 or similar specs
+- macOSX 10.15 with 3.6GHz Intel Core i9 or similar specs
 - RAM: 32GB
 - Available storage: > 20GB
 
