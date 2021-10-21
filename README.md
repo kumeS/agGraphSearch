@@ -8,7 +8,7 @@ and extracting the subset of the class-related hierarchy with domain specific te
 This set of functions also allows us to explore the triple-like formatted dataset 
 without creating any SPARQL queries on R scripts.
 
-See [the workflow submitted to IJCKG2021)](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Wikidata-WF.html)
+See [the workflow submitted to IJCKG2021](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Wikidata-WF.html)
 
 ## Installation
 
