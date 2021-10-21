@@ -825,7 +825,7 @@ CU_List <- readRDS("./04_Wiki_PolyInfo_XX/CU_List.Rds")
 head(CU_List)
 
 #Refinement: get the direction of the search entity
-for(n in 1:nrow(b1)){
+for(n in 144:nrow(b1)){
 #n <- 1
 #n <- 35
 #n <- 70
