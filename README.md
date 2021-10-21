@@ -8,6 +8,8 @@ and extracting the subset of the class-related hierarchy with domain specific te
 This set of functions also allows us to explore the triple-like formatted dataset 
 without creating any SPARQL queries on R scripts.
 
+See [the workflow submitted to IJCKG2021)](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Wikidata-WF.html)
+
 ## Installation
 
 1. Start R.app
@@ -28,7 +30,9 @@ system( "R CMD INSTALL agGraphSearch" )
 library( "agGraphSearch" )
 ```
 
-## Tutorial
+
+
+## Tutorial/workflow
 
 - [Installation](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-installation.html)
 
@@ -41,6 +45,8 @@ library( "agGraphSearch" )
 - [(Wikidata) agGraphSearch tutorial: A workflow to use agGraphSearch and Wikidata with PolyInfo terms](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Wikidata-WF.html)
 
 - [(Mesh) agGraphSearch tutorial: A workflow to use agGraphSearch and Mesh RDF with PolyInfo terms](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Mesh-WF-PolyInfo.html)
+
+- [The workflow submitted to IJCKG2021 (The 10th International Joint Conference on Knowledge Graphs)](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Wikidata-WF.html)
 
 ## Some examples of function execution in the package
 
