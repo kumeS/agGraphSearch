@@ -47,29 +47,14 @@ library(agGraphSearch)
 library(magrittr)
 ```
 
-## Generate temporary folders
-
-```{r echo=TRUE, eval=FALSE}
-#Create temporary folder path
-tempDIR <- tempdir()
-if(!dir.exists(paste0(tempDIR, "/", "Wiki_01_Out"))){dir.create(paste0(tempDIR, "/", "Wiki_01_Out"))}
-if(!dir.exists(paste0(tempDIR, "/", "Wiki_02_Out"))){dir.create(paste0(tempDIR, "/", "Wiki_02_Out"))}
-if(!dir.exists(paste0(tempDIR, "/", "Wiki_03_Out"))){dir.create(paste0(tempDIR, "/", "Wiki_03_Out"))}
-if(!dir.exists(paste0(tempDIR, "/", "Wiki_04_Jpn"))){dir.create(paste0(tempDIR, "/", "Wiki_04_Jpn"))}
-if(!dir.exists(paste0(tempDIR, "/", "Wiki_05_RDF"))){dir.create(paste0(tempDIR, "/", "Wiki_05_RDF"))}
-
-#show the folders
-dir(tempDIR)
-```
-
 # Read the search terms obtained from PolyInfo databse.
 
 In this tutorial, the Japanese terms obtained from PolyInfo Database will be used and the number of terms is total 510.
 
 ```{r echo=TRUE, eval=FALSE}
 #Read Japanese terms
-f <- system.file("extdata", "PoLyInfo_terms_Jpn_v01.csv", package="agGraphSearch")
-wordsj <- data.frame(readr::read_csv(f, col_names = T, show_col_types = FALSE))
+fp <- system.file("extdata", "PoLyInfo_terms_Jpn_v01.csv", package="agGraphSearch")
+wordsj <- data.frame(readr::read_csv(fp, col_names = T, show_col_types = FALSE))
 
 #Processing
 words <- unique(unlist(wordsj, use.names = F))
@@ -85,8 +70,8 @@ I also showed how to use the English terms obtained from PolyInfo Database (tota
 ```{r echo=TRUE, eval=FALSE}
 if(F){
 #Read English terms
-f <- system.file("extdata", "PoLyInfo_terms_En_v01.csv", package="agGraphSearch")
-wordse <- data.frame(readr::read_csv(f, col_names = T, show_col_types = FALSE))
+fp <- system.file("extdata", "PoLyInfo_terms_En_v01.csv", package="agGraphSearch")
+wordse <- data.frame(readr::read_csv(fp, col_names = T, show_col_types = FALSE))
 
 #Processing
 words <- unique(unlist(wordse, use.names = F))
@@ -106,6 +91,8 @@ Download below files and save on the local environment.
 ```{r echo=TRUE, eval=FALSE}
 ## Download Class-related hierarchy dataset (Common to English and Japanese)
 browseURL("https://drive.google.com/file/d/1YcUVgCShQOOSY0ckv1h-B4eu-4mBHLVz/view?usp=sharing")
+# the modified version
+browseURL("https://drive.google.com/file/d/1ir4_W0k8hFt7VZF38oA9whXbcHcmE7ZD/view?usp=sharing")
 
 ## Download Japanese labels
 browseURL("https://drive.google.com/file/d/1NMJYwDjuAujxA6tdpqUwUBtxQxYzGZ8c/view?usp=sharing")
@@ -121,6 +108,17 @@ In this time, I manually moved their files to the "04_Wiki_PolyInfo_00" folder i
 ## Import Wikidata datasets
 
 ```{r echo=TRUE, eval=FALSE}
+#Generate directories
+if(!dir.exists("04_Wiki_PolyInfo_01")){dir.create("04_Wiki_PolyInfo_01")}
+if(!dir.exists("04_Wiki_PolyInfo_02")){dir.create("04_Wiki_PolyInfo_02")}
+if(!dir.exists("04_Wiki_PolyInfo_03")){dir.create("04_Wiki_PolyInfo_03")}
+if(!dir.exists("04_Wiki_PolyInfo_04")){dir.create("04_Wiki_PolyInfo_04")}
+if(!dir.exists("04_Wiki_PolyInfo_05")){dir.create("04_Wiki_PolyInfo_05")}
+if(!dir.exists("04_Wiki_PolyInfo_06")){dir.create("04_Wiki_PolyInfo_06")}
+if(!dir.exists("04_Wiki_PolyInfo_XX")){dir.create("04_Wiki_PolyInfo_XX")}
+
+#Do not run
+if(F){
 #Load the hierarchy dataset
 ClassHi <- readRDS("./04_Wiki_PolyInfo_00/Relation_P279_P31_df.Rds")
 
@@ -132,8 +130,8 @@ head(ClassHi)
 table(ClassHi$Subject != ClassHi$Object)
 ClassHi <- ClassHi[ClassHi$Subject != ClassHi$Object,]
 
-#Do not run
-if(F){
+saveRDS(ClassHi, "./04_Wiki_PolyInfo_00/ClassHiR.Rds")
+
 #Load the label dataset
 Labels01 <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_rdfs_df.Rds")
 Labels02 <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_Altlabel_df.Rds")
@@ -143,6 +141,9 @@ Labels <- rbind(Labels01, Labels02)
 head(Labels)
 saveRDS(Labels, "./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")  
 }
+
+#Load the hierarchy dataset
+ClassHi <- readRDS("./04_Wiki_PolyInfo_00/ClassHiR.Rds")
 
 #Load the label dataset
 Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
@@ -158,7 +159,7 @@ Input are 510 terms in Japanese.
 head(words)
 head(Labels)
 
-#Linking
+#Linking to the wikidata entities
 LabelsR <- Labels[Labels$Object %in% words,]
 LabelsR <- LabelsR[LabelsR$Subject %in% unique(ClassHi$Subject),]
 
@@ -282,7 +283,7 @@ head(QID.d01)
 #show labels
 SearchEntity <- Labels[Labels$Subject %in% QID.d01 & Labels$Property == "rdfs:label",]
 head(SearchEntity); dim(SearchEntity)
-#readr::write_excel_csv(SearchEntity, "SearchEntity.csv")
+#readr::write_excel_csv(SearchEntity, "./04_Wiki_PolyInfo_XX/SearchEntity.csv")
 
 ##################################################################
 #Upper search up to 30 steps
@@ -334,15 +335,14 @@ if(x == 30){
 }}
 
 #length(QID.dat)
-#saveRDS(QID.dat, "./QID.dat.Rds")
-#QID.dat <- readRDS("./QID.dat.Rds")
+#saveRDS(QID.dat, "./04_Wiki_PolyInfo_XX/QID.dat.Rds")
+#QID.dat <- readRDS("./04_Wiki_PolyInfo_XX/QID.dat.Rds")
 ```
 
 ## Visualize Individual network diagrams.
 
 ```{r echo=TRUE, eval=FALSE}
 library(agGraphSearch)
-if(!dir.exists("04_Wiki_PolyInfo_01")){dir.create("04_Wiki_PolyInfo_01")}
 
 for(n in 1:length(QID.dat)){
 #n <- 1
@@ -377,7 +377,7 @@ suppressMessages(filesstrings::file.move(files = paste0("./agVisNetwork_", forma
 
 ```{r echo=TRUE, eval=FALSE}
 library(magrittr)
-#QID.dat <- readRDS("./QID.dat.Rds")
+#QID.dat <- readRDS("./04_Wiki_PolyInfo_XX/QID.dat.Rds")
 #Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
 #str(QID.dat)
 
@@ -474,7 +474,7 @@ dim(cu_table3)
 
 ```{r echo=TRUE, eval=FALSE}
 library(magrittr)
-#QID.dat <- readRDS("./QID.dat.Rds")
+#QID.dat <- readRDS("./04_Wiki_PolyInfo_XX/QID.dat.Rds")
 #Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
 #str(QID.dat)
 
@@ -521,16 +521,15 @@ SearchRnage01$Object[is.na(SearchRnage01$Object)] <- SearchRnage01$CommonEntity[
 head(SearchRnage01, n=15)
 tail(SearchRnage01, n=15)
 
-#saveRDS(SearchRnage01, "SearchRnage01.Rds")
-#SearchRnage01 <- readRDS("SearchRnage01.Rds")
-#readr::write_excel_csv(SearchRnage01, "SearchRnage01.csv")
+#saveRDS(SearchRnage01, "./04_Wiki_PolyInfo_XX/SearchRnage01.Rds")
+#SearchRnage01 <- readRDS("./04_Wiki_PolyInfo_XX/SearchRnage01.Rds")
+#readr::write_excel_csv(SearchRnage01, "./04_Wiki_PolyInfo_XX/SearchRnage01.csv")
 
 ```
 
 # Subordinate search
 
 ```{r echo=TRUE, eval=FALSE}
-if(!dir.exists("04_Wiki_PolyInfo_03")){dir.create("04_Wiki_PolyInfo_03")}
 ECU.list <- SearchRnage01
 
 #Run
@@ -637,34 +636,34 @@ for(m in 1:7){
   d <- ECU.list[ECU.list$Levels == m,]
   d1 <- as.numeric(rownames(d))
   temp <- NULL
-  system(paste0("rm -rf ", "TotalData_OutTriples_L", m, ".csv"))
+  system(paste0("rm -rf ", "./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, ".csv"))
   for(n in d1){
     #n <- 1
     print("n: ", n)
     readr::write_csv(TotalData[[n]], 
-                     paste0("TotalData_OutTriples_L", m, ".csv"), 
+                     paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, ".csv"), 
                      append=T, col_names=F)
 }
-temp <- data.frame(readr::read_csv(paste0("TotalData_OutTriples_L", m, ".csv"),
+temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, ".csv"),
                         show_col_types = FALSE, col_names=F))
 colnames(temp) <- c("Subject", "Property", "Object", "triple")
 rownames(temp) <- 1:nrow(temp)
 temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
 #head(temp)
-readr::write_csv(temp, paste0("TotalData_OutTriples_L", m, "R.csv"), append=F, col_names=F)
+readr::write_csv(temp, paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, "R.csv"), append=F, col_names=F)
 }
 
 #system("rm -rf *R_Acc.csv")
 for(m in 1:7){
 #m <- 1
 message("m: ", m)
-temp <- data.frame(readr::read_csv(paste0("TotalData_OutTriples_L", m, "R.csv"),
+temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, "R.csv"),
                         show_col_types = FALSE, col_names=F))
 for(l in m:7){
 #l <- 1
 message("l: ", l)
 readr::write_csv(temp,
-                 paste0("TotalData_OutTriples_L", l, "R_Acc.csv"), 
+                 paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", l, "R_Acc.csv"), 
                  append=T, col_names=F)  
 }}
 
@@ -689,7 +688,7 @@ for(n in 1:7){
   #n <- 1
   message("n: ", n)
   #Uni
-  temp <- data.frame(readr::read_csv(paste0("TotalData_OutTriples_L", n, "R.csv"),
+  temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", n, "R.csv"),
                                      show_col_types = FALSE, col_names=F))
   colnames(temp) <- c("Subject", "Property", "Object", "triple")
   rownames(temp) <- 1:nrow(temp)
@@ -700,7 +699,7 @@ for(n in 1:7){
   CountDat$UniTripleNum[n] <- length(unique(temp$triple))
   
   #Acc
-  temp <- data.frame(readr::read_csv(paste0("TotalData_OutTriples_L", n, "R_Acc.csv"),
+  temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", n, "R_Acc.csv"),
                                      show_col_types = FALSE, col_names=F))
   colnames(temp) <- c("Subject", "Property", "Object", "triple")
   rownames(temp) <- 1:nrow(temp)
@@ -811,7 +810,6 @@ system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
 ```{r echo=TRUE, eval=FALSE}
 #rm(list=ls())
 library(igraph)
-if(!dir.exists("04_Wiki_PolyInfo_05")){dir.create("04_Wiki_PolyInfo_05")}
 
 SearchRnage01 <- readRDS("./04_Wiki_PolyInfo_XX/SearchRnage01.Rds")
 ClassHi <- readRDS("./04_Wiki_PolyInfo_00/ClassHiR.Rds")
@@ -825,7 +823,7 @@ CU_List <- readRDS("./04_Wiki_PolyInfo_XX/CU_List.Rds")
 head(CU_List)
 
 #Refinement: get the direction of the search entity
-for(n in 144:nrow(b1)){
+for(n in 1:nrow(b1)){
 #n <- 1
 #n <- 35
 #n <- 70
@@ -837,6 +835,7 @@ d <- readRDS(paste0("./04_Wiki_PolyInfo_03/",
                     "_L", b1$Levels[n], "_",
                     b1$CommonEntity[n], ".Rds"))
 head(d)
+print(dim(d))
 
 g <- simplify(graph_from_edgelist(as.matrix(d[,c(1,3)]), directed = T))
 V(g)$color <- "lightyellow"
@@ -957,6 +956,7 @@ saveRDS(d1,
 
 }
 
+if(nrow(d) < 100000){
 ##plot 1
 set.seed(123)
 system.time(layout03 <- layout_with_fr(g))
@@ -989,6 +989,7 @@ quartz.save(file = paste0("./04_Wiki_PolyInfo_05/",
             "_L", b1$Levels[n], "_",
             b1$CommonEntity[n], "_refine1.png"),
             type = "png", dpi=300); dev.off()
+}
 
 ##plot 2
 if(!all(is.na(unlist(i)))){
@@ -1043,6 +1044,7 @@ CEX=0.01
 
 E(g)$lty <- 1
 
+if(nrow(d) < 100000){
 set.seed(123)
 system.time(layout03 <- layout_with_fr(g))
 el <- data.table::as.data.table(as_edgelist(g)) %>%
@@ -1073,6 +1075,7 @@ quartz.save(file = paste0("./04_Wiki_PolyInfo_05/",
             "_L", b1$Levels[n], "_",
             b1$CommonEntity[n], "_refine2.png"),
             type = "png", dpi=300); dev.off()
+}
 
 #Num
 d.len <- length(unique(c(d$Subject, d$Object)))
@@ -1103,13 +1106,11 @@ readr::write_csv(data.frame(X=paste0("No: ", n), Y=d2),
 # Evaluation after the refinement
 
 ```{r echo=TRUE, eval=FALSE}
-if(!dir.exists("04_Wiki_PolyInfo_06")){dir.create("04_Wiki_PolyInfo_06")}
-
 #ECU.list <- readRDS("./04_Wiki_PolyInfo_XX/ECU.list.Rds")
 head(ECU.list)
-#ECU.list <- ECU.list[1:123,]
-k <- 4
+k <- max(ECU.list$Levels)
 
+##step 01
 for(m in 1:k){
   #m <- 1
   message("m: ", m)
@@ -1128,9 +1129,9 @@ for(m in 1:k){
                      paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", m, ".csv"), 
                      append=T, col_names=F)
 }
-
+#getwd()
 temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", m, ".csv"),
-                        show_col_types = FALSE, col_names=F))
+                   show_col_types = FALSE, col_names=F))
 colnames(temp) <- c("Subject", "Property", "Object")
 temp$triple <- paste0(temp$Subject, ".", temp$Property, ".", temp$Object)
 rownames(temp) <- 1:nrow(temp)
@@ -1140,14 +1141,17 @@ readr::write_csv(temp, paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", m
 }
 
 #remove
-system("rm -rf ./04_Wiki_PolyInfo_06/*R_Acc.csv")
+if(length(dir(path = "./04_Wiki_PolyInfo_06", pattern = "R_Acc.csv")) != 0){
+  system("rm -rf ./04_Wiki_PolyInfo_06/*R_Acc.csv")
+}
 
-for(m in 1:k){
-#m <- 1
-message("m: ", m)
-temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", m, "R.csv"),
+##step 02
+for(j in 1:k){
+#j <- 1
+message("j: ", j)
+temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", j, "R.csv"),
                         show_col_types = FALSE, col_names=F))
-for(l in m:k){
+for(l in j:k){
 #l <- 1
 message("l: ", l)
 readr::write_csv(temp,
@@ -1155,7 +1159,10 @@ readr::write_csv(temp,
                  append=T, col_names=F)  
 }}
 
-CountDatR <- data.frame(No=1:k,
+########################
+#For Evaluation
+########################
+CountDatRefine <- data.frame(No=1:k,
                        UniEntityNum=NA,
                        UniTripleNum=NA,
                        AccEntityNum=NA,
@@ -1164,13 +1171,13 @@ CountDatR <- data.frame(No=1:k,
                        Rate=NA,
                        TotalAnswerNum=NA)
 
-##Evaluation
+
 #Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
 #OCR <- unlist(readr::read_csv("./高分子辞典OCR/高分子辞典OCR_2column_jpn_RRR.csv", col_names=F, show_col_types = FALSE), use.names = F)
 OCR.eva <- OCR[OCR %in% Labels$Object]
 length(OCR.eva)
 
-#Evaluation
+##step 03
 for(n in 1:k){
   #n <- 1
   message("n: ", n)
@@ -1182,8 +1189,8 @@ for(n in 1:k){
   temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
   #head(temp)
   message("Uni")
-  CountDatR$UniEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
-  CountDatR$UniTripleNum[n] <- length(unique(temp$triple))
+  CountDatRefine$UniEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
+  CountDatRefine$UniTripleNum[n] <- length(unique(temp$triple))
   
   #Acc
   temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", n, "R_Acc.csv"),
@@ -1194,8 +1201,8 @@ for(n in 1:k){
   
   #head(temp)
   message("Acc")
-  CountDatR$AccEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
-  CountDatR$AccTripleNum[n] <- length(unique(temp$triple))
+  CountDatRefine$AccEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
+  CountDatRefine$AccTripleNum[n] <- length(unique(temp$triple))
   
   message("OCR")
   Eva00 <- unique(c(temp$Subject, temp$Object))
@@ -1203,10 +1210,10 @@ for(n in 1:k){
   Eva01 <- unique(Labels[Labels$Subject %in% Eva00,]$Object)
   #Eva01
   Eva02 <- round(sum(Eva01 %in% OCR.eva)/length(OCR.eva)*100, 3)
-  CountDatR$ExtractedNum[n] <- sum(Eva01 %in% OCR.eva)
-  CountDatR$Rate[n] <- Eva02
-  CountDatR$TotalAnswerNum[n] <- length(OCR.eva)
-  print(CountDatR)
+  CountDatRefine$ExtractedNum[n] <- sum(Eva01 %in% OCR.eva)
+  CountDatRefine$Rate[n] <- Eva02
+  CountDatRefine$TotalAnswerNum[n] <- length(OCR.eva)
+  print(CountDatRefine)
 }
 
 SearchRnage01 <- readRDS("./04_Wiki_PolyInfo_XX/SearchRnage01.Rds")
@@ -1218,10 +1225,27 @@ SearchRnage02 <- data.frame(No=names(table(SearchRnage01$Levels)),
 head(SearchRnage02)
 
 #ECU 
-CountDatR$each_entity <- SearchRnage02$each_entity[1:k]
-CountDatR$sum_entity <- cumsum(SearchRnage02$each_entity)[1:k]
+CountDatRefine$RatePrec <- round((CountDatRefine$ExtractedNum / CountDatRefine$AccEntityNum)*100, 5)
+CountDatRefine$RatePrecLog <- round(logb((CountDatRefine$ExtractedNum / CountDatRefine$AccEntityNum)*100), 5)
+CountDatRefine$each_entity <- SearchRnage02$each_entity[1:k]
+CountDatRefine$sum_entity <- cumsum(SearchRnage02$each_entity)[1:k]
 
-#readr::write_csv(CountDatR, "./04_Wiki_PolyInfo_XX/CountDatR.csv", append=F, col_names=T)
-
+#readr::write_csv(CountDatRefine, "./04_Wiki_PolyInfo_XX/CountDatRefine.csv", append=F, col_names=T)
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
