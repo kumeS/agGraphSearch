@@ -581,9 +581,10 @@ saveRDS(Dat,
 
 ```
 
-# Calucation & Evaluation
+# Calucation & Evaluation for all candidates
 
 ```{r echo=TRUE, eval=FALSE}
+#rm(list=ls())
 #SearchRnage01 <- readRDS("./04_Wiki_PolyInfo_XX/SearchRnage01.Rds")
 dim(SearchRnage01)
 
@@ -617,29 +618,28 @@ ECU.list$UniEntityNum[n] <- length(unique(c(b$Subject, b$Object)))
 TotalData[[n]] <- b
 }
 
-
 #str(TotalData)
 #saveRDS(TotalData, "./04_Wiki_PolyInfo_XX/TotalData.Rds")
 #saveRDS(ECU.list, "./04_Wiki_PolyInfo_XX/ECU.list.Rds")
 #readr::write_excel_csv(ECU.list, "./04_Wiki_PolyInfo_XX/ECU.list.csv", append=F, col_names=T)
-#TotalData <- readRDS("./04_Wiki_PolyInfo_XX/TotalData.Rds")
-#ECU.list <- readRDS("./04_Wiki_PolyInfo_XX/ECU.list.Rds")
 
+##step 01
 head(ECU.list)
 rownames(ECU.list) <- 1:nrow(ECU.list)
 #str(TotalData)
 TotalDataECU <- NULL
+k <- max(ECU.list$Levels)
 
-for(m in 1:7){
+for(m in 1:k){
   #m <- 1
   message("m: ", m)
   d <- ECU.list[ECU.list$Levels == m,]
   d1 <- as.numeric(rownames(d))
   temp <- NULL
-  system(paste0("rm -rf ", "./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, ".csv"))
+  system(paste0("rm -rf ./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, ".csv"))
   for(n in d1){
     #n <- 1
-    print("n: ", n)
+    message("n: ", n)
     readr::write_csv(TotalData[[n]], 
                      paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, ".csv"), 
                      append=T, col_names=F)
@@ -650,16 +650,21 @@ colnames(temp) <- c("Subject", "Property", "Object", "triple")
 rownames(temp) <- 1:nrow(temp)
 temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
 #head(temp)
-readr::write_csv(temp, paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, "R.csv"), append=F, col_names=F)
+readr::write_csv(temp, paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, "R.csv"), 
+                 append=F, col_names=F)
 }
 
-#system("rm -rf *R_Acc.csv")
-for(m in 1:7){
+#Remove
+if(length(dir(path = "./04_Wiki_PolyInfo_06", pattern = "R_Acc.csv")) != 0){
+  system("rm -rf TotalData_OutTriples_L*R_Acc.csv")
+}
+
+for(m in 1:k){
 #m <- 1
 message("m: ", m)
 temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", m, "R.csv"),
                         show_col_types = FALSE, col_names=F))
-for(l in m:7){
+for(l in m:k){
 #l <- 1
 message("l: ", l)
 readr::write_csv(temp,
@@ -667,14 +672,21 @@ readr::write_csv(temp,
                  append=T, col_names=F)  
 }}
 
+```
+
+# For Evaluation
+
+```{r echo=TRUE, eval=FALSE}
 str(TotalDataECU)
 CountDat <- data.frame(No=1:7,
                        UniEntityNum=NA,
                        UniTripleNum=NA,
+                       UniJpnLab=NA,
                        AccEntityNum=NA,
                        AccTripleNum=NA,
+                       AccJpnLab=NA,
                        ExtractedNum=NA,
-                       Rate=NA,
+                       RateAccEntity=NA,
                        TotalAnswerNum=NA)
 
 ##Evaluation
@@ -683,8 +695,9 @@ CountDat <- data.frame(No=1:7,
 OCR.eva <- OCR[OCR %in% Labels$Object]
 length(OCR.eva)
 
+#step 03
 #Evaluation
-for(n in 1:7){
+for(n in 1:k){
   #n <- 1
   message("n: ", n)
   #Uni
@@ -698,6 +711,12 @@ for(n in 1:7){
   CountDat$UniEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
   CountDat$UniTripleNum[n] <- length(unique(temp$triple))
   
+  #Jpn
+  UniEntity <- unique(c(temp$Subject, temp$Object))
+  #head(Labels)
+  LabelsNum <- Labels[Labels$Subject %in% UniEntity, ]
+  CountDat$UniJpnLab[n] <- length(unique(LabelsNum$Subject))
+  
   #Acc
   temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/TotalData_OutTriples_L", n, "R_Acc.csv"),
                                      show_col_types = FALSE, col_names=F))
@@ -710,6 +729,12 @@ for(n in 1:7){
   CountDat$AccEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
   CountDat$AccTripleNum[n] <- length(unique(temp$triple))
   
+  #Jpn
+  UniEntity <- unique(c(temp$Subject, temp$Object))
+  #head(Labels)
+  LabelsNum <- Labels[Labels$Subject %in% UniEntity, ]
+  CountDat$AccJpnLab[n] <- length(unique(LabelsNum$Subject))
+
   message("OCR")
   Eva00 <- unique(c(temp$Subject, temp$Object))
   #head(Labels)
@@ -717,19 +742,32 @@ for(n in 1:7){
   #Eva01
   Eva02 <- round(sum(Eva01 %in% OCR.eva)/length(OCR.eva)*100, 3)
   CountDat$ExtractedNum[n] <- sum(Eva01 %in% OCR.eva)
-  CountDat$Rate[n] <- Eva02
+  CountDat$RateAccEntity[n] <- Eva02
   CountDat$TotalAnswerNum[n] <- length(OCR.eva)
+  
   print(CountDat)
 
 }
 
+SearchRnage01 <- readRDS("./04_Wiki_PolyInfo_XX/SearchRnage01.Rds")
+dim(SearchRnage01)
+
+#01 Barplot
+SearchRnage02 <- data.frame(No=names(table(SearchRnage01$Levels)),
+each_entity=as.numeric(table(SearchRnage01$Levels)))
+head(SearchRnage02)
+
 #ECU 
+CountDat$RateAccEntityPrec <- round((CountDat$ExtractedNum / CountDat$AccEntityNum)*100, 5)
+CountDat$RateAccEntityPrecLog <- round(logb((CountDat$ExtractedNum / CountDat$AccEntityNum)*100), 5)
+CountDat$RateAccJpnPrec <- round((CountDat$ExtractedNum / CountDat$AccJpnLab)*100, 5)
+CountDat$RateAccJpnPrecLog <- round(logb((CountDat$ExtractedNum / CountDat$AccJpnLab)*100), 5)
+
 CountDat$each_entity <- SearchRnage02$each_entity
 CountDat$sum_entity <- cumsum(SearchRnage02$each_entity)
+CountDat
 
-#readr::write_csv(CountDat, "CountDat.csv", append=F, col_names=T)
-
-
+readr::write_csv(CountDat, "CountDat.csv", append=F, col_names=T)
 
 ```
 
@@ -805,7 +843,7 @@ system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
 
 ```
 
-# Refinement
+# Refinement for the ontology candidate
 
 ```{r echo=TRUE, eval=FALSE}
 #rm(list=ls())
@@ -825,8 +863,11 @@ head(CU_List)
 #Refinement: get the direction of the search entity
 for(n in 1:nrow(b1)){
 #n <- 1
-#n <- 35
-#n <- 70
+#n <- 44
+#n <- 49
+#n <- 52
+#n <- 56
+#n <- 66
 #head(b1)
 
 print(n)
@@ -835,7 +876,7 @@ d <- readRDS(paste0("./04_Wiki_PolyInfo_03/",
                     "_L", b1$Levels[n], "_",
                     b1$CommonEntity[n], ".Rds"))
 head(d)
-print(dim(d))
+message("All: ", dim(d)[1])
 
 g <- simplify(graph_from_edgelist(as.matrix(d[,c(1,3)]), directed = T))
 V(g)$color <- "lightyellow"
@@ -864,16 +905,16 @@ V(g)$size[f1] <- 4
 V(g)$size[f2] <- 4
 E(g)$width <- 0.75
 V(g)$label.cex <- 0.1
-CEX=0.1
+CEX=0.2
 }else{
 if(length(names(V(g))) < 500){
 V(g)$size <- 2
-V(g)$size[f] <- 6
-V(g)$size[f1] <- 4
-V(g)$size[f2] <- 4
+V(g)$size[f] <- 5
+V(g)$size[f1] <- 3
+V(g)$size[f2] <- 3
 E(g)$width <- 0.5
 V(g)$label.cex <- 0.05
-CEX=0.05
+CEX=0.1
 }else{
 V(g)$size <- 0.5
 V(g)$size[f] <- 3
@@ -904,7 +945,12 @@ suppressMessages(h3 <- names(get.shortest.paths(g,
                                                 to=h2[m],
                                                 mode = "in")$vpath[[1]]))
 if(length(h3) == 2){
+if(b1$Levels[n] == 1){
 i[[m]] <- NA
+}else{
+#low-level entities from search entity
+i[[m]] <- h3
+}
 }else{
 i[[m]] <- c(h3)
 }
@@ -913,24 +959,44 @@ i[[m]] <- c(h3)
 
 if(all(is.na(unlist(i)))){
 V(g)$color[V(g)$color == "lightyellow"] <- "firebrick2"
-
 saveRDS(d,
         paste0("./04_Wiki_PolyInfo_05/",
                formatC(n, width = 4, flag = "0"),
                "_L", b1$Levels[n], "_",
                b1$CommonEntity[n], "_refine.Rds"))
+message("No Refine: ", dim(d)[1])
 
 }else{
 ii <- c()
 for(l in 1:length(i)){
 #l <- 1
-if(!all(is.na(unlist(i[[l]])))){
 #l <- 2
+if(!all(is.na(unlist(i[[l]])))){
+if(length(i[[l]]) == 2){
+i0 <- i[[l]]
+for(k in 1:length(i0)){
+#k <- 1
+if(i0[k] == b1$CommonEntity[n]){
+  ii <- c(ii, names(neighbors(g, v=b1$CommonEntity[n], mode = "in")))
+}else{
+  ii <- c(ii, names(subcomponent(g, c(1:length(names(V(g))))[names(V(g)) %in% i0[k]], "in")))
+}}
+}else{
 i0 <- i[[l]]
 i0 <- i0[!c(i0 %in% b1$CommonEntity[n])]
+
+if(length(i0) < 4){
 for(k in 1:length(i0)){
 #k <- 1
 ii <- c(ii, names(subcomponent(g, c(1:length(names(V(g))))[names(V(g)) %in% i0[k]], "in")))
+}  
+}else{
+kk <- length(i0) - 2
+for(k in kk:length(i0)){
+#k <- 1
+ii <- c(ii, names(subcomponent(g, c(1:length(names(V(g))))[names(V(g)) %in% i0[k]], "in")))
+}
+}
 }
 }else{
 ii <- c(ii, names(neighbors(g, v=b1$CommonEntity[n], mode = "in")))
@@ -953,7 +1019,7 @@ saveRDS(d1,
                formatC(n, width = 4, flag = "0"),
                "_L", b1$Levels[n], "_",
                b1$CommonEntity[n], "_refine.Rds"))
-
+message("Refine: ", dim(d1)[1])
 }
 
 if(nrow(d) < 100000){
@@ -969,7 +1035,7 @@ el_w_layout <- merge(el, d_layout, by.x = "x", by.y = "id", all.x = TRUE) %>%
         merge( d_layout, by.x = "y", by.y = "id", all.x = TRUE ) %>%
         data.table::setnames( c("x_coord", "y_coord"), c("x2", "y2") )
 
-head(d_layout)
+#head(d_layout)
 quartz(width=7.5, height=7.5)
 par(bg="white", cex.main=0.5, family="HiraKakuProN-W3", mgp=c(2.5, 1, 0), mai=c(0.5, 0.5, 0.5, 0.5))
 plot(d_layout[,1:2], axes = F, type = "n", xlab = NA, ylab = NA,
@@ -1026,9 +1092,9 @@ CEX=0.1
 }else{
 if(length(names(V(g))) < 500){
 V(g)$size <- 2
-V(g)$size[f] <- 6
-V(g)$size[f1] <- 4
-V(g)$size[f2] <- 4
+V(g)$size[f] <- 5
+V(g)$size[f1] <- 3
+V(g)$size[f2] <- 3
 E(g)$width <- 0.5
 V(g)$label.cex <- 0.05
 CEX=0.05
@@ -1077,11 +1143,14 @@ quartz.save(file = paste0("./04_Wiki_PolyInfo_05/",
             type = "png", dpi=300); dev.off()
 }
 
+
+
 #Num
 d.len <- length(unique(c(d$Subject, d$Object)))
 d1.len <- length(unique(c(d1$Subject, d1$Object)))
 d2 <- paste0("Delete: ", d.len, " => ", d1.len)
 
+#
 readr::write_csv(data.frame(d2),
                 file = paste0("./04_Wiki_PolyInfo_05/",
                               formatC(n, width = 4, flag = "0"),
@@ -1089,23 +1158,21 @@ readr::write_csv(data.frame(d2),
                               b1$CommonEntity[n], "_Delete.csv"),
                 append=F, col_names=F)
 
-if(n == 1){
-readr::write_csv(data.frame(X=paste0("No: ", n), Y=d2),
-                file = paste0("./04_Wiki_PolyInfo_05/Delete_all.csv"),
-                append=F, col_names=F)
-}else{
+#Save Delete_all.csv 
 readr::write_csv(data.frame(X=paste0("No: ", n), Y=d2),
                 file = paste0("./04_Wiki_PolyInfo_05/Delete_all.csv"),
                 append=T, col_names=F)
+
 }
 }
-}
+
 
 ```
 
 # Evaluation after the refinement
 
 ```{r echo=TRUE, eval=FALSE}
+#system(paste0("rm -rf ./04_Wiki_PolyInfo_06/*"))
 #ECU.list <- readRDS("./04_Wiki_PolyInfo_XX/ECU.list.Rds")
 head(ECU.list)
 k <- max(ECU.list$Levels)
@@ -1140,9 +1207,9 @@ temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
 readr::write_csv(temp, paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", m, "R.csv"), append=F, col_names=F)
 }
 
-#remove
+#Remove
 if(length(dir(path = "./04_Wiki_PolyInfo_06", pattern = "R_Acc.csv")) != 0){
-  system("rm -rf ./04_Wiki_PolyInfo_06/*R_Acc.csv")
+  system("rm -rf ./04_Wiki_PolyInfo_06/Refinement_OutTriples_L*R_Acc.csv")
 }
 
 ##step 02
@@ -1158,19 +1225,26 @@ readr::write_csv(temp,
                  paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", l, "R_Acc.csv"), 
                  append=T, col_names=F)  
 }}
+```
 
-########################
-#For Evaluation
-########################
+# For Evaluation
+
+```{r echo=TRUE, eval=FALSE}
+#rm(list=ls())
+#ECU.list <- readRDS("./04_Wiki_PolyInfo_XX/ECU.list.Rds")
+head(ECU.list)
+k <- max(ECU.list$Levels)
+
 CountDatRefine <- data.frame(No=1:k,
                        UniEntityNum=NA,
                        UniTripleNum=NA,
+                       UniJpnLab=NA,
                        AccEntityNum=NA,
                        AccTripleNum=NA,
+                       AccJpnLab=NA,
                        ExtractedNum=NA,
-                       Rate=NA,
+                       RateAccEntity=NA,
                        TotalAnswerNum=NA)
-
 
 #Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
 #OCR <- unlist(readr::read_csv("./高分子辞典OCR/高分子辞典OCR_2column_jpn_RRR.csv", col_names=F, show_col_types = FALSE), use.names = F)
@@ -1181,6 +1255,7 @@ length(OCR.eva)
 for(n in 1:k){
   #n <- 1
   message("n: ", n)
+  
   #Uni
   temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", n, "R.csv"),
                                      show_col_types = FALSE, col_names=F))
@@ -1191,6 +1266,12 @@ for(n in 1:k){
   message("Uni")
   CountDatRefine$UniEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
   CountDatRefine$UniTripleNum[n] <- length(unique(temp$triple))
+  
+  #Jpn
+  UniEntity <- unique(c(temp$Subject, temp$Object))
+  #head(Labels)
+  LabelsNum <- Labels[Labels$Subject %in% UniEntity, ]
+  CountDatRefine$UniJpnLab[n] <- length(unique(LabelsNum$Subject))
   
   #Acc
   temp <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", n, "R_Acc.csv"),
@@ -1204,16 +1285,26 @@ for(n in 1:k){
   CountDatRefine$AccEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
   CountDatRefine$AccTripleNum[n] <- length(unique(temp$triple))
   
+  #Jpn
+  UniEntity <- unique(c(temp$Subject, temp$Object))
+  #head(Labels)
+  LabelsNum <- Labels[Labels$Subject %in% UniEntity, ]
+  CountDatRefine$AccJpnLab[n] <- length(unique(LabelsNum$Subject))
+ 
   message("OCR")
   Eva00 <- unique(c(temp$Subject, temp$Object))
+  
   #head(Labels)
   Eva01 <- unique(Labels[Labels$Subject %in% Eva00,]$Object)
+  
   #Eva01
   Eva02 <- round(sum(Eva01 %in% OCR.eva)/length(OCR.eva)*100, 3)
+  
   CountDatRefine$ExtractedNum[n] <- sum(Eva01 %in% OCR.eva)
-  CountDatRefine$Rate[n] <- Eva02
+  CountDatRefine$RateAccEntity[n] <- Eva02
   CountDatRefine$TotalAnswerNum[n] <- length(OCR.eva)
   print(CountDatRefine)
+
 }
 
 SearchRnage01 <- readRDS("./04_Wiki_PolyInfo_XX/SearchRnage01.Rds")
@@ -1225,12 +1316,16 @@ SearchRnage02 <- data.frame(No=names(table(SearchRnage01$Levels)),
 head(SearchRnage02)
 
 #ECU 
-CountDatRefine$RatePrec <- round((CountDatRefine$ExtractedNum / CountDatRefine$AccEntityNum)*100, 5)
-CountDatRefine$RatePrecLog <- round(logb((CountDatRefine$ExtractedNum / CountDatRefine$AccEntityNum)*100), 5)
+CountDatRefine$RateAccEntityPrec <- round((CountDatRefine$ExtractedNum / CountDatRefine$AccEntityNum)*100, 5)
+CountDatRefine$RateAccEntityPrecLog <- round(logb((CountDatRefine$ExtractedNum / CountDatRefine$AccEntityNum)*100), 5)
+CountDatRefine$RateAccJpnPrec <- round((CountDatRefine$ExtractedNum / CountDatRefine$AccJpnLab)*100, 5)
+CountDatRefine$RateAccJpnPrecLog <- round(logb((CountDatRefine$ExtractedNum / CountDatRefine$AccJpnLab)*100), 5)
+
 CountDatRefine$each_entity <- SearchRnage02$each_entity[1:k]
 CountDatRefine$sum_entity <- cumsum(SearchRnage02$each_entity)[1:k]
 
-#readr::write_csv(CountDatRefine, "./04_Wiki_PolyInfo_XX/CountDatRefine.csv", append=F, col_names=T)
+readr::write_csv(CountDatRefine, 
+                 "./04_Wiki_PolyInfo_XX/CountDatRefine.csv", append=F, col_names=T)
 
 ```
 
