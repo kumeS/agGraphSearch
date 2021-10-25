@@ -677,8 +677,10 @@ readr::write_csv(temp,
 # For Evaluation
 
 ```{r echo=TRUE, eval=FALSE}
-str(TotalDataECU)
-CountDat <- data.frame(No=1:7,
+#ECU.list <- readRDS("./04_Wiki_PolyInfo_XX/ECU.list.Rds")
+#k <- max(ECU.list$Levels)
+str(ECU.list)
+CountDat <- data.frame(No=1:k,
                        UniEntityNum=NA,
                        UniTripleNum=NA,
                        UniJpnLab=NA,
@@ -767,7 +769,7 @@ CountDat$each_entity <- SearchRnage02$each_entity
 CountDat$sum_entity <- cumsum(SearchRnage02$each_entity)
 CountDat
 
-readr::write_csv(CountDat, "CountDat.csv", append=F, col_names=T)
+readr::write_csv(CountDat, "./04_Wiki_PolyInfo_XX/CountDat.csv", append=F, col_names=T)
 
 ```
 

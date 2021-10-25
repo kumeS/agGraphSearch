@@ -1,7 +1,7 @@
 Package: agGraphSearch
 Type: Package
 Title: Graph search for domain-specific concepts from the RDF-formatted data
-Version: 0.99.4
+Version: 0.99.5
 Encoding: UTF-8
 Authors@R: c(
     person (given = "Satoshi", family = "Kume",
