@@ -46,8 +46,6 @@
 ##' }
 ##'
 
-#graphList=eachGraph; search_List=list1a; CU_List=list2b; LowerSearch=T; UpdateList=F; breakRepeat=20;View=T; RemoveGraph=F; PlusLabel=T; FileName=TRUE; OutputResults=T; ResultsEach=F; ParticularEntity_only=FALSE; list2.WD="wd:Q35120"; GraphView=c(FALSE, FALSE, TRUE, TRUE); LvView=T;WindowSize=c(10,10,10,7.5,7.5)
-
 agGraphAnalysis <- function(graphList,
                             search_List,
                             CU_List,
@@ -68,11 +66,12 @@ agGraphAnalysis <- function(graphList,
 
 #Checking the type of graphList
 if(!is.list(graphList)){ return(message("Warning: graphList is not the list type")) }
-if(!is.character(list2.WD)){ return(message("Not proper value of list2.WD")) }
 
 list1=search_List
 list2=CU_List[CU_List != "wd:Q35120"]
 list2.WD=top.WD
+
+if(!is.character(list2.WD)){ return(message("Not proper value of list2.WD")) }
 
 #Parameters
 GraphView=c(TRUE, TRUE, TRUE, TRUE)
@@ -575,9 +574,9 @@ Col01[Col00 %in% list2.cc] <- "lightgreen"
 list2.ccc <- list3$V1[!is.na(list3$V2)]
 Col01[Col00 %in% list2.ccc] <- "pink"
 
-Size01 <- rep(1, length(Col00))
-Size01[Col00 %in% list1.c] <- 1.5
-Size01[Col00 %in% list2.cc] <- 1.5
+Size01 <- rep(2, length(Col00))
+Size01[Col00 %in% list1.c] <- 3
+Size01[Col00 %in% list2.cc] <- 3
 Size02 <- rep(0.05, length(Col00))
 Size02[Col00 %in% list1.c] <- 0.05
 Size02[Col00 %in% list2.cc] <- 0.05
@@ -603,8 +602,8 @@ Col01[Col00 %in% list1.c] <- "lightblue"
 list2.cc <- list2.c[!(list2.c %in% list1.c)]
 Col01[Col00 %in% list2.cc] <- "lightgreen"
 Size01 <- rep(2, length(Col00))
-Size01[Col00 %in% list1.c] <- 2.5
-Size01[Col00 %in% list2.cc] <- 2.5
+Size01[Col00 %in% list1.c] <- 3
+Size01[Col00 %in% list2.cc] <- 3
 Size02 <- rep(0.05, length(Col00))
 Size02[Col00 %in% list1.c] <- 0.05
 Size02[Col00 %in% list2.cc] <- 0.05

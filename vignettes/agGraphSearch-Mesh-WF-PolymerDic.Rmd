@@ -23,7 +23,7 @@ BiocStyle::markdown()
 ```
 
 **Last modified:** `r file.info("agGraphSearch-WF-002.Rmd")$mtime`<br />
-**Compiled**: `r date()`
+**Compiled**: `r Sys.time()`
 
 # Getting started
 
@@ -661,7 +661,7 @@ agJsTreeR(Data=DatJpn03,
 
 # Convert to RDF
 
-Meshから抽出した結果のRDF変換
+Meshから抽出した結果をRDFに変換する
 
 ```{r echo=TRUE, eval=FALSE}
 #rm(list=ls())

@@ -6,11 +6,11 @@
 \usage{
 agGraphAnalysis(
   graphList,
-  list1,
-  list2,
+  search_List,
+  CU_List,
   PlusLabel = TRUE,
   ParticularEntity_only = TRUE,
-  list2.WD = "wd:Q35120",
+  top.WD = "wd:Q35120",
   UpdateList = FALSE,
   breakRepeat = 20,
   View = TRUE,
@@ -19,21 +19,18 @@ agGraphAnalysis(
   OutputResults = TRUE,
   ResultsEach = FALSE,
   LowerSearch = FALSE,
-  GraphView = c(FALSE, FALSE, TRUE, TRUE),
   LvView = TRUE,
   WindowSize = c(10, 10, 10, 7.5, 7.5)
 )
 }
 \arguments{
-\item{list1}{a character vector of search entities.}
+\item{search_List}{a character vector of search entities.}
 
-\item{list2}{a character vector of common upper-level entities}
+\item{CU_List}{a character vector of common upper-level entities}
 
 \item{PlusLabel}{logical; add the labels or not when createing the network.}
 
 \item{ParticularEntity_only}{logical}
-
-\item{list2.WD}{a character vector}
 
 \item{UpdateList}{logical}
 
@@ -51,11 +48,13 @@ agGraphAnalysis(
 
 \item{LowerSearch}{logical}
 
-\item{GraphView}{logical}
-
 \item{LvView}{logical}
 
 \item{WindowSize}{a numeric}
+
+\item{list2.WD}{a character vector}
+
+\item{GraphView}{logical}
 }
 \value{
 data.frame
@@ -69,10 +68,11 @@ determining the exploration Segment
 
 library(magrittr)
 agGraphAnalysis(graphList=eachGraph,
-                list1=list1a,
-                list2=list2b)
+                search_List=list1a,
+                CU_List=list2b)
 
 }
+
 }
 \author{
 Satoshi Kume

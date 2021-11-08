@@ -4,7 +4,7 @@
 \alias{agCount_Label_Num_Wikidata_P279_P31}
 \title{Count triples from a label query for Wikidata local endpoint via SPARQL.}
 \usage{
-agCount_Label_Num_Wikidata_P279_P31(Entity_Name, Dir)
+agCount_Label_Num_Wikidata_P279_P31(Entity_Name, Dir = tempdir())
 }
 \arguments{
 \item{Entity_Name}{a character vector. The string was

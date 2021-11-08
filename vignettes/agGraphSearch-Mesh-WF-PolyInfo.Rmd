@@ -22,7 +22,7 @@ BiocStyle::markdown()
 ```
 
 **Last modified:** `r file.info("agGraphSearch-Mesh-WF-PolyInfo.Rmd")$mtime`<br />
-**Compiled**: `r date()`
+**Compiled**: `r Sys.time()`
 
 # Getting started
 

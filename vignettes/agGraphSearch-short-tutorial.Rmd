@@ -22,7 +22,7 @@ BiocStyle::markdown()
 ```
 
 **Last modified:** `r file.info("agGraphSearch-short-tutorial.Rmd")$mtime`<br>
-**Compiled**: `r date()`
+**Compiled**: `r Sys.time()`
 
 # Introduction
 

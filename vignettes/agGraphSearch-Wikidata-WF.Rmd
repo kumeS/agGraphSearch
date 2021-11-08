@@ -22,7 +22,7 @@ BiocStyle::markdown()
 ```
 
 **Last modified:** `r file.info("agGraphSearch-Wikidata-WF.Rmd")$mtime`<br />
-**Compiled**: `r date()`
+**Compiled**: `r Sys.time()`
 
 # Getting started
 
@@ -473,7 +473,9 @@ dim(cu_table3)
 ## Graph analysis algorism
 
 ```{r echo=TRUE, eval=FALSE}
+library(agGraphSearch)
 library(magrittr)
+library(igraph)
 #QID.dat <- readRDS("./04_Wiki_PolyInfo_XX/QID.dat.Rds")
 #Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
 #str(QID.dat)
@@ -490,17 +492,24 @@ for(n in 1:length(QID.dat)){
 }
 
 #set parameters
-graphList <- QID.datRR
+graph_List <- QID.datRR
 search_List <- QID.list
 CU_List <- cu_table3$parentClass
-#save(CU_List, "CU_List.Rds")
-#CU_List <- readRDS("CU_List.Rds")
+#QID.d <- readRDS("./04_Wiki_PolyInfo_XX/QID.d.Rds")
+#saveRDS(graph_List, "./04_Wiki_PolyInfo_XX/graph_List.Rds")
+#saveRDS(search_List, "./04_Wiki_PolyInfo_XX/search_List.Rds")
+#saveRDS(CU_List, "./04_Wiki_PolyInfo_XX/CU_List.Rds")
+
+#re-load
+#graph_List <- readRDS("./04_Wiki_PolyInfo_XX/graph_List.Rds")
+#search_List <- readRDS("./04_Wiki_PolyInfo_XX/search_List.Rds")
+#CU_List <- readRDS("./04_Wiki_PolyInfo_XX/CU_List.Rds")
 
 #Calculation
-SearchRnage <- agGraphAnalysis(graphList=graphList,
+SearchRnage <- agGraphAnalysis(graphList=graph_List,
                                search_List=search_List,
                                CU_List=CU_List)
-#system("mv -f ./Results_211018_1939 ./04_Wiki_PolyInfo_02")
+#system("mv -f ./Results_* ./04_Wiki_PolyInfo_02")
 
 #Levels
 SearchRnage00 <- SearchRnage[!is.na(SearchRnage$Levels),]
@@ -770,78 +779,6 @@ CountDat$sum_entity <- cumsum(SearchRnage02$each_entity)
 CountDat
 
 readr::write_csv(CountDat, "./04_Wiki_PolyInfo_XX/CountDat.csv", append=F, col_names=T)
-
-```
-
-# Plots
-
-```{r echo=TRUE, eval=FALSE}
-library(magrittr); library(plotly)
-SearchRnage03 <- data.frame(readr::read_csv("CountDat.csv", show_col_types = FALSE, col_names=T))
-SearchRnage03
-
-#Barplot 01
-fig <- plotly::plot_ly(SearchRnage03, x = ~No, y = ~each_entity, type = 'bar', name = '',
-               hovertemplate = paste('%{y}', sep=""),
-               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
-fig <- fig %>% plotly::layout(title = paste0("Number of ECU entities"),
-                      yaxis = list(title = 'Entity number', linewidth = 1),
-                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
-                                     tick0 = 1, dtick = 1),
-                      margin = list(l=50, r=10, b=50, t=50, pad=4))
-fig
-
-if(!dir.exists("04_Wiki_PolyInfo_04")){dir.create("04_Wiki_PolyInfo_04")}
-Filename <- paste0("./Barplot_results_", format(Sys.time(), "%y%m%d"),"_01.html")
-htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
-system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
-
-#Barplot 02
-fig <- plotly::plot_ly(SearchRnage03, x = ~No, y = ~UniEntityNum, type = 'bar', name = '',
-               hovertemplate = paste('%{y}', sep=""),
-               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
-fig <- fig %>% plotly::layout(title = paste0("Number of concepts per ENS (with dup.)"),
-                      yaxis = list(title = 'Entity number', linewidth = 1),
-                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
-                                     tick0 = 1, dtick = 1),
-                      margin = list(l=50, r=10, b=50, t=50, pad=4))
-fig
-
-Filename <- paste0("./Barplot_results_", format(Sys.time(), "%y%m%d"),"_02.html")
-htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
-system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
-
-#Barplot 03
-fig <- plotly::plot_ly(SearchRnage03, x = ~No, y = ~AccEntityNum, type = 'bar', name = '',
-               hovertemplate = paste('%{y}', sep=""),
-               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
-fig <- fig %>% plotly::layout(title = paste0("Unique cumulative number of concepts"),
-                      yaxis = list(title = 'Entity number', linewidth = 1),
-                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
-                                     tick0 = 1, dtick = 1),
-                      margin = list(l=50, r=10, b=50, t=50, pad=4))
-fig
-
-Filename <- paste0("./Barplot_results_", format(Sys.time(), "%y%m%d"),"_03.html")
-htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
-system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
-
-#Plot
-fig <- plotly::plot_ly(SearchRnage03, x = ~No, y = ~Rate, mode = 'lines+markers', name = '',
-               hovertemplate = paste('%{y}', sep=""),
-               marker = list(color = 'rgb(158,202,225)', 
-                             size=8,
-                             line = list(color = 'rgb(8,48,107)', width = 0.5)))
-fig <- fig %>% plotly::layout(title = paste0(""),
-                      yaxis = list(title = 'Reproductive rate (%)', linewidth = 1,
-                                   tick0 = 0, dtick = 10),
-                      xaxis = list(title = "NES range", ticks = "outside", linewidth = 1,
-                                     tick0 = 0, dtick = 1),
-                      margin = list(l=50, r=10, b=50, t=50, pad=4))
-fig
-Filename <- paste0("./Barplot_results_", format(Sys.time(), "%y%m%d"),"_04.html")
-htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
-system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
 
 ```
 
@@ -1264,6 +1201,7 @@ for(n in 1:k){
   colnames(temp) <- c("Subject", "Property", "Object", "triple")
   rownames(temp) <- 1:nrow(temp)
   temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
+  
   #head(temp)
   message("Uni")
   CountDatRefine$UniEntityNum[n]  <- length(unique(c(temp$Subject, temp$Object)))
@@ -1281,6 +1219,10 @@ for(n in 1:k){
   colnames(temp) <- c("Subject", "Property", "Object", "triple")
   rownames(temp) <- 1:nrow(temp)
   temp <- temp[as.numeric(rownames(unique(temp["triple"]))),]
+  
+  readr::write_csv(temp,
+                   paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", n, "R_Acc_Uni.csv"), 
+                   append=F, col_names=F)  
   
   #head(temp)
   message("Acc")
@@ -1331,11 +1273,257 @@ readr::write_csv(CountDatRefine,
 
 ```
 
+# Plots of results
+
+```{r echo=TRUE, eval=FALSE}
+library(magrittr); library(plotly)
+CountDat <- data.frame(readr::read_csv("./04_Wiki_PolyInfo_XX/CountDat.csv", show_col_types = FALSE, col_names=T))
+CountDat
+CountDatRefine <- data.frame(readr::read_csv("./04_Wiki_PolyInfo_XX/CountDatRefine.csv", show_col_types = FALSE, col_names=T))
+CountDatRefine
+
+######################################################
+#Barplot 01
+######################################################
+fig <- plotly::plot_ly(CountDat, x = ~No, y = ~each_entity, type = 'bar', name = '',
+               hovertemplate = paste0('%{y}'),
+               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% plotly::layout(title = paste0("Number of ECU entities"),
+                      yaxis = list(title = 'Entity number', linewidth = 1),
+                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
+                                     tick0 = 1, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+if(!dir.exists("04_Wiki_PolyInfo_04")){dir.create("04_Wiki_PolyInfo_04")}
+Filename <- paste0("./Results_", format(Sys.time(), "%y%m%d"),"_01.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+######################################################
+#Barplot 02
+######################################################
+fig <- plotly::plot_ly(CountDat, x = ~No, y = ~UniEntityNum, type = 'bar', name = '',
+               hovertemplate = paste0('%{y}'),
+               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% plotly::layout(title = paste0("Number of concepts per ENS (with dup.)"),
+                      yaxis = list(title = 'Entity number', linewidth = 1,
+                                   range=c(0,70000000)),
+                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
+                                     tick0 = 1, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+Filename <- paste0("./Results_", format(Sys.time(), "%y%m%d"),"_02.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+######################################################
+#Barplot 03
+######################################################
+fig <- plotly::plot_ly(CountDat, x = ~No, y = ~AccEntityNum, type = 'bar', name = '',
+               hovertemplate = paste0('%{y}'),
+               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% plotly::layout(title = paste0("Unique cumulative number of concepts"),
+                      yaxis = list(title = 'Entity number', linewidth = 1,
+                                   range=c(0,70000000)),
+                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
+                                     tick0 = 1, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+Filename <- paste0("./Results_", format(Sys.time(), "%y%m%d"),"_03.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+######################################################
+#Plot 01: Recall
+######################################################
+CountDat$Refine.RateAccEntity <- CountDatRefine$RateAccEntity
+CountDat$Refine.RateAccJpnPrec <- CountDatRefine$RateAccJpnPrec
+
+fig <- plotly::plot_ly(CountDat, x = ~No, y = ~RateAccEntity, 
+                       type = 'scatter', mode = 'lines+markers', name = 'All candidates',
+               hovertemplate = paste0('%{y}'),
+               marker = list(color = 'rgb(158,202,225)', 
+                             size=8,
+                             line = list(color = 'rgb(8,48,107)', width = 0.5)))
+fig <- fig %>% add_trace(CountDat, y = ~Refine.RateAccEntity, name = 'Refinement', 
+                         mode = 'lines+markers',
+                         marker = list(color = 'rgb(255,128,0)', 
+                                       size=8,
+                                       line = list(color = 'rgb(8,48,107)', width = 0.5))) 
+fig <- fig %>% plotly::layout(title = paste0(""),
+                      yaxis = list(title = 'Recall rate (%)', linewidth = 1,
+                                   tick0 = 0, dtick = 10, range=c(0,80), zeroline = F),
+                      xaxis = list(title = "NES range", ticks = "outside", linewidth = 1,
+                                     tick0 = 0, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+Filename <- paste0("./Results_", format(Sys.time(), "%y%m%d"),"_04R.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+######################################################
+#Plot 02: Precision
+######################################################
+fig <- plotly::plot_ly(CountDat, x = ~No, y = ~RateAccJpnPrec, 
+                       type = 'scatter', mode = 'lines+markers', name = 'All candidates',
+                       hovertemplate = paste0('%{y}'),
+                       marker = list(color = 'rgb(158,202,225)', 
+                                     size=8,
+                                     line = list(color = 'rgb(8,48,107)', width = 0.5)))
+fig <- fig %>% add_trace(CountDat, y = ~Refine.RateAccJpnPrec, name = 'Refinement', 
+                         mode = 'lines+markers',
+                         marker = list(color = 'rgb(255,128,0)', 
+                                       size=8,
+                                       line = list(color = 'rgb(8,48,107)', width = 0.5))) 
+fig <- fig %>% plotly::layout(title = paste0(""),
+                      yaxis = list(title = 'Precision rate (%)', linewidth = 1,
+                                   tick0 = 0, dtick = 1, type = "log"),
+                      xaxis = list(title = "NES range", ticks = "outside", linewidth = 1,
+                                     tick0 = 0, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+Filename <- paste0("./Results_", format(Sys.time(), "%y%m%d"),"_05R.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+######################################################
+#CountDatRefine: Barplot 02
+######################################################
+fig <- plotly::plot_ly(CountDatRefine, x = ~No, y = ~UniEntityNum, type = 'bar', name = '',
+               hovertemplate = paste0('%{y}'),
+               marker = list(color = 'rgb(255,158,72)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% plotly::layout(title = paste0("Number of concepts per ENS (with dup.)"),
+                      yaxis = list(title = 'Entity number', linewidth = 1,
+                                   range=c(0,70000000)),
+                      xaxis = list(title = "NES", ticks = "outside", linewidth = 0,
+                                     tick0 = 1, dtick = 1),
+                      margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+Filename <- paste0("./Results_", format(Sys.time(), "%y%m%d"),"_06R.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+######################################################
+#CountDatRefine: Barplot 03
+######################################################
+fig <- plotly::plot_ly(CountDatRefine, x = ~No, y = ~AccEntityNum, type = 'bar', name = '',
+                       hovertemplate = paste0('%{y}'),
+                       marker = list(color = 'rgb(255,158,72)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% plotly::layout(title = paste0("Unique cumulative number of concepts"),
+                              yaxis = list(title = 'Entity number', linewidth = 1, range=c(0,70000000)),
+                              xaxis = list(title = "NES", ticks = "outside", linewidth = 0, tick0 = 1, dtick = 1),
+                              margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+Filename <- paste0("./Results_", format(Sys.time(), "%y%m%d"),"_07R.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+######################################################
+#Barplot 04
+######################################################
+CountDat$Refine.each_entity <- CountDatRefine$each_entity
+CountDat$Refine.UniEntityNum <- CountDatRefine$UniEntityNum
+CountDat$Refine.AccEntityNum <- CountDatRefine$AccEntityNum
+
+fig <- plotly::plot_ly(CountDat, x = ~No, y = ~each_entity, type = 'bar', name = 'All candidates',
+               hovertemplate = paste0('%{y}'),
+               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% add_trace(y = ~Refine.each_entity, name = 'Refinement', 
+                         type = 'bar', marker = list(color = 'rgb(255,128,0)', size=8, line = list(color = 'rgb(8,48,107)', width = 0.5))) 
+fig <- fig %>% plotly::layout(title = paste0("Number of ECU entities"),
+                              bargap = 0.1, bargroupgap = 0.1,
+                              yaxis = list(title = 'Entity number', linewidth = 1),
+                              xaxis = list(title = "NES", ticks = "outside", linewidth = 0, tick0 = 1, dtick = 1),
+                              margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+if(!dir.exists("04_Wiki_PolyInfo_04")){dir.create("04_Wiki_PolyInfo_04")}
+Filename <- paste0("./Results_", format(Sys.time(), "%y%m%d"),"_01R.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+######################################################
+#Barplot 05
+######################################################
+fig <- plotly::plot_ly(CountDat, x = ~No, y = ~UniEntityNum, type = 'bar', name = 'All candidates',
+               hovertemplate = paste0('%{y}'),
+               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% add_trace(y = ~Refine.UniEntityNum, name = 'Refinement', 
+                         type = 'bar', marker = list(color = 'rgb(255,128,0)', size=8, line = list(color = 'rgb(8,48,107)', width = 0.5))) 
+fig <- fig %>% plotly::layout(title = paste0("Number of concepts per ENS (with dup.)"),
+                              bargap = 0.1, bargroupgap = 0.1,
+                              yaxis = list(title = 'Entity number', linewidth = 1, range=c(0,70000000)),
+                              xaxis = list(title = "NES", ticks = "outside", linewidth = 0, tick0 = 1, dtick = 1),
+                              margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+Filename <- paste0("./Results_", format(Sys.time(), "%y%m%d"),"_02R.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+######################################################
+#Barplot 06
+######################################################
+fig <- plotly::plot_ly(CountDat, x = ~No, y = ~AccEntityNum, type = 'bar', name = 'All candidates',
+               hovertemplate = paste0('%{y}'),
+               marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8,48,107)', width = 0.25)))
+fig <- fig %>% add_trace(y = ~Refine.AccEntityNum, name = 'Refinement', 
+                         type = 'bar', marker = list(color = 'rgb(255,128,0)', size=8, line = list(color = 'rgb(8,48,107)', width = 0.5))) 
+fig <- fig %>% plotly::layout(title = paste0("Unique cumulative number of concepts"),
+                              bargap = 0.1, bargroupgap = 0.1,
+                              yaxis = list(title = 'Entity number', linewidth = 1, range=c(0,70000000)),
+                              xaxis = list(title = "NES", ticks = "outside", linewidth = 0, tick0 = 1, dtick = 1),
+                              margin = list(l=50, r=10, b=50, t=50, pad=4))
+fig
+
+Filename <- paste0("./Results_", format(Sys.time(), "%y%m%d"),"_03R.html")
+htmlwidgets::saveWidget(plotly::as_widget(fig), file=Filename)
+system(paste0("mv ", Filename, " ./04_Wiki_PolyInfo_04"))
+
+```
+
+# Convert them to RDF format
+
+In this step, the results extracted from Wikidata are converted to RDF.
+
+Unnecessary strings were removed.
+
+```{r echo=TRUE, eval=FALSE}
+#File No
+N <- 7
+
+#Read All data after refinement
+Dat <- data.frame(readr::read_csv(paste0("./04_Wiki_PolyInfo_06/Refinement_OutTriples_L", N, "R_Acc.csv"),
+                                  show_col_types = FALSE, col_names=F))
+colnames(Dat) <- c("Subject", "Property", "Object", "triple")
+rownames(Dat) <- 1:nrow(Dat)
+Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
+
+#remove the column of triple
+head(Dat)
+Dat00 <- Dat[,-4]
+head(Dat00)
+Dat00entity <- unique(c(Dat00$Subject, Dat00$Object))
+head(Dat00entity)
+
+#Labels
+Labels <- readRDS("./04_Wiki_PolyInfo_00/Label_ja_All_label_df.Rds")
+head(Labels)
+Labels00 <- Labels[Labels$Subject %in% Dat00entity,]
+head(Labels00)
 
 
 
 
 
+```
 
 
 
