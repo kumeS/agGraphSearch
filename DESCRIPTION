@@ -10,8 +10,9 @@ Authors@R: c(
     comment = c(ORCID = "0000-0001-7481-2843"))
     )
 Maintainer: Satoshi Kume <satoshi.kume.1984@gmail.com>
-Description: This package provides a tool set for searching RDF graph data 
-  and data mining. This package proposes a methodology for extracting target domain concepts from 
+Description: In recent years, there has been an increase in RDF (Resource Description Framework) compliant databases.
+  This package provides a tool set for searching RDF graph data and data mining. 
+  This package proposes a methodology for extracting target domain concepts from 
   a large-scale Linked Open Data (LOD) system. 
   This method allows us to obtain the class-related hierarchy of the target domain concept 
   by the occurrences of common upper entities and the chain of those path relationships
@@ -49,6 +50,6 @@ Suggests: furrr,
   rmarkdown
 License: Artistic-2.0
 VignetteBuilder: knitr
-URL: https://github.com/kumeS/agGraphSearch
+URL: https://kumes.github.io/agGraphSearch/
 LazyData: true
 RoxygenNote: 7.1.2

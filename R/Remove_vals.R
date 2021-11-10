@@ -1,7 +1,7 @@
 ##' @title Remove_vals: remove unnecessary strings for Japanese.
 ##'
 ##' @param Data a data frame with columns of "Subject", "Property", "Object", and "OtherInfo".
-##' @StringLength a numeric; upper limit of string length.
+##' @param StringLength a numeric; upper limit of string length.
 ##'
 ##' @description Exclude one character, number rules and symbols.
 ##'

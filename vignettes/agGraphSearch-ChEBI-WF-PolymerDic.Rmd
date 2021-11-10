@@ -1,6 +1,6 @@
 ---
-title: "A workflow to use agGraphSearch and Mesh RDF"
-shorttitle: "Application to a simple class hierarchy model of Mesh RDF"
+title: "A workflow to use agGraphSearch and ChEBI RDF"
+shorttitle: "Application to the class hierarchy of ChEBI RDF"
 author:
   - name: Satoshi Kume
 date: "`r Sys.Date()`"
@@ -12,7 +12,7 @@ output:
 vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{agGraphSearch}
-  %\VignetteIndexEntry{A workflow to use agGraphSearch and Mesh RDF}
+  %\VignetteIndexEntry{A workflow to use agGraphSearch and ChEBI RDF}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
@@ -22,7 +22,7 @@ editor_options:
 BiocStyle::markdown()
 ```
 
-**Last modified:** `r file.info("agGraphSearch-Mesh-WF-PolymerDic.Rmd")$mtime`<br />
+**Last modified:** `r file.info("agGraphSearch-ChEBI-WF-PolymerDic.Rmd")$mtime`<br />
 **Compiled**: `r Sys.time()`
 
 # Getting started
@@ -73,12 +73,12 @@ devtools::install_github( "kumeS/agGraphSearch" )
 library(agGraphSearch)
 }
 
-if(!dir.exists("03_Mesh_OCR_00")){dir.create("03_Mesh_OCR_00")}
-if(!dir.exists("03_Mesh_OCR_01_Out")){dir.create("03_Mesh_OCR_01_Out")}
-if(!dir.exists("03_Mesh_OCR_02_Out")){dir.create("03_Mesh_OCR_02_Out")}
-if(!dir.exists("03_Mesh_OCR_03_Out")){dir.create("03_Mesh_OCR_03_Out")}
-if(!dir.exists("03_Mesh_OCR_04_Jpn")){dir.create("03_Mesh_OCR_04_Jpn")}
-if(!dir.exists("03_Mesh_OCR_05_RDF")){dir.create("03_Mesh_OCR_05_RDF")}
+if(!dir.exists("05_ChEBI_OCR_00")){dir.create("05_ChEBI_OCR_00")}
+if(!dir.exists("05_ChEBI_OCR_01_Out")){dir.create("05_ChEBI_OCR_01_Out")}
+if(!dir.exists("05_ChEBI_OCR_02_Out")){dir.create("05_ChEBI_OCR_02_Out")}
+if(!dir.exists("05_ChEBI_OCR_03_Out")){dir.create("05_ChEBI_OCR_03_Out")}
+if(!dir.exists("05_ChEBI_OCR_04_Jpn")){dir.create("05_ChEBI_OCR_04_Jpn")}
+if(!dir.exists("05_ChEBI_OCR_05_RDF")){dir.create("05_ChEBI_OCR_05_RDF")}
 
 ```
 
@@ -87,7 +87,7 @@ if(!dir.exists("03_Mesh_OCR_05_RDF")){dir.create("03_Mesh_OCR_05_RDF")}
 You should split compound words as a pre-processing.
 
 ```{r echo=TRUE, eval=FALSE}
-words <- data.frame(readr::read_csv("./03_Mesh_OCR_00/高分子辞典OCR_2column_en.csv", col_names = F, show_col_types = F))
+words <- data.frame(readr::read_csv("./05_ChEBI_OCR_00/高分子辞典OCR_2column_en.csv", col_names = F, show_col_types = F))
 words <- unlist(words, use.names = F)
 words <- data.frame(X1=words[!is.na(words)])
 dim(words)
@@ -106,29 +106,29 @@ length(unique(words))
 head(words)
 ```
 
-# Import Mesh data (2021)
+# Import ChEBI data (2021)
 
 ```{r, echo=TRUE, eval=FALSE}
 
 if(F){
-MeshLabels <- readRDS("./03_Mesh_OCR_00/mesh_Label_en_dfR.Rds")
-head(MeshLabels)
-table(MeshLabels$Property)
-dim(MeshLabels)
+ChEBILabels <- readRDS("./05_ChEBI_OCR_00/ChEBI_Label_en_dfR.Rds")
+head(ChEBILabels)
+table(ChEBILabels$Property)
+dim(ChEBILabels)
 
-MeshOthers <- readRDS("./03_Mesh_OCR_00/Mesh_othersR.Rds")
-head(MeshOthers)
-table(MeshOthers$Property)
-dim(MeshOthers)
+ChEBIOthers <- readRDS("./05_ChEBI_OCR_00/ChEBI_othersR.Rds")
+head(ChEBIOthers)
+table(ChEBIOthers$Property)
+dim(ChEBIOthers)
 
-MeshLabelsR <- MeshLabels[MeshLabels$Subject %in% unique(c(MeshOthers$Subject, MeshOthers$Object)),]
-dim(MeshLabelsR)
-saveRDS(MeshLabelsR, "./03_Mesh_OCR_00/MeshLabelsR.Rds")
+ChEBILabelsR <- ChEBILabels[ChEBILabels$Subject %in% unique(c(ChEBIOthers$Subject, ChEBIOthers$Object)),]
+dim(ChEBILabelsR)
+saveRDS(ChEBILabelsR, "./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
 }
 
 ```
 
-# Linking of input words to the Mesh words
+# Linking of input words to the ChEBI words
 
 Input words in English are 408.
 
@@ -145,16 +145,16 @@ words01 <- unique(tolower(words00))
 head(words01)
 
 #小文字変換
-MeshLabelsR <- readRDS("./03_Mesh_OCR_00/MeshLabelsR.Rds")
-head(MeshLabelsR)
-MeshLabels01 <- unique(tolower(MeshLabelsR$Object))
-head(MeshLabels01)
-length(MeshLabels01)
+ChEBILabelsR <- readRDS("./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
+head(ChEBILabelsR)
+ChEBILabels01 <- unique(tolower(ChEBILabelsR$Object))
+head(ChEBILabels01)
+length(ChEBILabels01)
 
 #文字列距離実行
 library( agGraphSearch )
 Dat <- ComputeDistance(InputTerms=words01,
-                       RDFterms=MeshLabels01,
+                       RDFterms=ChEBILabels01,
                        q=2, nthread=4, TopWords=3)
   
 head(Dat)
@@ -163,7 +163,7 @@ table(Dat$PerfectMatch > 0)
 table(Dat$PartialMatch > 0)
 table(Dat$cosine1 > 0)
 table(Dat$cosine3 < 0.075)
-#saveRDS(Dat, "./03_Mesh_OCR_01_Out/Dat_OCR_en_match.Rds")
+#saveRDS(Dat, "./05_ChEBI_OCR_01_Out/Dat_OCR_en_match.Rds")
 
 ```
 
@@ -175,7 +175,7 @@ words02 <- Dat[Dat$cosine3 < 0.075, ]
 head(words02)
 dim(words02)
 rownames(words02) <- 1:nrow(words02)
-#saveRDS(words02, "./03_Mesh_OCR_01_Out/Dat_OCR_en_words02.Rds")
+#saveRDS(words02, "./05_ChEBI_OCR_01_Out/Dat_OCR_en_words02.Rds")
 
 ```
 
@@ -183,7 +183,7 @@ rownames(words02) <- 1:nrow(words02)
 
 ```{r echo=TRUE, eval=FALSE}
 #rm(list=ls())
-words02 <- readRDS("./03_Mesh_OCR_01_Out/Dat_OCR_en_words02.Rds")
+words02 <- readRDS("./05_ChEBI_OCR_01_Out/Dat_OCR_en_words02.Rds")
 head(words02)
 dim(words02)
 
@@ -263,33 +263,33 @@ sum(a)
 
 ##################################################################
 #Save
-#saveRDS(words02, "./03_Mesh_OCR_01_Out/OCR_en2jpn_words02.Rds")
-#readr::write_excel_csv(words02, file="./03_Mesh_OCR_01_Out/OCR_en2jpn_words02.csv", col_names = T, append=F)
+#saveRDS(words02, "./05_ChEBI_OCR_01_Out/OCR_en2jpn_words02.Rds")
+#readr::write_excel_csv(words02, file="./05_ChEBI_OCR_01_Out/OCR_en2jpn_words02.csv", col_names = T, append=F)
 ##################################################################
 ```
 
-# Linking to the Mesh
+# Linking to the ChEBI
 
 ```{r echo=TRUE, eval=FALSE}
 #rm(list=ls())
 
 #Match List
-MeshLabelR <- readRDS("./03_Mesh_OCR_00/MeshLabelsR.Rds")
-words02 <- readRDS("./03_Mesh_OCR_01_Out/OCR_en2jpn_words02.Rds")
+ChEBILabelR <- readRDS("./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
+words02 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en2jpn_words02.Rds")
 head(words02)
 dim(words02)
 
 table(words02$cosine2 == words02$Lab00)
 table(words02$cosine2 == words02$Lab01)
 
-#Mesh D term List
-MeshLabels00 <- MeshLabelR
-head( MeshLabels00 )
+#ChEBI D term List
+ChEBILabels00 <- ChEBILabelR
+head( ChEBILabels00 )
 
-dim( MeshLabels00 )
-length(unique(MeshLabels00$Subject))
-length(unique(MeshLabels00$Property))
-length(unique(MeshLabels00$Object))
+dim( ChEBILabels00 )
+length(unique(ChEBILabels00$Subject))
+length(unique(ChEBILabels00$Property))
+length(unique(ChEBILabels00$Object))
 
 #Check
 library( magrittr )
@@ -299,21 +299,21 @@ library( magrittr )
 ##################################################################
 #一時的に小文字に変換してマッティング
 ##################################################################
-MeshLabels01 <- MeshLabels00[c(tolower(MeshLabels00$Object) %in% tolower(words02$Lab00)),]
+ChEBILabels01 <- ChEBILabels00[c(tolower(ChEBILabels00$Object) %in% tolower(words02$Lab00)),]
 
-head(MeshLabels01)
-dim(MeshLabels01)
-length(unique(MeshLabels01$Subject))
-length(unique(MeshLabels01$Property))
-unique(MeshLabels01$Property)
-length(unique(MeshLabels01$Object))
+head(ChEBILabels01)
+dim(ChEBILabels01)
+length(unique(ChEBILabels01$Subject))
+length(unique(ChEBILabels01$Property))
+unique(ChEBILabels01$Property)
+length(unique(ChEBILabels01$Object))
 #491words/entities
 
-MeshLabels01
-LabList00 <- unique(MeshLabels01$Subject)
+ChEBILabels01
+LabList00 <- unique(ChEBILabels01$Subject)
 head(LabList00)
 length(LabList00)
-#saveRDS(LabList00, "./03_Mesh_OCR_01_Out/OCR_en_LabList00.Rds")
+#saveRDS(LabList00, "./05_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
 
 ```
 
@@ -324,36 +324,36 @@ length(LabList00)
 #rm(list=ls())
 
 #words
-LabList00 <- readRDS("./03_Mesh_OCR_01_Out/OCR_en_LabList00.Rds")
+LabList00 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
 LabList00
 str(LabList00)
 
-#MeshLabelsR.Rds
-MeshLabelR <- readRDS("./03_Mesh_OCR_00/MeshLabelsR.Rds")
+#ChEBILabelsR.Rds
+ChEBILabelR <- readRDS("./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
 
-head(MeshLabelR); dim(MeshLabelR)
-table(MeshLabelR$OtherInfo == "BLANK")
-table(MeshLabelR$Property)
-table(MeshLabelR$SubInfo)
+head(ChEBILabelR); dim(ChEBILabelR)
+table(ChEBILabelR$OtherInfo == "BLANK")
+table(ChEBILabelR$Property)
+table(ChEBILabelR$SubInfo)
 
-#Mesh_othersR.Rds
-MeshOthers <- readRDS("./03_Mesh_OCR_00/Mesh_othersR.Rds")
+#ChEBI_othersR.Rds
+ChEBIOthers <- readRDS("./05_ChEBI_OCR_00/ChEBI_othersR.Rds")
 
-head(MeshOthers); dim(MeshOthers)
-table(MeshOthers$OtherInfo == "BLANK")
-table(MeshOthers$Property)
-table(MeshOthers$SubInfo)
-table(MeshOthers$ObjInfo)
+head(ChEBIOthers); dim(ChEBIOthers)
+table(ChEBIOthers$OtherInfo == "BLANK")
+table(ChEBIOthers$Property)
+table(ChEBIOthers$SubInfo)
+table(ChEBIOthers$ObjInfo)
 
 ##################################################################
 #Trial 01
 ##################################################################
 txt <- unique(LabList00)
-a1 <- MeshLabelR[MeshLabelR$Subject %in% txt,]
+a1 <- ChEBILabelR[ChEBILabelR$Subject %in% txt,]
 a1
 #              Subject   Property   Object OtherInfo    SubInfo
-#1242522  mesh:D011108 rdfs:label Polymers       @en IDs:mesh:D
-#1906322 mesh:M0017208 rdfs:label Polymers       @en IDs:mesh:M
+#1242522  ChEBI:D011108 rdfs:label Polymers       @en IDs:ChEBI:D
+#1906322 ChEBI:M0017208 rdfs:label Polymers       @en IDs:ChEBI:M
 a2 <- unique(a1$Subject)
 a2
 
@@ -364,7 +364,7 @@ table(txt %in% a2)
 Dat <- c(); x <- 1; Query <- a2
 repeat{
 message(x)
-b1 <- MeshOthers[MeshOthers$Subject %in% Query,]
+b1 <- ChEBIOthers[ChEBIOthers$Subject %in% Query,]
 if(dim(b1)[1] == 0){break}
 Dat <- rbind(Dat, b1)
 Query <- b1$Object
@@ -394,11 +394,11 @@ a3
 ##################################################################
 #Add labels
 ##################################################################
-MeshLabelR <- readRDS("./03_Mesh_OCR_00/MeshLabelsR.Rds")
+ChEBILabelR <- readRDS("./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
 
 library(agGraphSearch)
 library(magrittr)
-DatX <- MergeMeshData(Data=Dat, Labels=MeshLabelR)
+DatX <- MergeChEBIData(Data=Dat, Labels=ChEBILabelR)
 head(DatX)
 dim(DatX)
 length(unique(c(DatX$subject, DatX$parentClass)))
@@ -412,7 +412,7 @@ try(agVisNetwork(Graph=DatX,
              Physics=T,
              Smooth=T,
              FilePath="upClass_v01.html"))
-filesstrings::move_files("upClass_v01.html", "./03_Mesh_OCR_02_Out")
+filesstrings::move_files("upClass_v01.html", "./05_ChEBI_OCR_02_Out")
 ##################################################################
 for(n in 1:length(a3)){
 print(n)
@@ -422,7 +422,7 @@ try(agJsTree(Data=DatX,
          SaveHtmlFile=TRUE, 
          ExcludeQID=TRUE,
          FileName=paste0("agVisNetwork_upClass_", a3[n], ".html"), 
-         Output="./03_Mesh_OCR_03_Out"))
+         Output="./05_ChEBI_OCR_03_Out"))
 }
 
 ##################################################################
@@ -431,7 +431,7 @@ try(agJsTree(Data=DatX,
 Dat <- c(); x <- 1; Query <- a3
 repeat{
 message(x)
-b2 <- MeshOthers[MeshOthers$Object %in% Query,]
+b2 <- ChEBIOthers[ChEBIOthers$Object %in% Query,]
 if(dim(b2)[1] == 0){break}
 Dat <- rbind(Dat, b2)
 Query <- b2$Subject
@@ -449,24 +449,24 @@ Dat <- Dat[,-ncol(Dat)]
 
 head(Dat); dim(Dat)
 length(unique(c(Dat$subject, Dat$parentClass)))
-#saveRDS(Dat, "./03_Mesh_OCR_01_Out/OCR_en_downClass.Rds")
+#saveRDS(Dat, "./05_ChEBI_OCR_01_Out/OCR_en_downClass.Rds")
 
 ##################################################################
 #Bind data
 ##################################################################
 #rm(list=ls())
-MeshLabelR <- readRDS("./03_Mesh_OCR_00/MeshLabelsR.Rds")
-upClass <- readRDS("./03_Mesh_OCR_01_Out/OCR_en_upClass.Rds")
-downClass <- readRDS("./03_Mesh_OCR_01_Out/OCR_en_downClass.Rds")
-Dat <- readRDS("./03_Mesh_OCR_01_Out/OCR_en_downClass.Rds")
+ChEBILabelR <- readRDS("./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
+upClass <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_upClass.Rds")
+downClass <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_downClass.Rds")
+Dat <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_downClass.Rds")
 
 #Add labels
 #library(agGraphSearch)
-Dat00 <- MergeMeshData(Data=Dat, Labels=MeshLabelR)
+Dat00 <- MergeChEBIData(Data=Dat, Labels=ChEBILabelR)
 
 head(Dat00); dim(Dat00); table(Dat00$property)
 table(Dat00$property)
-#saveRDS(Dat00, "./03_Mesh_OCR_01_Out/OCR_Dat02.Rds")
+#saveRDS(Dat00, "./05_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
 
 ##################################################################
 ##################################################################
@@ -506,7 +506,7 @@ Sys.setenv("ftp_proxy" = proxy_url)
 
 ##################################################################
 ##################################################################
-a <- readRDS("./03_Mesh_OCR_01_Out/OCR_DatJpn02.Rds")
+a <- readRDS("./05_ChEBI_OCR_01_Out/OCR_DatJpn02.Rds")
 head(a)
 aa <- data.frame(IDs=c(a$subject, a$parentClass), Jpn=c(a$subjectLabel, a$parentClassLabel))
 head(aa)
@@ -587,21 +587,21 @@ for(n in 1:nrow(dd)){
 }
 #head(DatJpn01)
 DatJpn03 <- DatJpn01
-DatJpn03 <- DatJpn03[DatJpn03$property != "meshv:preferredConcept",]
-#DatJpn03 <- DatJpn03[DatJpn03$property != "meshv:preferredConceptR",]
+DatJpn03 <- DatJpn03[DatJpn03$property != "ChEBIv:preferredConcept",]
+#DatJpn03 <- DatJpn03[DatJpn03$property != "ChEBIv:preferredConceptR",]
 head(DatJpn03); dim(DatJpn03)
 length(unique(c(DatJpn03$subject, DatJpn03$parentClass)))
 #Save
-#saveRDS(DatJpn03, "./03_Mesh_OCR_01_Out/OCR_DatJpn03_new.Rds")
+#saveRDS(DatJpn03, "./05_ChEBI_OCR_01_Out/OCR_DatJpn03_new.Rds")
 }
 
 ##################################################################
 #個別にグラフ化
 ##################################################################
 #rm( list=ls() )
-DatJpn03 <- readRDS("./03_Mesh_OCR_01_Out/OCR_DatJpn03_new.Rds")
+DatJpn03 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_DatJpn03_new.Rds")
 topClass <- unique(DatJpn03$parentClass)[!(unique(DatJpn03$parentClass) %in% unique(DatJpn03$subject))]
-LabList00 <- readRDS("./03_Mesh_OCR_01_Out/OCR_en_LabList00.Rds")
+LabList00 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
 
 for(k in 1:length(topClass)){
 #k <- 1
@@ -638,8 +638,8 @@ try(agVisNetwork(Graph=Dat,
              ColoredSeed=LabList00,
              ColoredTopClass=topClass,
              FilePath=FileName))
-#table(LabList00 == "mesh:D000937")
-suppressMessages(filesstrings::move_files(FileName, "./03_Mesh_OCR_04_Jpn"))
+#table(LabList00 == "ChEBI:D000937")
+suppressMessages(filesstrings::move_files(FileName, "./05_ChEBI_OCR_04_Jpn"))
 }
 
 ##################################################################
@@ -650,7 +650,7 @@ agJsTreeR(Data=DatJpn03,
           TopClass=topClass,
           Brouse=TRUE,
           SaveHtmlFile=TRUE,
-          FileName="ExtractedMesh_tree.html",
+          FileName="ExtractedChEBI_tree.html",
           Output=NULL,
           ExcludeQID=TRUE)
 
@@ -658,14 +658,14 @@ agJsTreeR(Data=DatJpn03,
 
 # Convert to RDF
 
-Meshから抽出した結果をRDFに変換する
+ChEBIから抽出した結果をRDFに変換する
 
 ```{r echo=TRUE, eval=FALSE}
 #rm(list=ls())
-Dat02 <- readRDS("./03_Mesh_OCR_01_Out/OCR_Dat02.Rds")
-DatJpn03 <- readRDS("./03_Mesh_OCR_01_Out/OCR_DatJpn03_new.Rds")
+Dat02 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
+DatJpn03 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_DatJpn03_new.Rds")
 topClass <- unique(DatJpn03$parentClass)[!(unique(DatJpn03$parentClass) %in% unique(DatJpn03$subject))]
-LabList00 <- readRDS("./03_Mesh_OCR_01_Out/OCR_en_LabList00.Rds")
+LabList00 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
 #write.csv(topClass, "topClass.csv")
 #SPARQL結果をN-triplesに変換
 
@@ -682,87 +682,87 @@ head(a)
 table(a$subject != a$parentClass)
 a <- a[a$subject != a$parentClass, ]
 
-#table(grepl("mesh[:]", a$subject))
-#table(grepl("mesh[:]", a$parentClass))
+#table(grepl("ChEBI[:]", a$subject))
+#table(grepl("ChEBI[:]", a$parentClass))
 
-nt <- paste("<", sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$subject), "> ",
+nt <- paste("<", sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", a$subject), "> ",
             "<http://www.w3.org/2000/01/rdf-schema#subClassOf> ",
-            "<", sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$parentClass), "> .",
+            "<", sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", a$parentClass), "> .",
             sep="")
 nt <- unique(nt)
 
-write.table(nt, "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt", sep="",
+write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
              row.names = F, col.names = F, append=F, quote = F)
 
 colnames(a)
 
 #Labels: a
-nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$subject), '> ',
+nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", a$subject), '> ',
             '<http://www.w3.org/2000/01/rdf-schema#label> ',
             '"', a$subjectLabel, '"@ja.',
             sep="")
 nt <- unique(nt)
-write.table(nt, "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt", sep="",
+write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
              row.names = F, col.names = F, append=T, quote = F)
 
-nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$parentClass), '> ',
+nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", a$parentClass), '> ',
             '<http://www.w3.org/2000/01/rdf-schema#label> ',
             '"', a$parentClassLabel, '"@ja.',
             sep="")
 nt <- unique(nt)
-write.table(nt, "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt", sep="",
+write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
              row.names = F, col.names = F, append=T, quote = F)
 
 #Labels: b
 #head(b)
-nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", b$subject), '> ',
+nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", b$subject), '> ',
             '<http://www.w3.org/2000/01/rdf-schema#label> ',
             '"', b$subjectLabel, '"@en.',
             sep="")
 nt <- unique(nt)
-write.table(nt, "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt", sep="",
+write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
              row.names = F, col.names = F, append=T, quote = F)
 
-nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", b$parentClass), '> ',
+nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", b$parentClass), '> ',
             '<http://www.w3.org/2000/01/rdf-schema#label> ',
             '"', b$parentClassLabel, '"@en.',
             sep="")
 nt <- unique(nt)
-write.table(nt, "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt", sep="",
+write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
              row.names = F, col.names = F, append=T, quote = F)
 }
 
 if(T){
 #検索エンティティ
 cc <- LabList00
-nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", cc), '> ',
+nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", cc), '> ',
             '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://class/search> .',
             sep="")
 nt <- unique(nt)
-write.table(nt, "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt", sep="",
+write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
              row.names = F, col.names = F, append=T, quote = F)
 
 
 #最上位エンティティ
 d <- topClass
-nt <- paste('<', sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", d), '> ',
+nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", d), '> ',
             '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://class/top> .',
             sep="")
 nt <- unique(nt)
-write.table(nt, "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt", sep="",
+write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
              row.names = F, col.names = F, append=T, quote = F)
 
 }
 
 ##################################################################
 #集計・重複除去
-e <- readLines("./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt")
+e <- readLines("./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt")
 str(e)
 length(unique(e))
 ##################################################################
 #保存
 write.table(data.frame(X=unique(e)), 
-            "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01R.nt", sep="",
+            "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01R.nt", sep="",
              row.names = F, col.names = F, append=F, quote = F)
 ##################################################################
 
@@ -770,13 +770,13 @@ write.table(data.frame(X=unique(e)),
 
 ## Summary
 
-Mesh RDFからクラス階層を抽出した結果
+ChEBI RDFからクラス階層を抽出した結果
 
 1. 高分子辞典のOCR語彙を使用
 
 初期入力語彙: 4520語彙（高分子辞典 英語の語彙のみ）
 
-2. Mesh RDFの語彙(英語)とエンティティリンキング(コサイン類似度)
+2. ChEBI RDFの語彙(英語)とエンティティリンキング(コサイン類似度)
 
 エンティティリンキング後: 491 エンティティ
 

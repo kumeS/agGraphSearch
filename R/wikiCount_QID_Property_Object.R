@@ -2,10 +2,10 @@
 ##'
 ##' @param Entity_ID a character vector corresponing to the entity ID.
 ##' @param Object
-##' @param Property
-##' @param Count
-##' @param lang
-##' @param GroupBy
+##' @param Property a character vector
+##' @param Count a character vector
+##' @param lang a numeric; The value 1 is to use "ja, en". The value 2 is to use "ja". The value 3 is to use "en".
+##' @param GroupBy a logical
 ##'
 ##' @description this function is a general function for ...
 ##'
@@ -16,10 +16,22 @@
 ##'
 
 
-wikiCount_QID_Property_Object <- function(Entity_ID, Object, Property="?p", Count="?p", lang=1, GroupBy=FALSE){
+wikiCount_QID_Property_Object <- function(Entity_ID,
+                                          Object,
+                                          Property="?p",
+                                          Count="?p",
+                                          lang=1,
+                                          GroupBy=FALSE){
 
 QID <- Entity_ID
-if(lang == 1){ lang1 <- "ja, en" } else { if(lang == 2){ lang1 <- "ja" } else { lang1 <- "en" } }
+if(lang == 1){
+  lang1 <- "ja, en"
+} else {
+if(lang == 2){
+  lang1 <- "ja"
+} else {
+  lang1 <- "en"
+}}
 
 Prefix <- '
 PREFIX wd: <http://www.wikidata.org/entity/>

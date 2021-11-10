@@ -16,7 +16,13 @@ wikiCount_QID_Property_Object(
 \arguments{
 \item{Entity_ID}{a character vector corresponing to the entity ID.}
 
-\item{GroupBy}{}
+\item{Property}{a character vector}
+
+\item{Count}{a character vector}
+
+\item{lang}{a numeric; The value 1 is to use "ja, en". The value 2 is to use "ja". The value 3 is to use "en".}
+
+\item{GroupBy}{a logical}
 }
 \value{
 data.frame

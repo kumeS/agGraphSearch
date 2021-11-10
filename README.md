@@ -30,17 +30,15 @@ system( "R CMD INSTALL agGraphSearch" )
 library( "agGraphSearch" )
 ```
 
-
-
 ## Tutorial/workflow
 
 - [Installation](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-installation.html)
 
-- [Installation (Japanese)](http://translate.google.com/translate?hl=&sl=en&tl=ja&u=https%3A%2F%2Fkumes.github.io%2FagGraphSearch%2Fvignettes%2FagGraphSearch-installation.html)
+- [Installation (Japanese)](https://kumes-github-io.translate.goog/agGraphSearch/vignettes/agGraphSearch-installation.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja&_x_tr_pto=nui)
 
 - [A short-tutorial for agGraphSearch](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-short-tutorial.html)
 
-- [A Japanese short-tutorial for agGraphSearch](http://translate.google.com/translate?hl=&sl=en&tl=ja&u=https%3A%2F%2Fkumes.github.io%2FagGraphSearch%2Fvignettes%2FagGraphSearch-short-tutorial.html)
+- [A Japanese short-tutorial for agGraphSearch](https://translate.google.com/translate?sl=en&tl=ja&u=https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-short-tutorial.html)
 
 - [[Wikidata] agGraphSearch tutorial: A workflow to use agGraphSearch and Wikidata with PolyInfo terms](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Wikidata-WF.html)
   - Data Dump: [Google Drive](https://drive.google.com/drive/folders/1nk9nubKnX1uzcBf3GmdaijdGeqDoHucz?usp=sharing)

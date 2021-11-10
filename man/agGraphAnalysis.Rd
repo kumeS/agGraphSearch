@@ -19,8 +19,7 @@ agGraphAnalysis(
   OutputResults = TRUE,
   ResultsEach = FALSE,
   LowerSearch = FALSE,
-  LvView = TRUE,
-  WindowSize = c(10, 10, 10, 7.5, 7.5)
+  LvView = TRUE
 )
 }
 \arguments{
@@ -30,31 +29,27 @@ agGraphAnalysis(
 
 \item{PlusLabel}{logical; add the labels or not when createing the network.}
 
-\item{ParticularEntity_only}{logical}
+\item{ParticularEntity_only}{a logical}
 
-\item{UpdateList}{logical}
+\item{top.WD}{a character vector}
+
+\item{UpdateList}{a logical}
 
 \item{breakRepeat}{a numeric}
 
-\item{View}{logical}
+\item{View}{a logical}
 
-\item{RemoveGraph}{logical}
+\item{RemoveGraph}{a logical}
 
 \item{FileName}{a string}
 
-\item{OutputResults}{logical}
+\item{OutputResults}{a logical}
 
-\item{ResultsEach}{logical}
+\item{ResultsEach}{a logical}
 
-\item{LowerSearch}{logical}
+\item{LowerSearch}{a logical}
 
-\item{LvView}{logical}
-
-\item{WindowSize}{a numeric}
-
-\item{list2.WD}{a character vector}
-
-\item{GraphView}{logical}
+\item{LvView}{a logical}
 }
 \value{
 data.frame

@@ -4,19 +4,18 @@
 ##' @param search_List a character vector of search entities.
 ##' @param CU_List a character vector of common upper-level entities
 ##' @param PlusLabel logical; add the labels or not when createing the network.
-##' @param ParticularEntity_only logical
-##' @param list2.WD a character vector
-##' @param UpdateList logical
+##' @param ParticularEntity_only a logical
+##' @param top.WD a character vector
+##' @param UpdateList a logical
 ##' @param breakRepeat a numeric
-##' @param View logical
-##' @param RemoveGraph logical
+##' @param View a logical
+##' @param RemoveGraph a logical
 ##' @param FileName a string
-##' @param OutputResults logical
-##' @param ResultsEach logical
-##' @param LowerSearch logical
-##' @param GraphView logical
-##' @param LvView logical
-##' @param WindowSize a numeric
+##' @param OutputResults a logical
+##' @param ResultsEach a logical
+##' @param LowerSearch a logical
+##' @param LvView a logical
+##'
 ##' @description this function is a general function for
 ##' determining the exploration Segment
 ##'
@@ -60,8 +59,7 @@ agGraphAnalysis <- function(graphList,
                             OutputResults=TRUE,
                             ResultsEach=FALSE,
                             LowerSearch=FALSE,
-                            LvView=TRUE,
-                            WindowSize=c(10, 10, 10, 7.5, 7.5)
+                            LvView=TRUE
                             ){
 
 #Checking the type of graphList
@@ -74,6 +72,7 @@ list2.WD=top.WD
 if(!is.character(list2.WD)){ return(message("Not proper value of list2.WD")) }
 
 #Parameters
+WindowSize=c(10, 10, 10, 7.5, 7.5)
 GraphView=c(TRUE, TRUE, TRUE, TRUE)
 GraphView01=GraphView[1]
 GraphView02=GraphView[2]
