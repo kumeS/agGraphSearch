@@ -445,113 +445,43 @@ table(is.na(Dat00))
 #saveRDS(Dat00, "./05_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
 #hist(table(nchar(Dat00$subjectLabel)))
 
-Dat00 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
-head(Dat00)
+Dat02 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
+head(Dat02)
 
 #entity number
-length(unique(c(Dat00$subject, Dat00$parentClass)))
+length(unique(c(Dat02$subject, Dat02$parentClass)))
 #[1] 147421
 
 #triple number
-table(Dat00$property)
+table(Dat02$property)
 #rdfs:subClassOf 
 #        216709
 
+#Label number
+length(unique(c(Dat02$subjectLabel, Dat02$parentClassLabel)))
+#[1] 147421
 ```
 
 # Convert to RDF (N-triples)
 
-ChEBIから抽出した結果(ほぼ全て)をRDF(N-triples)に変換する
+ChEBIから抽出した結果(ほぼ全て)を、RDF(N-triples)に変換する
 
 ラベル数が多くて、日本語変換はできない。
-
-今後、Wikidataのやり方をChEBIに用いる予定。
 
 ```{r echo=TRUE, eval=FALSE}
 #rm(list=ls())
 Dat02 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
 LabList00 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
+table(Dat02$property)
+head(Dat02)
 
-#Convert the extracted results to N-triples
+source(system.file("inst/script/convRDF_ChEBI.R", package="agGraphSearch"))
+convRDF_ChEBI(Dat02=Dat02,
+              LabList00=LabList00,
+              FileName="./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt")
 
-if(T){
-#class hierarchy
-b <- Dat02
-head(b)
-
-##Check NA
-table(is.na(b))
-
-#Remove the loops
-head(b)
-table(b$subject != b$parentClass)
-b <- b[b$subject != b$parentClass, ]
-
-#table(grepl("obo[:]", b$subject))
-#table(grepl("obo[:]", b$parentClass))
-
-nt <- paste("<", sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$subject), "> ",
-            "<http://www.w3.org/2000/01/rdf-schema#subClassOf> ",
-            "<", sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$parentClass), "> .",
-            sep="")
-nt <- unique(nt)
-
-write.table(nt, "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt", sep="",
-             row.names = F, col.names = F, append=F, quote = F)
-
-colnames(a)
-
-
-#Labels: b
-nt <- paste0('<', sub("obo[:]", "http://purl.obolibrary.org/obo/", b$subject), '> ',
-            '<http://www.w3.org/2000/01/rdf-schema#label> ',
-            '"', b$subjectLabel, '"@en.')
-nt <- unique(nt)
-write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
-             row.names = F, col.names = F, append=T, quote = F)
-
-nt <- paste0('<', sub("obo[:]", "http://purl.obolibrary.org/obo/", b$parentClass), '> ',
-            '<http://www.w3.org/2000/01/rdf-schema#label> ',
-            '"', b$parentClassLabel, '"@en.')
-nt <- unique(nt)
-write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
-             row.names = F, col.names = F, append=T, quote = F)
-}
-
-if(T){
-#検索エンティティ
-cc <- LabList00
-nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", cc), '> ',
-            '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://class/search> .',
-            sep="")
-nt <- unique(nt)
-write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
-             row.names = F, col.names = F, append=T, quote = F)
-
-
-#最上位エンティティ
-d <- topClass
-nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", d), '> ',
-            '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://class/top> .',
-            sep="")
-nt <- unique(nt)
-write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
-             row.names = F, col.names = F, append=T, quote = F)
-
-}
-
-##################################################################
-#集計・重複除去
-e <- readLines("./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt")
-str(e)
-length(unique(e))
-##################################################################
-#保存
-write.table(data.frame(X=unique(e)), 
-            "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01R.nt", sep="",
-             row.names = F, col.names = F, append=F, quote = F)
-##################################################################
-
+#display
+readLines("./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", n = 10)
 ```
 
 ## Summary
