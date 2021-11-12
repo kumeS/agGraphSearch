@@ -570,12 +570,3 @@ ChEBI RDFからクラス階層を抽出した結果
 
 下位展開した結果: 147421 エンティティ / 57359トリプル
 
-```{r echo=TRUE, eval=FALSE}
-#dim(DatJpn03)
-#length(unique(c(DatJpn03$subject, DatJpn03$parentClass)))
-#table(topClass %in% a3)
-
-
-```
-
-
