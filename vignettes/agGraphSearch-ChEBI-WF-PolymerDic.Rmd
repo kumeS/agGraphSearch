@@ -246,6 +246,13 @@ sum(a)
 ##################################################################
 ```
 
+```{r echo=TRUE, eval=TRUE}
+library(agGraphSearch)
+a <- readRDS("../../05_ChEBI_OCR_01_Out/OCR_en2jpn_words03.Rds")
+#a <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en2jpn_words03.Rds")
+agGraphSearch::agTableFM(a, Output=F)
+```
+
 # Linking to the ChEBI
 
 ```{r echo=TRUE, eval=FALSE}
@@ -397,6 +404,26 @@ dim(Dat)
 #saveRDS(Dat, "./05_ChEBI_OCR_01_Out/OCR_en_downClass.Rds")
 ```
 
+```{r echo=TRUE, eval=TRUE}
+library(agGraphSearch)
+library(magrittr)
+##################################################################
+Dat <- readRDS("../../05_ChEBI_OCR_01_Out/OCR_en_upClass.Rds")
+ChEBILabelR <- readRDS("../../05_ChEBI_OCR_00/ChEBILabelsR.Rds")
+LabList00 <- readRDS("../../05_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
+DatX <- MergeChEBIData(Data=Dat, Labels=ChEBILabelR)
+##################################################################
+try(agVisNetwork(Graph=DatX,
+                 Selected=NULL, 
+                 Browse=TRUE, 
+                 Output=FALSE,
+                 ColoredSeed=LabList00,
+                 ColoredTopClass="",
+                 Physics=T,
+                 Smooth=T,
+                 FilePath="upClass_v01.html"))
+```
+
 # Bind data
 
 ```{r echo=TRUE, eval=FALSE}
@@ -537,11 +564,11 @@ ChEBI RDFからクラス階層を抽出した結果
 
 2. ChEBI RDFの語彙(英語)とエンティティリンキング(コサイン類似度)
 
-エンティティリンキング後: 491 エンティティ
+エンティティリンキング後: 237 エンティティ
 
-上位展開して、最上位エンティティ: 69 エンティティ
+上位展開して、最上位エンティティ: 2 エンティティ
 
-下位展開した結果: 49127 エンティティ / 57359トリプル
+下位展開した結果: 147421 エンティティ / 57359トリプル
 
 ```{r echo=TRUE, eval=FALSE}
 #dim(DatJpn03)
