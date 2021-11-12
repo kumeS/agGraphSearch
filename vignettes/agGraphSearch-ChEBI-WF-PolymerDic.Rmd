@@ -99,6 +99,7 @@ head(ChEBILabels)
 table(ChEBILabels$Property)
 dim(ChEBILabels)
 #[1] 147547      4
+length(unique(ChEBILabels$Object))
 #ChEBILabels[ChEBILabels$Subject == "owl:Thing",]
 
 ChEBIrelation <- readRDS("./05_ChEBI_OCR_00/ChEBI_Relation_subClassOf_df.Rds")
@@ -106,6 +107,8 @@ head(ChEBIrelation)
 table(ChEBIrelation$Property)
 dim(ChEBIrelation)
 #[1] 216757      3
+length(unique(c(ChEBILabels$Subject, ChEBILabels$Object)))
+#[1] 295094
 
 #Remove owl:Thing class
 ChEBIrelationR <- ChEBIrelation[ChEBIrelation$Subject %in% unique(ChEBILabels$Subject),]
@@ -121,7 +124,9 @@ ChEBILabelsR <- ChEBILabels[ChEBILabels$Subject %in% unique(c(ChEBIrelation$Subj
 head(ChEBILabelsR)
 dim(ChEBILabelsR)
 #[1] 147458      4
+
 saveRDS(ChEBILabelsR, "./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
+
 }
 
 ```
@@ -438,62 +443,43 @@ LabList00 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
 
 if(T){
 #class hierarchy
-a <- DatJpn03
 b <- Dat02
-  
-##NA対応
-table(is.na(a))
+head(b)
 
-#ループ消す
-head(a)
-table(a$subject != a$parentClass)
-a <- a[a$subject != a$parentClass, ]
+##Check NA
+table(is.na(b))
 
-#table(grepl("ChEBI[:]", a$subject))
-#table(grepl("ChEBI[:]", a$parentClass))
+#Remove the loops
+head(b)
+table(b$subject != b$parentClass)
+b <- b[b$subject != b$parentClass, ]
 
-nt <- paste("<", sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", a$subject), "> ",
+#table(grepl("obo[:]", b$subject))
+#table(grepl("obo[:]", b$parentClass))
+
+nt <- paste("<", sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$subject), "> ",
             "<http://www.w3.org/2000/01/rdf-schema#subClassOf> ",
-            "<", sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", a$parentClass), "> .",
+            "<", sub("mesh[:]", "http://id.nlm.nih.gov/mesh/", a$parentClass), "> .",
             sep="")
 nt <- unique(nt)
 
-write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
+write.table(nt, "./03_Mesh_OCR_05_RDF/RDF_from_mesh_v01.nt", sep="",
              row.names = F, col.names = F, append=F, quote = F)
 
 colnames(a)
 
-#Labels: a
-nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", a$subject), '> ',
-            '<http://www.w3.org/2000/01/rdf-schema#label> ',
-            '"', a$subjectLabel, '"@ja.',
-            sep="")
-nt <- unique(nt)
-write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
-             row.names = F, col.names = F, append=T, quote = F)
-
-nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", a$parentClass), '> ',
-            '<http://www.w3.org/2000/01/rdf-schema#label> ',
-            '"', a$parentClassLabel, '"@ja.',
-            sep="")
-nt <- unique(nt)
-write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
-             row.names = F, col.names = F, append=T, quote = F)
 
 #Labels: b
-#head(b)
-nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", b$subject), '> ',
+nt <- paste0('<', sub("obo[:]", "http://purl.obolibrary.org/obo/", b$subject), '> ',
             '<http://www.w3.org/2000/01/rdf-schema#label> ',
-            '"', b$subjectLabel, '"@en.',
-            sep="")
+            '"', b$subjectLabel, '"@en.')
 nt <- unique(nt)
 write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
              row.names = F, col.names = F, append=T, quote = F)
 
-nt <- paste('<', sub("ChEBI[:]", "http://id.nlm.nih.gov/ChEBI/", b$parentClass), '> ',
+nt <- paste0('<', sub("obo[:]", "http://purl.obolibrary.org/obo/", b$parentClass), '> ',
             '<http://www.w3.org/2000/01/rdf-schema#label> ',
-            '"', b$parentClassLabel, '"@en.',
-            sep="")
+            '"', b$parentClassLabel, '"@en.')
 nt <- unique(nt)
 write.table(nt, "./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", sep="",
              row.names = F, col.names = F, append=T, quote = F)

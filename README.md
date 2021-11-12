@@ -48,7 +48,7 @@ library( "agGraphSearch" )
   - Data Dump: [Google Drive](https://drive.google.com/drive/folders/1qMSSfQ5maJsXj0FcDGhc5gnThMobpSSY?usp=sharing)
   - [Pre-processing of Dump Data](https://github.com/kumeS/AHLodDbs)
 
-- [[ChEBI] A workflow to use agGraphSearch and ChEBI RDF]()
+- [[ChEBI] A workflow to use agGraphSearch and ChEBI RDF](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-ChEBI-WF-PolymerDic.html)
   - Data Dump: [Google Drive](https://drive.google.com/drive/folders/1KF54X4BH8RPZP1v0rnZWIHeBCsY083iI?usp=sharing)
   - [Pre-processing of Dump Data](https://github.com/kumeS/AHLodDbs)
   
