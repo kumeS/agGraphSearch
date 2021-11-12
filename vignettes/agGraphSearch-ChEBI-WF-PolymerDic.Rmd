@@ -171,6 +171,12 @@ table(Dat$cosine3 < 0.075)
 
 ```
 
+```{r echo=TRUE, eval=TRUE}
+library(agGraphSearch)
+a <- readRDS("../..//05_ChEBI_OCR_01_Out/Dat_OCR_en_match.Rds")
+agGraphSearch::agTableDT(a, Output=F)
+```
+
 # Set the threshold at 0.075
 
 ```{r echo=TRUE, eval=FALSE}
