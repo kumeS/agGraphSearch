@@ -48,6 +48,11 @@ library( "agGraphSearch" )
   - Data Dump: [Google Drive](https://drive.google.com/drive/folders/1qMSSfQ5maJsXj0FcDGhc5gnThMobpSSY?usp=sharing)
   - [Pre-processing of Dump Data](https://github.com/kumeS/AHLodDbs)
 
+- [[ChEBI] A workflow to use agGraphSearch and ChEBI RDF]()
+  - Data Dump: [Google Drive](https://drive.google.com/drive/folders/1KF54X4BH8RPZP1v0rnZWIHeBCsY083iI?usp=sharing)
+  - [Pre-processing of Dump Data](https://github.com/kumeS/AHLodDbs)
+  
+  
 - [The workflow submitted to IJCKG2021 (The 10th International Joint Conference on Knowledge Graphs)](https://kumes.github.io/agGraphSearch/vignettes/agGraphSearch-Wikidata-WF.html)
 
 ## Some examples of function execution in the package

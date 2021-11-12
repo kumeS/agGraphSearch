@@ -32,8 +32,8 @@ agJsTree <- function(Data,
 Width="125%"
 Height="175%"
 Dat <- Data
-Dat$X <- paste0(Dat$subjectLabel, ".", Dat$subject)
-Dat$Y <- paste0(Dat$parentClassLabel, ".", Dat$parentClass)
+Dat$X <- gsub(" ", "_", paste0(Dat$subjectLabel, ".", Dat$subject))
+Dat$Y <- gsub(" ", "_", paste0(Dat$parentClassLabel, ".", Dat$parentClass))
 DatXY <- Dat[,c("X", "Y")]
 
 head(DatXY)

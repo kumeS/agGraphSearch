@@ -19,21 +19,21 @@
 agVisNetwork <- function(Graph,
                          NodeColorRandom=FALSE,
                          Count=2,
-                         Size=10,
-                         SmallSize=5,
                          StarSize=10,
-                         FontSize=7,
                          Selected=NULL,
                          Browse=TRUE,
                          Output=FALSE,
                          ColoredSeed=NULL,
                          ColoredTopClass=NULL,
-                         Layout="layout_with_fr",
                          MaxRow=100000,
                          Physics=F,
                          Smooth=F,
                          FilePath=paste0("agVisNetwork_", format(Sys.time(), "%y%m%d"),".html"),
                          outputNodesEdges=FALSE){
+
+#Parameters
+SmallSize=5; FontSize=7; Size=10; Layout="layout_with_fr"
+#options(max.print=100000)
 
 if(is.null(Graph)){return(message("Warning: Not proper value of Graph"))}
 if(!is.data.frame(Graph)){return(message("Warning: Not proper value of Graph"))}
@@ -136,6 +136,9 @@ if(Count > 1){
     }else{}
   }
 
+#head(nodes)
+#nodes[grepl("owl", nodes$id),]
+
 if(!is.null(ColoredSeed)){
 if(grepl("mesh:", nodes$id[1])){
 a <- paste0("mesh:", unlist(purrr::map(nodes$id, function(x){strsplit(x, split = "[.]mesh[:]")[[1]][2]})))
@@ -143,6 +146,11 @@ a <- paste0("mesh:", unlist(purrr::map(nodes$id, function(x){strsplit(x, split =
 if(grepl("wd:", nodes$id[1])){
 a <- paste0("wd:", unlist(purrr::map(nodes$id, function(x){strsplit(x, split = "[.]wd[:]")[[1]][2]})))
 }
+if(grepl("obo:", nodes$id[1])){
+a <- paste0("obo:", unlist(purrr::map(nodes$id, function(x){strsplit(x, split = "[.]obo[:]")[[1]][2]})))
+b <- paste0("obo:", unlist(purrr::map(nodes$id, function(x){strsplit(x, split = "[.]owl[:]")[[1]][2]})))
+}
+
 nodes$color.background[a %in% ColoredSeed] <- "#ffff00"
 nodes$color.border[a %in% ColoredSeed] <- "#ffd700"
 nodes$size[a %in% ColoredSeed] <- 12
@@ -153,7 +161,8 @@ nodes$font.color[a %in% ColoredTopClass] <- "red"
 }
 }
 
-  if(!any(colnames(Graph) == "propertyLabel")){}else{
+#head(Graph)
+if(!any(colnames(Graph) == "propertyLabel")){}else{
     if(any(colnames(Graph) == "parentClassLabel")){}else{
       nodes %>% rbind(nodes2) -> nodes}}
   nodes <- nodes[as.numeric(as.character(rownames(unique(nodes['id'])))),]
@@ -194,6 +203,5 @@ nodes$font.color[a %in% ColoredTopClass] <- "red"
   } else { return(VIS) }
 
 }
-
 
 

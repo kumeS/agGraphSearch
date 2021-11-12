@@ -130,7 +130,7 @@ saveRDS(MeshLabelsR, "./03_Mesh_OCR_00/MeshLabelsR.Rds")
 
 # Linking of input words to the Mesh words
 
-Input words in English are 408.
+Input words in English are 4520.
 
 ```{r echo=TRUE, eval=FALSE}
 words <- unlist(words, use.names = F)

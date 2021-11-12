@@ -53,22 +53,6 @@ library(agGraphSearch)
 }
 
 if(F){
-proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
-Sys.setenv("http_proxy" = proxy_url)
-Sys.setenv("https_proxy" = proxy_url)
-Sys.setenv("ftp_proxy" = proxy_url)
-}
-
-if(F){
-proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
-Sys.setenv("http_proxy" = proxy_url)
-Sys.setenv("https_proxy" = proxy_url)
-Sys.setenv("ftp_proxy" = proxy_url)
-devtools::install_github( "kumeS/agGraphSearch" )
-library(agGraphSearch)
-}
-
-if(F){
 devtools::install_github( "kumeS/agGraphSearch" )
 library(agGraphSearch)
 }
@@ -109,20 +93,34 @@ head(words)
 # Import ChEBI data (2021)
 
 ```{r, echo=TRUE, eval=FALSE}
-
 if(F){
-ChEBILabels <- readRDS("./05_ChEBI_OCR_00/ChEBI_Label_en_dfR.Rds")
+ChEBILabels <- readRDS("./05_ChEBI_OCR_00/ChEBI_Label_en_rdfs_df.Rds")
 head(ChEBILabels)
 table(ChEBILabels$Property)
 dim(ChEBILabels)
+#[1] 147547      4
+#ChEBILabels[ChEBILabels$Subject == "owl:Thing",]
 
-ChEBIOthers <- readRDS("./05_ChEBI_OCR_00/ChEBI_othersR.Rds")
-head(ChEBIOthers)
-table(ChEBIOthers$Property)
-dim(ChEBIOthers)
+ChEBIrelation <- readRDS("./05_ChEBI_OCR_00/ChEBI_Relation_subClassOf_df.Rds")
+head(ChEBIrelation)
+table(ChEBIrelation$Property)
+dim(ChEBIrelation)
+#[1] 216757      3
 
-ChEBILabelsR <- ChEBILabels[ChEBILabels$Subject %in% unique(c(ChEBIOthers$Subject, ChEBIOthers$Object)),]
+#Remove owl:Thing class
+ChEBIrelationR <- ChEBIrelation[ChEBIrelation$Subject %in% unique(ChEBILabels$Subject),]
+ChEBIrelationR[!ChEBIrelationR$Object %in% unique(ChEBILabels$Subject),]
+#               Subject        Property    Object
+#59996  obo:CHEBI_50906 rdfs:subClassOf owl:Thing
+#115628 obo:CHEBI_36342 rdfs:subClassOf owl:Thing
+#146360 obo:CHEBI_24431 rdfs:subClassOf owl:Thing
+ChEBIrelationR <- ChEBIrelationR[ChEBIrelationR$Object %in% unique(ChEBILabels$Subject),]
+saveRDS(ChEBIrelationR, "./05_ChEBI_OCR_00/ChEBIrelationR.Rds")
+
+ChEBILabelsR <- ChEBILabels[ChEBILabels$Subject %in% unique(c(ChEBIrelation$Subject, ChEBIrelation$Object)),]
+head(ChEBILabelsR)
 dim(ChEBILabelsR)
+#[1] 147458      4
 saveRDS(ChEBILabelsR, "./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
 }
 
@@ -130,7 +128,7 @@ saveRDS(ChEBILabelsR, "./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
 
 # Linking of input words to the ChEBI words
 
-Input words in English are 408.
+Input words in English are 4520
 
 ```{r echo=TRUE, eval=FALSE}
 words <- unlist(words, use.names = F)
@@ -143,15 +141,16 @@ length(unique(words))
 words00 <- unique(unlist(words)); words00 <- words00[!is.na(words00)]
 words01 <- unique(tolower(words00))
 head(words01)
+length(unique(words01))
 
-#小文字変換
+#Lower-case conversion
 ChEBILabelsR <- readRDS("./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
 head(ChEBILabelsR)
 ChEBILabels01 <- unique(tolower(ChEBILabelsR$Object))
 head(ChEBILabels01)
 length(ChEBILabels01)
 
-#文字列距離実行
+#String distance execution
 library( agGraphSearch )
 Dat <- ComputeDistance(InputTerms=words01,
                        RDFterms=ChEBILabels01,
@@ -167,7 +166,7 @@ table(Dat$cosine3 < 0.075)
 
 ```
 
-#閾値0.075で切る
+# Set the threshold at 0.075
 
 ```{r echo=TRUE, eval=FALSE}
 head(Dat)
@@ -187,35 +186,8 @@ words02 <- readRDS("./05_ChEBI_OCR_01_Out/Dat_OCR_en_words02.Rds")
 head(words02)
 dim(words02)
 
-words02$Lab00 <- NA
-head(words02)
-
-#ラベルを逆にする
-head(words02)
-words02$Lab00 <- tolower(words02$cosine2)
-words02$Lab01 <- NA
-head(words02)
-
-table(grepl("[,][ ]", words02$Lab00))
-table(grepl("[,][ ]and", words02$Lab00))
-
-for(n in 1:length(words02$Lab00)){
-#n <- 5
-if(grepl("[,][ ]", words02$Lab00[n])){
- aa <- strsplit(words02$Lab00[n], split = ", ")[[1]]
- words02$Lab01[n] <- paste(aa[length(aa):1], collapse = " ")
-}else{
- aa <-  words02$Lab00[n]
- words02$Lab01[n] <- aa
-}}
-table(grepl("[,]", words02$Lab01))
-
-words02$Jpn <- NA
-head(words02, n=10)
-
 #proxy at OECU
-#rm( list=ls() )
-if(T){
+if(F){
 library(agGraphSearch)
 library(magrittr)
 
@@ -223,48 +195,43 @@ proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
 Sys.setenv("http_proxy" = proxy_url)
 Sys.setenv("https_proxy" = proxy_url)
 Sys.setenv("ftp_proxy" = proxy_url)
+
 }
 
 ##################################################################
 #Translate to Jpn Labels
 ##################################################################
 head(words02)
-wordsTerms <- unique(words02$Terms)
-str(wordsTerms)
-for(n in 1:length(wordsTerms)){
-#n <- 1
-Result <- DeePL(Sentence=wordsTerms[n], Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
-words02$Jpn[words02$Terms == wordsTerms[n]] <- Result
-message(colourise(paste("  No.: ", n), fg = "green", bg = NULL))
-message(colourise(paste("  ", wordsTerms[n], "=>", Result), fg = "green", bg = NULL))
-}
+source(system.file("inst/script/DeePL.R", package="agGraphSearch"))
+words03 <- Trans2Jpn(words02)
 
-head(words02, n=10)
-tail(words02, n=10)
-words02[is.na(words02)] <- 0
+head(words03, n=10)
+tail(words03, n=10)
+table(is.na(words03))
+words03[is.na(words03)] <- 0
 
 #PerfectMatch
-a <- words02$PerfectMatch > 0
-unique(words02$Terms[a])
+a <- words03$PerfectMatch > 0
+unique(words03$Terms[a])
 sum(a)
-#[1] 266
+#[1] 198
 
 #PartialMatch
-a <- words02$PartialMatch > 0
-unique(words02$Terms[a])
+a <- words03$PartialMatch > 0
+unique(words03$Terms[a])
 sum(a)
-#[1] 454
+#[1] 202
 
 #cosine3
-a <- words02$cosine3 < 0.075
-unique(words02$Terms[a])
+a <- words03$cosine3 < 0.075
+unique(words03$Terms[a])
 sum(a)
-#[1] 493
+#[1] 242
 
 ##################################################################
 #Save
-#saveRDS(words02, "./05_ChEBI_OCR_01_Out/OCR_en2jpn_words02.Rds")
-#readr::write_excel_csv(words02, file="./05_ChEBI_OCR_01_Out/OCR_en2jpn_words02.csv", col_names = T, append=F)
+#saveRDS(words03, "./05_ChEBI_OCR_01_Out/OCR_en2jpn_words03.Rds")
+#readr::write_excel_csv(words03, file="./05_ChEBI_OCR_01_Out/OCR_en2jpn_words03.csv", col_names = T, append=F)
 ##################################################################
 ```
 
@@ -275,14 +242,11 @@ sum(a)
 
 #Match List
 ChEBILabelR <- readRDS("./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
-words02 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en2jpn_words02.Rds")
-head(words02)
-dim(words02)
+words03 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en2jpn_words03.Rds")
+head(words03)
+dim(words03)
 
-table(words02$cosine2 == words02$Lab00)
-table(words02$cosine2 == words02$Lab01)
-
-#ChEBI D term List
+#ChEBI term List
 ChEBILabels00 <- ChEBILabelR
 head( ChEBILabels00 )
 
@@ -297,22 +261,28 @@ library( magrittr )
 ##################################################################
 #Extract IDs
 ##################################################################
-#一時的に小文字に変換してマッティング
+#Temporarily converted to lowercase and then matched
 ##################################################################
-ChEBILabels01 <- ChEBILabels00[c(tolower(ChEBILabels00$Object) %in% tolower(words02$Lab00)),]
+ChEBILabels01 <- ChEBILabels00[c(tolower(ChEBILabels00$Object) %in% tolower(words03$cosine2)),]
 
 head(ChEBILabels01)
 dim(ChEBILabels01)
 length(unique(ChEBILabels01$Subject))
+#[1] 237
 length(unique(ChEBILabels01$Property))
+#[1] 1
 unique(ChEBILabels01$Property)
+#[1] "rdfs:label"
 length(unique(ChEBILabels01$Object))
-#491words/entities
+#237 words / all entities
 
-ChEBILabels01
+head(ChEBILabels01)
 LabList00 <- unique(ChEBILabels01$Subject)
 head(LabList00)
+#[1] "obo:CHEBI_59827" "obo:CHEBI_29365" "obo:CHEBI_35366" "obo:CHEBI_7044"  "obo:CHEBI_16412"
+#[6] "obo:CHEBI_16646"
 length(LabList00)
+#[1] 237
 #saveRDS(LabList00, "./05_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
 
 ```
@@ -320,7 +290,6 @@ length(LabList00)
 # Obtain all class hierarchy
 
 ```{r echo=TRUE, eval=FALSE}
-#修正版の読み込み
 #rm(list=ls())
 
 #words
@@ -334,62 +303,43 @@ ChEBILabelR <- readRDS("./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
 head(ChEBILabelR); dim(ChEBILabelR)
 table(ChEBILabelR$OtherInfo == "BLANK")
 table(ChEBILabelR$Property)
-table(ChEBILabelR$SubInfo)
+table(ChEBILabelR$OtherInfo)
 
-#ChEBI_othersR.Rds
-ChEBIOthers <- readRDS("./05_ChEBI_OCR_00/ChEBI_othersR.Rds")
+#ChEBIrelationR.Rds
+ChEBIrelation <- readRDS("./05_ChEBI_OCR_00/ChEBIrelationR.Rds")
 
-head(ChEBIOthers); dim(ChEBIOthers)
-table(ChEBIOthers$OtherInfo == "BLANK")
-table(ChEBIOthers$Property)
-table(ChEBIOthers$SubInfo)
-table(ChEBIOthers$ObjInfo)
+head(ChEBIrelation); dim(ChEBIrelation)
+table(ChEBIrelation$Property)
 
 ##################################################################
 #Trial 01
 ##################################################################
 txt <- unique(LabList00)
 a1 <- ChEBILabelR[ChEBILabelR$Subject %in% txt,]
-a1
-#              Subject   Property   Object OtherInfo    SubInfo
-#1242522  ChEBI:D011108 rdfs:label Polymers       @en IDs:ChEBI:D
-#1906322 ChEBI:M0017208 rdfs:label Polymers       @en IDs:ChEBI:M
+head(a1, n=3)
+#             Subject   Property         Object  OtherInfo
+#1732 obo:CHEBI_59827 rdfs:label silsesquioxane xsd:string
+#1735 obo:CHEBI_29365 rdfs:label       phosgene xsd:string
+#1988 obo:CHEBI_35366 rdfs:label     fatty acid xsd:string
 a2 <- unique(a1$Subject)
 a2
 
 table(txt %in% a2)
 ##################################################################
-#上位探索
+#Search for superordinate concepts
 ##################################################################
-Dat <- c(); x <- 1; Query <- a2
-repeat{
-message(x)
-b1 <- ChEBIOthers[ChEBIOthers$Subject %in% Query,]
-if(dim(b1)[1] == 0){break}
-Dat <- rbind(Dat, b1)
-Query <- b1$Object
-x <- x + 1
-if(x == 100){break}
-}
+source(system.file("inst/script/searchChEBI.R", package="agGraphSearch"))
+Dat <- searchSuperordinate(a2=a2, ChEBIrelation=ChEBIrelation)
+head(Dat)
+#saveRDS(Dat, "./05_ChEBI_OCR_01_Out/OCR_en_upClass.Rds")
 
 ##################################################################
-#重複を除く
-##################################################################
-head(Dat); dim(Dat)
-rownames(Dat) <- 1:nrow(Dat)
-colnames(Dat) <- c("subject", "property", "parentClass", "OtherInfo", "SubInfo", "ObjInfo")
-Dat$triple <- paste0(Dat$subject, ".", Dat$property, ".", Dat$parentClass)
-Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
-Dat <- Dat[,-ncol(Dat)]
-head(Dat); dim(Dat)
-length(unique(c(Dat$subject, Dat$parentClass)))
-
-##################################################################
-#最上位
+#Find the top-level entities
 ##################################################################
 a3 <- unique(Dat$parentClass)[!(unique(Dat$parentClass) %in% unique(Dat$subject))]
 str(a3)
 a3
+#[1] "obo:CHEBI_50906" "obo:CHEBI_24431"
 
 ##################################################################
 #Add labels
@@ -398,26 +348,28 @@ ChEBILabelR <- readRDS("./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
 
 library(agGraphSearch)
 library(magrittr)
+
 DatX <- MergeChEBIData(Data=Dat, Labels=ChEBILabelR)
 head(DatX)
 dim(DatX)
 length(unique(c(DatX$subject, DatX$parentClass)))
+
 ##################################################################
 try(agVisNetwork(Graph=DatX,
-             Selected=NULL, 
-             Browse=TRUE, 
-             Output=TRUE,
-             ColoredSeed=LabList00,
-             ColoredTopClass=a3,
-             Physics=T,
-             Smooth=T,
-             FilePath="upClass_v01.html"))
+                 Selected=NULL, 
+                 Browse=TRUE, 
+                 Output=TRUE,
+                 ColoredSeed=LabList00,
+                 ColoredTopClass=a3,
+                 Physics=T,
+                 Smooth=T,
+                 FilePath="upClass_v01.html"))
 filesstrings::move_files("upClass_v01.html", "./05_ChEBI_OCR_02_Out")
 ##################################################################
 for(n in 1:length(a3)){
 print(n)
 try(agJsTree(Data=DatX, 
-         TopClass=a3[n], 
+         TopClass=gsub(" ", "_", paste0(DatX[DatX$parentClass %in% a3[n],]$parentClassLabel[1], ".", DatX[DatX$parentClass %in% a3[n],]$parentClass[1])), 
          Brouse=TRUE, 
          SaveHtmlFile=TRUE, 
          ExcludeQID=TRUE,
@@ -426,251 +378,66 @@ try(agJsTree(Data=DatX,
 }
 
 ##################################################################
-#下位探索: 最上位から全部取得
+#Search for lower-level concepts: get everything from the top level
 ##################################################################
-Dat <- c(); x <- 1; Query <- a3
-repeat{
-message(x)
-b2 <- ChEBIOthers[ChEBIOthers$Object %in% Query,]
-if(dim(b2)[1] == 0){break}
-Dat <- rbind(Dat, b2)
-Query <- b2$Subject
-x <- x + 1
-if(x == 100){break}
-}
-
-#重複を除く
-head(Dat); dim(Dat)
-rownames(Dat) <- 1:nrow(Dat)
-colnames(Dat) <- c("subject", "property", "parentClass", "OtherInfo", "SubInfo", "ObjInfo")
-Dat$triple <- paste0(Dat$subject, ".", Dat$property, ".", Dat$parentClass)
-Dat <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
-Dat <- Dat[,-ncol(Dat)]
-
-head(Dat); dim(Dat)
-length(unique(c(Dat$subject, Dat$parentClass)))
+Dat <- searchSubordinate(a3=a3, ChEBIrelation=ChEBIrelation)
+head(Dat)
+dim(Dat)
 #saveRDS(Dat, "./05_ChEBI_OCR_01_Out/OCR_en_downClass.Rds")
+```
 
-##################################################################
-#Bind data
-##################################################################
+# Bind data
+
+```{r echo=TRUE, eval=FALSE}
 #rm(list=ls())
 ChEBILabelR <- readRDS("./05_ChEBI_OCR_00/ChEBILabelsR.Rds")
 upClass <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_upClass.Rds")
 downClass <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_downClass.Rds")
-Dat <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_downClass.Rds")
+#head(upClass); head(downClass)
+Dat <- rbind(upClass, downClass)
 
 #Add labels
-#library(agGraphSearch)
+library(agGraphSearch)
 Dat00 <- MergeChEBIData(Data=Dat, Labels=ChEBILabelR)
 
 head(Dat00); dim(Dat00); table(Dat00$property)
 table(Dat00$property)
+table(is.na(Dat00))
+
 #saveRDS(Dat00, "./05_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
+#hist(table(nchar(Dat00$subjectLabel)))
 
-##################################################################
-##################################################################
-#Jpn
-##################################################################
-##################################################################
+Dat00 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
 head(Dat00)
-DatJpn <- Dat00
-dim(DatJpn)
-colnames(DatJpn)
 
-DatJpn$triple <- paste0(DatJpn$subject, ".", DatJpn$property, ".", DatJpn$parentClass)
-rownames(DatJpn) <- 1:nrow(DatJpn)
-DatJpn00 <- DatJpn[as.numeric(rownames(unique(DatJpn["triple"]))),]
-DatJpn00 <- DatJpn00[,-ncol(DatJpn00)]
-dim(DatJpn00)
+#entity number
+length(unique(c(Dat00$subject, Dat00$parentClass)))
+#[1] 147421
 
-DatJpn <- DatJpn00
-table(DatJpn$property)
-dim(DatJpn)
-length(unique(c(DatJpn$subject, DatJpn$parentClass)))
-length(unique(c(DatJpn$subjectLabel, DatJpn$parentClassLabel)))
-
-#Translate to Jpn
-if(F){
-#proxy at OECU
-#rm( list=ls() )
-if(T){
-library(agGraphSearch)
-library(magrittr)
-
-proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
-Sys.setenv("http_proxy" = proxy_url)
-Sys.setenv("https_proxy" = proxy_url)
-Sys.setenv("ftp_proxy" = proxy_url)
-}
-
-##################################################################
-##################################################################
-a <- readRDS("./05_ChEBI_OCR_01_Out/OCR_DatJpn02.Rds")
-head(a)
-aa <- data.frame(IDs=c(a$subject, a$parentClass), Jpn=c(a$subjectLabel, a$parentClassLabel))
-head(aa)
-aa1 <- aa[as.numeric(rownames(unique(aa["IDs"]))),]
-head(aa1); dim(aa1)
-bb3_a <- readRDS("./bb3_a.Rds")
-##################################################################
-##################################################################
-head(DatJpn); dim(DatJpn)
-table(DatJpn$property)
-length(unique(c(DatJpn$subject, DatJpn$parentClass)))
-bb <- data.frame(IDs=c(DatJpn$subject, DatJpn$parentClass), Jpn=c(DatJpn$subjectLabel, DatJpn$parentClassLabel))
-rownames(bb) <- 1:nrow(bb)
-bb1 <- bb[as.numeric(rownames(unique(bb["IDs"]))),]
-head(bb1); dim(bb1)
-
-bb2 <- bb1[!(bb1$IDs %in% unique(c(aa1$IDs, bb3_a$IDs))),]
-
-str(bb2)
-dim(bb2)
-length(unique(bb2$IDs))
-head(bb2)
-
-bb4 <- bb2
-rownames(bb4) <- 1:nrow(bb4)
-dim(bb4)
-length(bb2$IDs)
-
-##################################################################
-#日本語訳
-##################################################################
-for(k in 7645:length(bb2$IDs)){
-#k <- 1
-wordsList <- bb2[k,2]
-message(colourise(paste(k, "/", length(bb2$IDs)), fg = "blue", bg = NULL))
-if(grepl("[,][ ]", wordsList) & !grepl("[,][ ]and", wordsList)){
-a1 <- strsplit(wordsList, split = ", ")[[1]]
-aa <- paste(a1[length(a1):1], collapse = " ")
-}else{
-aa <-  wordsList
-}
-
-#43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx
-#7a2cdd89-60a7-d251-8090-2f6f40293dd6:fx
-Jpn <- DeePL(aa, Auth_Key="7a2cdd89-60a7-d251-8090-2f6f40293dd6:fx")
-bb4[k,2] <- Jpn
-message(colourise(paste("  ", wordsList, "=>", Jpn), fg = "green", bg = NULL))
-}
-
-#23439から家で
-#saveRDS(bb4, "./bb4_jpn.Rds")
-##################################################################
-##################################################################
-#日本語リスト
-##################################################################
-head(aa1);dim(aa1)
-head(bb4);dim(bb4)
-
-bb3_a <- readRDS("./bb3_a.Rds")
-dd <- aa1 %>% rbind(bb3_a) %>% rbind(bb4)
-
-rownames(dd) <- 1:nrow(dd)
-head(dd);dim(dd)
-length(unique(dd$IDs))
-##################################################################
-##################################################################
-#代入
-##################################################################
-DatJpn01 <- DatJpn
-head(DatJpn01); dim(DatJpn01)
-head(dd); dim(dd)
-length(unique(c(DatJpn01$subject, DatJpn01$parentClass)))
-
-for(n in 1:nrow(dd)){
-  #n <- 1
-  DatJpn01$subjectLabel[DatJpn01$subject == dd$IDs[n]] <- dd$Jpn[n]
-  DatJpn01$parentClassLabel[DatJpn01$parentClass == dd$IDs[n]] <- dd$Jpn[n]
-}
-#head(DatJpn01)
-DatJpn03 <- DatJpn01
-DatJpn03 <- DatJpn03[DatJpn03$property != "ChEBIv:preferredConcept",]
-#DatJpn03 <- DatJpn03[DatJpn03$property != "ChEBIv:preferredConceptR",]
-head(DatJpn03); dim(DatJpn03)
-length(unique(c(DatJpn03$subject, DatJpn03$parentClass)))
-#Save
-#saveRDS(DatJpn03, "./05_ChEBI_OCR_01_Out/OCR_DatJpn03_new.Rds")
-}
-
-##################################################################
-#個別にグラフ化
-##################################################################
-#rm( list=ls() )
-DatJpn03 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_DatJpn03_new.Rds")
-topClass <- unique(DatJpn03$parentClass)[!(unique(DatJpn03$parentClass) %in% unique(DatJpn03$subject))]
-LabList00 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
-
-for(k in 1:length(topClass)){
-#k <- 1
-Dat <- c(); x <- 1; Query <- topClass[k]
-
-repeat{
-b2 <- DatJpn03[DatJpn03$parentClass %in% Query,]
-if(dim(b2)[1] == 0){break}
-Dat <- rbind(Dat, b2)
-Query <- b2$subject
-message(x)
-x <- x + 1
-if(x == 100){break}
-}
-
-head(Dat)
-rownames(Dat) <- 1:nrow(Dat)
-Dat$triple <- paste0(Dat$subject, ".", Dat$property, ".", Dat$parentClass)
-Dat00 <- Dat[as.numeric(rownames(unique(Dat["triple"]))),]
-Dat <- Dat00[,-ncol(Dat00)]
-dim(Dat)
-
-a <- DatJpn03[DatJpn03$parentClass %in% topClass[k],]
-FileName <- paste0("agVisNetwork_OCR_Jpn_", topClass[k], "_",
-                   a$parentClassLabel[1], "_", format(Sys.time(), "%y%m%d-%H%M%S"),".html")
-
-##################################################################
-#All: 検索エンティティをyellowに
-##################################################################
-try(agVisNetwork(Graph=Dat,
-             Selected=NULL, 
-             Browse=TRUE, 
-             Output=TRUE,
-             ColoredSeed=LabList00,
-             ColoredTopClass=topClass,
-             FilePath=FileName))
-#table(LabList00 == "ChEBI:D000937")
-suppressMessages(filesstrings::move_files(FileName, "./05_ChEBI_OCR_04_Jpn"))
-}
-
-##################################################################
-#ツリー可視化
-##################################################################
-head(DatJpn03)
-agJsTreeR(Data=DatJpn03,
-          TopClass=topClass,
-          Brouse=TRUE,
-          SaveHtmlFile=TRUE,
-          FileName="ExtractedChEBI_tree.html",
-          Output=NULL,
-          ExcludeQID=TRUE)
+#triple number
+table(Dat00$property)
+#rdfs:subClassOf 
+#        216709
 
 ```
 
-# Convert to RDF
+# Convert to RDF (N-triples)
 
-ChEBIから抽出した結果をRDFに変換する
+ChEBIから抽出した結果(ほぼ全て)をRDF(N-triples)に変換する
+
+ラベル数が多くて、日本語変換はできない。
+
+今後、Wikidataのやり方をChEBIに用いる予定。
 
 ```{r echo=TRUE, eval=FALSE}
 #rm(list=ls())
 Dat02 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
-DatJpn03 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_DatJpn03_new.Rds")
-topClass <- unique(DatJpn03$parentClass)[!(unique(DatJpn03$parentClass) %in% unique(DatJpn03$subject))]
 LabList00 <- readRDS("./05_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
-#write.csv(topClass, "topClass.csv")
-#SPARQL結果をN-triplesに変換
+
+#Convert the extracted results to N-triples
 
 if(T){
-#クラス階層
+#class hierarchy
 a <- DatJpn03
 b <- Dat02
   

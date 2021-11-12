@@ -22,3 +22,33 @@ return(result)
 
 }
 
+Trans2Jpn <- function(words02=words02){
+
+words02$Jpn <- NA
+words02$cosine2_Jpn <- NA
+
+if(colnames(words02)[1] != "Terms"){return(message("warning: not proper value of words02"))}
+if(colnames(words02)[5] != "cosine2"){return(message("warning: not proper value of words02"))}
+
+wordsTerms <- unique(c(words02$Terms, words02$cosine2))
+
+#head(words02)
+#str(wordsTerms)
+#length(wordsTerms)
+
+for(n in 1:length(wordsTerms)){
+#n <- 1
+Result <- DeePL(Sentence=wordsTerms[n],
+                Auth_Key="43725ffd-d3d3-a301-c92d-8d7e2070f71c:fx")
+
+words02$Jpn[words02$Terms == wordsTerms[n]] <- Result
+words02$cosine2_Jpn[words02$cosine2 == wordsTerms[n]] <- Result
+
+message(colourise(paste("  No.: ", n, " / ", length(wordsTerms)), fg = "green", bg = NULL))
+message(colourise(paste("  ", wordsTerms[n], "=>", Result), fg = "green", bg = NULL))
+}
+
+return(words02)
+
+}
+
