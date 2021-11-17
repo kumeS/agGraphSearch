@@ -211,14 +211,17 @@ a <- furrr::future_map2(unlist(DatA), unlist(DatB), Tem00, .progress = TRUE)
 eval(parse(text=paste0("QID.d$", ExcluQ[n], " <- c(unlist(a) > 0)")))
 
 readr::write_excel_csv(QID.d, 
-                       paste0(paste0(tempDIR, "/", "Wiki_01_Out"), 
-                              "/ExcluQ_", formatC(n, width = 3, flag = "0"), "_", ExcluQ[n], ".csv"), col_names = T)
+                       paste0("./04_Wiki_PolyInfo_01/ExcluQ_", formatC(n, width = 3, flag = "0"), "_", ExcluQ[n], ".csv"), 
+                       col_names = T)
 #show hits
 print(eval(parse(text=paste0("QID.d[QID.d$", ExcluQ[n], " == TRUE,c(1, ncol(QID.d))]"))))
 #remove hits
-QID.d <- QID.d[unlist(a, use.names = F) == 0,]
-print(dim(QID.d))
+#QID.d <- QID.d[unlist(a, use.names = F) == 0,]
+#print(dim(QID.d))
 }
+
+#remove hits
+QID.d <- QID.d[apply(QID.d[,-1], 1, function(x) sum(x)) > 0,]
 
 #show results
 dim(QID.d)
@@ -248,14 +251,17 @@ a <- furrr::future_map2(unlist(DatA), unlist(DatB), Tem01, .progress = TRUE)
 eval(parse(text=paste0("QID.d$", ExcluP[n], " <- c(unlist(a) > 0)")))
 
 readr::write_excel_csv(QID.d, 
-                       paste0(paste0(tempDIR, "/", "Wiki_01_Out"), 
-                              "/ExcluP_", formatC(n, width = 3, flag = "0"), "_", ExcluP[n], ".csv"), col_names = T)
+                       paste0("./04_Wiki_PolyInfo_01/ExcluP_", formatC(n, width = 3, flag = "0"), "_", ExcluP[n], ".csv"), 
+                       col_names = T)
 #show hits
 print(eval(parse(text=paste0("QID.d[QID.d$", ExcluP[n], " == TRUE,c(1, ncol(QID.d))]"))))
 #remove hits
-QID.d <- QID.d[unlist(a, use.names = F) == 0,]
-print(dim(QID.d))
+#QID.d <- QID.d[unlist(a, use.names = F) == 0,]
+#print(dim(QID.d))
 }
+
+#remove hits
+QID.d <- QID.d[apply(QID.d[,-1], 1, function(x) sum(x)) > 0,]
 
 #show results
 dim(QID.d)
