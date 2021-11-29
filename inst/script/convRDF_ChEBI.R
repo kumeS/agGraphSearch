@@ -1,5 +1,4 @@
 #Convert the extracted results to N-triples
-
 convRDF_ChEBI <- function(Dat02=Dat02,
                          LabList00=LabList00,
                          FileName="./05_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt"){

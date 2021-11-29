@@ -1,0 +1,489 @@
+---
+title: "A workflow to use agGraphSearch and ChEBI RDF"
+shorttitle: "Application to the class hierarchy of ChEBI RDF"
+author:
+  - name: Satoshi Kume
+date: "`r Sys.Date()`"
+graphics: no
+package: agGraphSearch, knitr, SPARQL
+output:
+  BiocStyle::html_document:
+  toc_float: true
+vignette: >
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{agGraphSearch}
+  %\VignetteIndexEntry{A workflow to use agGraphSearch and ChEBI RDF}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r style, echo=FALSE, message=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+**Last modified:** `r file.info("agGraphSearch-ChEBI-WF-PolymerDic.Rmd")$mtime`<br />
+**Compiled**: `r Sys.time()`
+
+# Getting started
+
+Once `r Rpackage("agGraphSearch")` is installed, it can be loaded by the following command.
+
+```{r library, echo=TRUE, eval=FALSE}
+#rm( list=ls() )
+library(agGraphSearch)
+library(magrittr)
+
+#Re-build
+rm(list=ls())
+
+if(F){
+system("rm -rf ./agGraphSearch/NAMESPACE")
+roxygen2::roxygenise("./agGraphSearch")
+system("cat ./agGraphSearch/NAMESPACE")
+remove.packages("agGraphSearch", lib=.libPaths())
+.rs.restartR()
+}
+#install.packages(c("SPARQL", "franc", "formattable"))
+
+if(F){
+system("R CMD INSTALL agGraphSearch")
+Sys.sleep(1)
+library(agGraphSearch)
+}
+
+if(F){
+devtools::install_github( "kumeS/agGraphSearch" )
+library(agGraphSearch)
+}
+
+if(!dir.exists("06_ChEBI_OCR_00")){dir.create("06_ChEBI_OCR_00")}
+if(!dir.exists("06_ChEBI_OCR_01_Out")){dir.create("06_ChEBI_OCR_01_Out")}
+if(!dir.exists("06_ChEBI_OCR_02_Out")){dir.create("06_ChEBI_OCR_02_Out")}
+if(!dir.exists("06_ChEBI_OCR_03_Out")){dir.create("06_ChEBI_OCR_03_Out")}
+if(!dir.exists("06_ChEBI_OCR_04_Jpn")){dir.create("06_ChEBI_OCR_04_Jpn")}
+if(!dir.exists("06_ChEBI_OCR_05_RDF")){dir.create("06_ChEBI_OCR_05_RDF")}
+
+```
+
+# Read the csv files
+
+You should split compound words as a pre-processing.
+
+```{r echo=TRUE, eval=FALSE}
+words <- data.frame(readr::read_csv("./06_ChEBI_OCR_00/高分子辞典OCR_2column_en.csv", col_names = F, show_col_types = F))
+words <- unlist(words, use.names = F)
+words <- data.frame(X1=words[!is.na(words)])
+dim(words)
+```
+
+# check the data
+
+```{r echo=TRUE, eval=FALSE}
+head(words)
+dim(words)
+
+#unique number
+length(unique(words))
+
+#table
+head(words)
+```
+
+# Import ChEBI data (2021)
+
+```{r, echo=TRUE, eval=FALSE}
+if(F){
+ChEBILabels <- readRDS("./06_ChEBI_OCR_00/ChEBI_Label_en_rdfs_df.Rds")
+head(ChEBILabels)
+table(ChEBILabels$Property)
+dim(ChEBILabels)
+#[1] 147547      4
+length(unique(ChEBILabels$Object))
+#ChEBILabels[ChEBILabels$Subject == "owl:Thing",]
+
+ChEBIrelation <- readRDS("./06_ChEBI_OCR_00/ChEBI_Relation_subClassOf_df.Rds")
+head(ChEBIrelation)
+table(ChEBIrelation$Property)
+dim(ChEBIrelation)
+#[1] 216757      3
+length(unique(c(ChEBILabels$Subject, ChEBILabels$Object)))
+#[1] 295094
+
+#Remove owl:Thing class
+ChEBIrelationR <- ChEBIrelation[ChEBIrelation$Subject %in% unique(ChEBILabels$Subject),]
+ChEBIrelationR[!ChEBIrelationR$Object %in% unique(ChEBILabels$Subject),]
+#               Subject        Property    Object
+#59996  obo:CHEBI_50906 rdfs:subClassOf owl:Thing
+#115628 obo:CHEBI_36342 rdfs:subClassOf owl:Thing
+#146360 obo:CHEBI_24431 rdfs:subClassOf owl:Thing
+ChEBIrelationR <- ChEBIrelationR[ChEBIrelationR$Object %in% unique(ChEBILabels$Subject),]
+saveRDS(ChEBIrelationR, "./06_ChEBI_OCR_00/ChEBIrelationR.Rds")
+
+ChEBILabelsR <- ChEBILabels[ChEBILabels$Subject %in% unique(c(ChEBIrelation$Subject, ChEBIrelation$Object)),]
+head(ChEBILabelsR)
+dim(ChEBILabelsR)
+#[1] 147458      4
+
+saveRDS(ChEBILabelsR, "./06_ChEBI_OCR_00/ChEBILabelsR.Rds")
+
+}
+
+```
+
+# Linking of input words to the ChEBI words
+
+Input words in English are 4520
+
+```{r echo=TRUE, eval=FALSE}
+words <- unlist(words, use.names = F)
+words <- words[!is.na(words)]
+words <- words[words != ""]
+words <- unique(words)
+
+head(words)
+length(unique(words))
+words00 <- unique(unlist(words)); words00 <- words00[!is.na(words00)]
+words01 <- unique(tolower(words00))
+head(words01)
+length(unique(words01))
+
+#Lower-case conversion
+ChEBILabelsR <- readRDS("./06_ChEBI_OCR_00/ChEBILabelsR.Rds")
+head(ChEBILabelsR)
+ChEBILabels01 <- unique(tolower(ChEBILabelsR$Object))
+head(ChEBILabels01)
+length(ChEBILabels01)
+
+#String distance execution
+library( agGraphSearch )
+Dat <- ComputeDistance(InputTerms=words01,
+                       RDFterms=ChEBILabels01,
+                       q=2, nthread=4, TopWords=3)
+  
+head(Dat)
+#Dat[is.na(Dat)] <- 0
+table(Dat$PerfectMatch > 0)
+table(Dat$PartialMatch > 0)
+table(Dat$cosine1 > 0)
+table(Dat$cosine3 < 0.075)
+#saveRDS(Dat, "./06_ChEBI_OCR_01_Out/Dat_OCR_en_match.Rds")
+
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(agGraphSearch)
+a <- readRDS("../..//06_ChEBI_OCR_01_Out/Dat_OCR_en_match.Rds")
+agGraphSearch::agTableDT(a, Output=F)
+```
+
+# Set the threshold at 0.075
+
+```{r echo=TRUE, eval=FALSE}
+head(Dat)
+words02 <- Dat[Dat$cosine3 < 0.075, ]
+head(words02)
+dim(words02)
+rownames(words02) <- 1:nrow(words02)
+#saveRDS(words02, "./06_ChEBI_OCR_01_Out/Dat_OCR_en_words02.Rds")
+
+```
+
+# Translate English to Japanese
+
+```{r echo=TRUE, eval=FALSE}
+#rm(list=ls())
+words02 <- readRDS("./06_ChEBI_OCR_01_Out/Dat_OCR_en_words02.Rds")
+head(words02)
+dim(words02)
+
+#proxy at OECU
+if(F){
+library(agGraphSearch)
+library(magrittr)
+
+proxy_url = "http://wwwproxy.osakac.ac.jp:8080"
+Sys.setenv("http_proxy" = proxy_url)
+Sys.setenv("https_proxy" = proxy_url)
+Sys.setenv("ftp_proxy" = proxy_url)
+
+}
+
+##################################################################
+#Translate to Jpn Labels
+##################################################################
+head(words02)
+source(system.file("inst/script/DeePL.R", package="agGraphSearch"))
+words03 <- Trans2Jpn(words02)
+
+head(words03, n=10)
+tail(words03, n=10)
+table(is.na(words03))
+words03[is.na(words03)] <- 0
+
+#PerfectMatch
+a <- words03$PerfectMatch > 0
+unique(words03$Terms[a])
+sum(a)
+#[1] 198
+
+#PartialMatch
+a <- words03$PartialMatch > 0
+unique(words03$Terms[a])
+sum(a)
+#[1] 202
+
+#cosine3
+a <- words03$cosine3 < 0.075
+unique(words03$Terms[a])
+sum(a)
+#[1] 242
+
+##################################################################
+#Save
+#saveRDS(words03, "./06_ChEBI_OCR_01_Out/OCR_en2jpn_words03.Rds")
+#readr::write_excel_csv(words03, file="./06_ChEBI_OCR_01_Out/OCR_en2jpn_words03.csv", col_names = T, append=F)
+##################################################################
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(agGraphSearch)
+a <- readRDS("../../06_ChEBI_OCR_01_Out/OCR_en2jpn_words03.Rds")
+#a <- readRDS("./06_ChEBI_OCR_01_Out/OCR_en2jpn_words03.Rds")
+agGraphSearch::agTableFM(a, Output=F)
+```
+
+# Linking to the ChEBI
+
+```{r echo=TRUE, eval=FALSE}
+#rm(list=ls())
+
+#Match List
+ChEBILabelR <- readRDS("./06_ChEBI_OCR_00/ChEBILabelsR.Rds")
+words03 <- readRDS("./06_ChEBI_OCR_01_Out/OCR_en2jpn_words03.Rds")
+head(words03)
+dim(words03)
+
+#ChEBI term List
+ChEBILabels00 <- ChEBILabelR
+head( ChEBILabels00 )
+
+dim( ChEBILabels00 )
+length(unique(ChEBILabels00$Subject))
+length(unique(ChEBILabels00$Property))
+length(unique(ChEBILabels00$Object))
+
+#Check
+library( magrittr )
+
+##################################################################
+#Extract IDs
+##################################################################
+#Temporarily converted to lowercase and then matched
+##################################################################
+ChEBILabels01 <- ChEBILabels00[c(tolower(ChEBILabels00$Object) %in% tolower(words03$cosine2)),]
+
+head(ChEBILabels01)
+dim(ChEBILabels01)
+length(unique(ChEBILabels01$Subject))
+#[1] 237
+length(unique(ChEBILabels01$Property))
+#[1] 1
+unique(ChEBILabels01$Property)
+#[1] "rdfs:label"
+length(unique(ChEBILabels01$Object))
+#237 words / all entities
+
+head(ChEBILabels01)
+LabList00 <- unique(ChEBILabels01$Subject)
+head(LabList00)
+#[1] "obo:CHEBI_59827" "obo:CHEBI_29365" "obo:CHEBI_35366" "obo:CHEBI_7044"  "obo:CHEBI_16412"
+#[6] "obo:CHEBI_16646"
+length(LabList00)
+#[1] 237
+#saveRDS(LabList00, "./06_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
+
+```
+
+# Obtain all class hierarchy
+
+```{r echo=TRUE, eval=FALSE}
+#rm(list=ls())
+
+#words
+LabList00 <- readRDS("./06_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
+LabList00
+str(LabList00)
+
+#ChEBILabelsR.Rds
+ChEBILabelR <- readRDS("./06_ChEBI_OCR_00/ChEBILabelsR.Rds")
+
+head(ChEBILabelR); dim(ChEBILabelR)
+table(ChEBILabelR$OtherInfo == "BLANK")
+table(ChEBILabelR$Property)
+table(ChEBILabelR$OtherInfo)
+
+#ChEBIrelationR.Rds
+ChEBIrelation <- readRDS("./06_ChEBI_OCR_00/ChEBIrelationR.Rds")
+
+head(ChEBIrelation); dim(ChEBIrelation)
+table(ChEBIrelation$Property)
+
+##################################################################
+#Trial 01
+##################################################################
+txt <- unique(LabList00)
+a1 <- ChEBILabelR[ChEBILabelR$Subject %in% txt,]
+head(a1, n=3)
+#             Subject   Property         Object  OtherInfo
+#1732 obo:CHEBI_59827 rdfs:label silsesquioxane xsd:string
+#1735 obo:CHEBI_29365 rdfs:label       phosgene xsd:string
+#1988 obo:CHEBI_35366 rdfs:label     fatty acid xsd:string
+a2 <- unique(a1$Subject)
+a2
+
+table(txt %in% a2)
+##################################################################
+#Search for superordinate concepts
+##################################################################
+source(system.file("inst/script/searchChEBI.R", package="agGraphSearch"))
+Dat <- searchSuperordinate(a2=a2, ChEBIrelation=ChEBIrelation)
+head(Dat)
+#saveRDS(Dat, "./06_ChEBI_OCR_01_Out/OCR_en_upClass.Rds")
+
+##################################################################
+#Find the top-level entities
+##################################################################
+a3 <- unique(Dat$parentClass)[!(unique(Dat$parentClass) %in% unique(Dat$subject))]
+str(a3)
+a3
+#[1] "obo:CHEBI_50906" "obo:CHEBI_24431"
+
+##################################################################
+#Add labels
+##################################################################
+ChEBILabelR <- readRDS("./06_ChEBI_OCR_00/ChEBILabelsR.Rds")
+
+library(agGraphSearch)
+library(magrittr)
+
+DatX <- MergeChEBIData(Data=Dat, Labels=ChEBILabelR)
+head(DatX)
+dim(DatX)
+length(unique(c(DatX$subject, DatX$parentClass)))
+
+##################################################################
+try(agVisNetwork(Graph=DatX,
+                 Selected=NULL, 
+                 Browse=TRUE, 
+                 Output=TRUE,
+                 ColoredSeed=LabList00,
+                 ColoredTopClass=a3,
+                 Physics=T,
+                 Smooth=T,
+                 FilePath="upClass_v01.html"))
+filesstrings::move_files("upClass_v01.html", "./06_ChEBI_OCR_02_Out")
+##################################################################
+for(n in 1:length(a3)){
+print(n)
+try(agJsTree(Data=DatX, 
+         TopClass=gsub(" ", "_", paste0(DatX[DatX$parentClass %in% a3[n],]$parentClassLabel[1], ".", DatX[DatX$parentClass %in% a3[n],]$parentClass[1])), 
+         Brouse=TRUE, 
+         SaveHtmlFile=TRUE, 
+         ExcludeQID=TRUE,
+         FileName=paste0("agVisNetwork_upClass_", a3[n], ".html"), 
+         Output="./06_ChEBI_OCR_03_Out"))
+}
+
+##################################################################
+#Search for lower-level concepts: get everything from the top level
+##################################################################
+Dat <- searchSubordinate(a3=a3, ChEBIrelation=ChEBIrelation)
+head(Dat)
+dim(Dat)
+#saveRDS(Dat, "./06_ChEBI_OCR_01_Out/OCR_en_downClass.Rds")
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(agGraphSearch)
+library(magrittr)
+##################################################################
+Dat <- readRDS("../../06_ChEBI_OCR_01_Out/OCR_en_upClass.Rds")
+ChEBILabelR <- readRDS("../../06_ChEBI_OCR_00/ChEBILabelsR.Rds")
+LabList00 <- readRDS("../../06_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
+DatX <- MergeChEBIData(Data=Dat, Labels=ChEBILabelR)
+##################################################################
+try(agVisNetwork(Graph=DatX,
+                 Selected=NULL, 
+                 Browse=TRUE, 
+                 Output=FALSE,
+                 ColoredSeed=LabList00,
+                 ColoredTopClass="",
+                 Physics=T,
+                 Smooth=T,
+                 FilePath="upClass_v01.html"))
+```
+
+# Bind data
+
+```{r echo=TRUE, eval=FALSE}
+#rm(list=ls())
+ChEBILabelR <- readRDS("./06_ChEBI_OCR_00/ChEBILabelsR.Rds")
+upClass <- readRDS("./06_ChEBI_OCR_01_Out/OCR_en_upClass.Rds")
+downClass <- readRDS("./06_ChEBI_OCR_01_Out/OCR_en_downClass.Rds")
+#head(upClass); head(downClass)
+Dat <- rbind(upClass, downClass)
+
+#Add labels
+library(agGraphSearch)
+Dat00 <- MergeChEBIData(Data=Dat, Labels=ChEBILabelR)
+
+head(Dat00); dim(Dat00); table(Dat00$property)
+table(Dat00$property)
+table(is.na(Dat00))
+
+#saveRDS(Dat00, "./06_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
+#hist(table(nchar(Dat00$subjectLabel)))
+
+Dat02 <- readRDS("./06_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
+head(Dat02)
+
+#entity number
+length(unique(c(Dat02$subject, Dat02$parentClass)))
+#[1] 147421
+
+#triple number
+table(Dat02$property)
+#rdfs:subClassOf 
+#        216709
+
+#Label number
+length(unique(c(Dat02$subjectLabel, Dat02$parentClassLabel)))
+#[1] 147421
+```
+
+# Convert to RDF (N-triples)
+
+ChEBIから抽出した結果(ほぼ全て)を、RDF(N-triples)に変換する
+
+ラベル数が多くて、日本語変換はできない。
+
+```{r echo=TRUE, eval=FALSE}
+#rm(list=ls())
+Dat02 <- readRDS("./06_ChEBI_OCR_01_Out/OCR_Dat02.Rds")
+LabList00 <- readRDS("./06_ChEBI_OCR_01_Out/OCR_en_LabList00.Rds")
+table(Dat02$property)
+head(Dat02)
+
+source(system.file("inst/script/convRDF_ChEBI.R", package="agGraphSearch"))
+convRDF_ChEBI(Dat02=Dat02,
+              LabList00=LabList00,
+              FileName="./06_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt")
+
+#display
+readLines("./06_ChEBI_OCR_05_RDF/RDF_from_ChEBI_v01.nt", n = 10)
+```
+
+## Summary
+
+
