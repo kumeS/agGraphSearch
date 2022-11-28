@@ -36,7 +36,8 @@ Imports: RCurl,
   igraph,
   jsTree,
   WikidataQueryServiceR,
-  stringdist
+  stringdist,
+  SPARQL (== 1.16)
 Suggests: furrr,
   BiocManager,
   BiocStyle,
