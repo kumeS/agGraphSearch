@@ -34,296 +34,296 @@ if(!is.null(StringLength)){
 #Exclude number rules
 cc <- grepl("^[0-9][0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9][0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9].[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]..[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]...[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]....[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9].....[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]......[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9].......[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]........[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9].........[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]..........[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]...........[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]............[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9].............[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]..............[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]...............[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]................[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9].................[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]..................[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9][0-9][0-9][0-9]...................[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]年", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]年代", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]月", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]日", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]時間", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]年度", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]世紀", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]歳", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]円", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]万", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]つ", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]番", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]丁", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]の", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]度", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]形", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9]等", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("第[0-9]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9].$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9]..$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[0-9]...$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^.[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^..[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^...[0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 #Exclude symbols
 cc <- grepl("^[.]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[.]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[.]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[/][/]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[/][0-9]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[/][a-z]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[a-z][/]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[,]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[:]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[;]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[%]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[$]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[&]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[!]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[']$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("^[(]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[+]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[*]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[?]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[,][0-9]$", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[[]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[]]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("\"", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("\'", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[・][・]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 cc <- grepl("[0-9][・][0-9]", words02$Object)
 d <- rbind(d, words02[cc, ])
-words02　<- words02[!cc, ]
+words02 <- words02[!cc, ]
 
 #Results
 words03 <- words02[,-ncol(words02)]
