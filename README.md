@@ -17,16 +17,13 @@ See [the workflow submitted to IJCKG2021](https://kumes.github.io/agGraphSearch/
 2. Run the following commands in the R console.
 
 ```r
+#install SPARQL_1.16
+URL <- "https://cran.r-project.org/src/contrib/Archive/SPARQL/SPARQL_1.16.tar.gz"
+install.packages(URL, repos=NULL, type="source")
+
+#install agGraphSearch
 install.packages( "devtools" )
 devtools::install_github( "kumeS/agGraphSearch" )
-library( "agGraphSearch" )
-```
-
-An alternative way, type the code below in the R console window if you install Git command.
-
-```r
-system( "git clone https://github.com/kumeS/agGraphSearch.git" )
-system( "R CMD INSTALL agGraphSearch" )
 library( "agGraphSearch" )
 ```
 
@@ -136,3 +133,24 @@ library( "agGraphSearch" )
 
 [Artistic License 2.0](http://www.perlfoundation.org/artistic_license_2_0).
 
+## Citation
+
+```
+@inproceedings{10.1145/3502223.3502227,
+author = {Kume, Satoshi and Kozaki, Kouji},
+title = {Extracting Domain-Specific Concepts from Large-Scale Linked Open Data},
+year = {2022},
+isbn = {9781450395656},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3502223.3502227},
+doi = {10.1145/3502223.3502227},
+abstract = {We propose a methodology for extracting concepts for a target domain from large-scale linked open data (LOD) to support the construction of domain ontologies providing field-specific knowledge and definitions. The proposed method defines search entities by linking the LOD vocabulary with technical terms related to the target domain. The search entities are then used as a starting point for obtaining upper-level concepts in the LOD, and the occurrences of common upper-level entities and the chain-of-path relationships are examined to determine the range of conceptual connections in the target domain. A technical dictionary index and natural language processing are used to evaluate whether the extracted concepts cover the domain. As an example of extracting a class hierarchy from LOD, we used Wikidata to construct a domain ontology for polymer materials and physical properties. The proposed method can be applied to general datasets with class hierarchies, and it allows ontology developers to create an initial model of the domain ontology for their own purposes.},
+booktitle = {The 10th International Joint Conference on Knowledge Graphs},
+pages = {28–37},
+numpages = {10},
+keywords = {Linked open data, Ontology construction, Domain ontology, Wikidata, Graph analysis},
+location = {Virtual Event, Thailand},
+series = {IJCKG'21}
+}
+```

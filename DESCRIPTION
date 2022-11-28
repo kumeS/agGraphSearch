@@ -17,7 +17,7 @@ Description: In recent years, there has been an increase in RDF (Resource Descri
   This method allows us to obtain the class-related hierarchy of the target domain concept 
   by the occurrences of common upper entities and the chain of those path relationships
   using Wikidata and other RDF data.
-Depends: R (>= 4.0.0), SPARQL
+Depends: R (>= 4.0.0)
 Imports: RCurl,
   XML,
   franc,
