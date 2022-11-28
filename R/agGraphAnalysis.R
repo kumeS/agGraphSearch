@@ -1,6 +1,6 @@
 ##' @title Graph analysis function for the upper-level concepts.
 ##'
-##' @param graphList
+##' @param graphList a graph list
 ##' @param search_List a character vector of search entities.
 ##' @param CU_List a character vector of common upper-level entities
 ##' @param PlusLabel logical; add the labels or not when createing the network.
@@ -25,8 +25,6 @@
 ##' @importFrom magrittr %>%
 ##' @importFrom igraph decompose
 ##' @importFrom igraph graph_from_edgelist
-##' @importFrom grDevices quartz
-##' @importFrom grDevices quartz.save
 ##' @importFrom purrr map
 ##' @importFrom readr write_csv
 ##' @importFrom igraph as_ids
@@ -246,7 +244,7 @@ FONT <- "HiraKakuProN-W3"
 
 #visualization
 if(GraphView01){
-grDevices::quartz(width=WindowSize01, height=WindowSize01)
+if(as.vector(Sys.info()["sysname"] == "Darwin")){grDevices::quartz(width=WindowSize01, height=WindowSize01)}
 set.seed(123)
 igraph::plot.igraph(D.d1,
      #layout =layout_as_tree(D01, mode = "in"),
@@ -269,8 +267,9 @@ igraph::plot.igraph(D.d1,
 title(paste("Common: ", lab.c,
             "\nGraph Num.: ", length(A[c(A == TRUE)]), sep=""),
       cex.main=1, col.main="black")
+if(as.vector(Sys.info()["sysname"] == "Darwin")){
 grDevices::quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_", formatC(k, width = 3, flag = "0"), "_01.pdf", sep=""),
-            type = "pdf"); dev.off()
+            type = "pdf"); dev.off()}
 }
 }
 }else{
@@ -289,7 +288,7 @@ FONT <- "Times"
 
 #visualization
 if(GraphView01){
-grDevices::quartz(width=WindowSize01, height=WindowSize01)
+if(as.vector(Sys.info()["sysname"] == "Darwin")){grDevices::quartz(width=WindowSize01, height=WindowSize01)}
 set.seed(123)
 igraph::plot.igraph(D,
      #layout =layout_as_tree(D01, mode = "in"),
@@ -312,8 +311,9 @@ igraph::plot.igraph(D,
 title(paste("Common: ", lab.c,
             "\nGraph Num.: ", length(A[c(A == TRUE)]), sep=""),
       cex.main=1, col.main="black")
+if(as.vector(Sys.info()["sysname"] == "Darwin")){
 grDevices::quartz.save(file = paste("./", Folder, "/Graph_", "_", lab.c, "_01_", formatC(p, width = 4, flag = "0"), ".pdf", sep=""),
-            type = "pdf"); dev.off()
+            type = "pdf"); dev.off()}
 }
 }
 
@@ -528,7 +528,7 @@ FONT <- "Times"
 }
 
 if(GraphView02){
-grDevices::quartz(width=WindowSize02, height=WindowSize02)
+if(as.vector(Sys.info()["sysname"] == "Darwin")){grDevices::quartz(width=WindowSize02, height=WindowSize02)}
 set.seed(123)
 igraph::plot.igraph(G00,
      #layout =layout_as_tree(D01, mode = "in"),
@@ -551,8 +551,9 @@ igraph::plot.igraph(G00,
 #title(paste("Common: ", lab.c,
 #            "\nGraph Num.: ", length(A[c(A == TRUE)]), sep=""),
 #      cex.main=1, col.main="black")
+if(as.vector(Sys.info()["sysname"] == "Darwin")){
 grDevices::quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_02.pdf", sep=""),
-                       type = "pdf"); grDevices::dev.off()
+                       type = "pdf"); grDevices::dev.off()}
 }
 
 ##visualization(2)
@@ -610,7 +611,7 @@ FONT <- "Times"
 }
 
 if(GraphView03){
-grDevices::quartz(width=WindowSize03, height=WindowSize03)
+if(as.vector(Sys.info()["sysname"] == "Darwin")){grDevices::quartz(width=WindowSize03, height=WindowSize03)}
 set.seed(123)
 igraph::plot.igraph(G00_mod,
      #layout =layout_as_tree(G00, mode = "in"),
@@ -633,8 +634,9 @@ igraph::plot.igraph(G00_mod,
 #title(paste("Common: ", lab.c,
 #            "\nGraph Num.: ", length(A[c(A == TRUE)]), sep=""),
 #      cex.main=1, col.main="black")
+if(as.vector(Sys.info()["sysname"] == "Darwin")){
 grDevices::quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_03.pdf", sep=""),
-            type = "pdf"); grDevices::dev.off()
+            type = "pdf"); grDevices::dev.off()}
 }
 
 #個別グラフ
@@ -683,7 +685,7 @@ for(n in seq_len(length(bb))){
 Col00[Col00 == bb[[n]][1]] <- aa[n]
 }}
 
-grDevices::quartz(width=b, height=b)
+if(as.vector(Sys.info()["sysname"] == "Darwin")){grDevices::quartz(width=b, height=b)}
 set.seed(123)
 igraph::plot.igraph(G00_mod.dg00,
      #layout =layout_as_tree(G00, mode = "in"),
@@ -703,8 +705,9 @@ igraph::plot.igraph(G00_mod.dg00,
      edge.arrow.size = 0.1,
      edge.curved=0,
      edge.arrow.width = 1)
+if(as.vector(Sys.info()["sysname"] == "Darwin")){
 grDevices::quartz.save(file = paste("./", Folder, "/Graph_", formatC(p, width = 4, flag = "0"), "_", lab.c, "_04_", N, ".pdf", sep=""),
-            type = "pdf"); grDevices::dev.off()
+            type = "pdf"); grDevices::dev.off()}
 }
 }else{
 G00_mod.dg <- igraph::decompose(G00_mod, min.vertices = 2)

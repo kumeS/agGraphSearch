@@ -630,7 +630,7 @@ el_w_layout <- merge(el, d_layout, by.x = "x", by.y = "id", all.x = TRUE) %>%
         data.table::setnames( c("x_coord", "y_coord"), c("x2", "y2") )
 
 #head(d_layout)
-quartz(width=7.5, height=7.5)
+if(as.vector(Sys.info()["sysname"] == "Darwin")){quartz(width=7.5, height=7.5)}
 par(bg="white", cex.main=0.5, family="HiraKakuProN-W3", mgp=c(2.5, 1, 0), mai=c(0.5, 0.5, 0.5, 0.5))
 plot(d_layout[,1:2], axes = F, type = "n", xlab = NA, ylab = NA,
   xlim=c(c(range(d_layout$x_coord)) + c(-diff(range(d_layout$x_coord))*0.05, diff(range(d_layout$x_coord))*0.05)),
@@ -643,12 +643,12 @@ points(d_layout$x_coord, d_layout$y_coord, pch = 21, col="grey", lwd=0.2, cex = 
 if(len < 10000){
 text(d_layout$x_coord, d_layout$y_coord, labels=d_layout$id, cex=CEX)
 }
-
+if(as.vector(Sys.info()["sysname"] == "Darwin")){
 quartz.save(file = paste0("./04_Wiki_PolyInfo_05/",
             formatC(n, width = 4, flag = "0"),
             "_L", b1$Levels[n], "_",
             b1$CommonEntity[n], "_refine1.png"),
-            type = "png", dpi=300); dev.off()
+            type = "png", dpi=300); dev.off()}
 }
 
 ##plot 2
@@ -717,7 +717,7 @@ el_w_layout <- merge(el, d_layout, by.x = "x", by.y = "id", all.x = TRUE) %>%
         data.table::setnames( c("x_coord", "y_coord"), c("x2", "y2") )
 
 head(d_layout)
-quartz(width=7.5, height=7.5)
+if(as.vector(Sys.info()["sysname"] == "Darwin")){quartz(width=7.5, height=7.5)}
 par(bg="white", cex.main=0.5, family="HiraKakuProN-W3", mgp=c(2.5, 1, 0), mai=c(0.5, 0.5, 0.5, 0.5))
 plot(d_layout[,1:2], axes = F, type = "n", xlab = NA, ylab = NA,
   xlim=c(c(range(d_layout$x_coord)) + c(-diff(range(d_layout$x_coord))*0.05, diff(range(d_layout$x_coord))*0.05)),
@@ -730,11 +730,12 @@ points(d_layout$x_coord, d_layout$y_coord, pch = 21, col="grey", lwd=0.2, cex = 
 if(len < 10000){
 text(d_layout$x_coord, d_layout$y_coord, labels=d_layout$id, cex=CEX)
 }
+if(as.vector(Sys.info()["sysname"] == "Darwin")){
 quartz.save(file = paste0("./04_Wiki_PolyInfo_05/",
             formatC(n, width = 4, flag = "0"),
             "_L", b1$Levels[n], "_",
             b1$CommonEntity[n], "_refine2.png"),
-            type = "png", dpi=300); dev.off()
+            type = "png", dpi=300); dev.off()}
 }
 
 

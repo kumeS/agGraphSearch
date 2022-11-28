@@ -1,7 +1,7 @@
 ##' @title wikiCount_QID_Property_Object
 ##'
 ##' @param Entity_ID a character vector corresponing to the entity ID.
-##' @param Object
+##' @param Object  An object
 ##' @param Property a character vector
 ##' @param Count a character vector
 ##' @param lang a numeric; The value 1 is to use "ja, en". The value 2 is to use "ja". The value 3 is to use "en".

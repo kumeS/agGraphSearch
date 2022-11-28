@@ -23,6 +23,8 @@ agGraphAnalysis(
 )
 }
 \arguments{
+\item{graphList}{a graph list}
+
 \item{search_List}{a character vector of search entities.}
 
 \item{CU_List}{a character vector of common upper-level entities}

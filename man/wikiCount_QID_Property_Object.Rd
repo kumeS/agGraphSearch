@@ -16,6 +16,8 @@ wikiCount_QID_Property_Object(
 \arguments{
 \item{Entity_ID}{a character vector corresponing to the entity ID.}
 
+\item{Object}{An object}
+
 \item{Property}{a character vector}
 
 \item{Count}{a character vector}
