@@ -20,10 +20,11 @@ See [the workflow submitted to IJCKG2021](https://kumes.github.io/agGraphSearch/
 #install SPARQL_1.16
 URL <- "https://cran.r-project.org/src/contrib/Archive/SPARQL/SPARQL_1.16.tar.gz"
 install.packages(URL, repos=NULL, type="source")
+library(SPARQL)
 
 #install agGraphSearch
 install.packages( "devtools" )
-devtools::install_github( "kumeS/agGraphSearch" )
+devtools::install_github( "kumeS/agGraphSearch" , force = TRUE)
 library( "agGraphSearch" )
 ```
 
