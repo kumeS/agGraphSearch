@@ -135,7 +135,10 @@ library( "agGraphSearch" )
 
 ## Citation
 
-[Satoshi Kume, Kouji Kozaki: Extracting Domain-specific Concepts from Large-scale Linked Open Data](https://doi.org/10.1145/3502223.3502227) IJCKG'21: The 10th International Joint Conference on Knowledge GraphsDecember 2021 Pages 28–37
+- Satoshi Kume, Kouji Kozaki: Extracting Domain-specific Concepts from Large-scale Linked Open Data, [arXiv:2112.03102](https://arxiv.org/abs/2112.03102), Computer Science > Information Retrieval
+
+
+- [Satoshi Kume, Kouji Kozaki: Extracting Domain-specific Concepts from Large-scale Linked Open Data](https://doi.org/10.1145/3502223.3502227) IJCKG'21: The 10th International Joint Conference on Knowledge GraphsDecember 2021 Pages 28–37
 
 ```
 @inproceedings{10.1145/3502223.3502227,
