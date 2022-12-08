@@ -86,21 +86,21 @@ head(words)
 
 # Wikidata datasets (25th Sep 2021)
 
-## Download the Wikidata datasets from Google Drive.
+## Download the Wikidata datasets from Google Drive. (Updated on 08-DEC-2022)
 
 Download below files and save on the local environment.
 
 ```{r echo=TRUE, eval=FALSE}
 ## Download Class-related hierarchy dataset (Common to English and Japanese)
-browseURL("https://drive.google.com/file/d/1YcUVgCShQOOSY0ckv1h-B4eu-4mBHLVz/view?usp=sharing")
+browseURL("https://drive.google.com/file/d/14sBKcU0vDZG18krsgXw7sVMkEG10muPd/view?usp=share_link")
 # the modified version
-browseURL("https://drive.google.com/file/d/1ir4_W0k8hFt7VZF38oA9whXbcHcmE7ZD/view?usp=sharing")
+browseURL("https://drive.google.com/file/d/16Jh7YMnLWplyHMxdiA3e6t3cIIDy0kvz/view?usp=share_link")
 
 ## Download Japanese labels
-browseURL("https://drive.google.com/file/d/1NMJYwDjuAujxA6tdpqUwUBtxQxYzGZ8c/view?usp=sharing")
+browseURL("https://drive.google.com/file/d/116zAB0Ycggd6Fu45CSSSzM9kDDF5xwlB/view?usp=share_link")
 
 ## Download English labels
-#browseURL("https://drive.google.com/file/d/11G934BfEe_tkserJw8iKEFWfbgW22mwi/view?usp=sharing")
+browseURL("https://drive.google.com/file/d/1_BOq3jh3QNqHarlvCyFkp--0dUwGYCPR/view?usp=share_link")
 
 ```
 
@@ -116,6 +116,8 @@ source(fp)
 ```
 
 ## Import Wikidata datasets
+
+If you download files, you can skip this.
 
 ```{r echo=TRUE, eval=FALSE}
 #Multi-comment-out
